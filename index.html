@@ -1,0 +1,68 @@
+<html>
+	<head>
+		<title>Grafy COVID-19</title>
+		<link rel="stylesheet" type="text/css" href="styles.css">
+		<link href="https://fonts.googleapis.com/css2?family=PT+Mono&display=swap" rel="stylesheet">
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.1.0/papaparse.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js"></script>
+		<script type="text/javascript" src="index_script.js"></script>
+		<meta charset="utf8">
+		<style></style>
+	</head>
+	<body>
+        <div class="content">
+            <ul id="navBar">
+                <li class="navBarItem left" id="navBarLogo"><h1>koronagrafy</h1></li>
+                <li class="navBarItem left" id="navBarLogo">Pandemie COVID-19 v ČR</li>
+                <li class="navBarItem right" id="navBarGithubIcon"><a href="about.html">about</a></li>
+                <li class="navBarItem" id="navBarGithubIcon">
+                    <a href="https://github.com/kukosek/koronagrafy"><img width="20px" src="Octicons-mark-github.svg"></img></a>
+                </li>
+            </ul>
+            
+            <div class="wrapper">
+                <div class="box basicStats confirmedCasesLight" id="confirmedCases">
+                    <img class="oneColorIconLight" width="30px" src="sick.svg"></img>
+                    <div id="confirmedCasesText">
+                        <div class="statNumber">
+                            loading
+                        </div>
+                        <div class="statDate">
+                            ...
+                        </div>
+                    </div>
+                </div>
+                <div class="box basicStats curedLight" id="cured">
+                    <img class="oneColorIconLight" width="30px" src="plus.svg"></img>
+                    <div id="curedText">
+                        <div class ="statNumber">
+                            loading
+                        </div>
+                        <div class="statDate">
+                            ...
+                        </div>
+                    </div>
+                </div>
+                <div class="box basicStats deathsLight" id="deaths">
+                    <img class="oneColorIconLight" width="30px" src="funeral.svg"></img>
+                    <div id="deathsText">
+                        <div class ="statNumber">
+                            loading
+                        </div>
+                        <div class="statDate">
+                            ...
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div style="width:100%; ">
+                <canvas id="chart"></canvas>
+            </div>
+		</div>
+        <div class="footer">
+            Icons made by <a href="https://www.flaticon.com/authors/freepik" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" title="Flaticon"> www.flaticon.com</a>
+        </div>
+	</body>
+</html>

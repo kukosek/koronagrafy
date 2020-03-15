@@ -1,0 +1,96 @@
+.content {
+  margin: 10px;
+}
+.wrapper {
+    display: grid;
+    grid-gap: 10px;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr) );
+    background-color: #fff;
+    color: #444;
+}
+
+.box {
+    color: #fff;
+    border-radius: 5px;
+    padding: 20px;
+    font-size: 150%;
+
+}
+
+.basicStats {
+    font-family: 'PT Mono', monospace;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    text-align: right;
+}
+
+.statDate {
+    font-size: 5px;
+}
+
+.confirmedCasesLight {
+    background-image: linear-gradient(45deg, #ff844f 0%, #f74a4a 60%);
+}
+
+.curedLight {
+    background-image: linear-gradient(45deg, #8e52f7 0%, #1261ff 60%);
+}
+
+.deathsLight {
+    background-image: linear-gradient(45deg, #aaa5b8 0%, #6b7587 60%);
+}
+
+@navbarHeight: 60px;
+#navBar {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    display: flex;             /* establish flex container */
+    align-items: center;       /* center ul container vertically */ (optional) */
+    justify-content: space-between;
+}
+
+
+.navBarItem {
+    display: inline-block;
+    color: black;
+    
+    padding: 0px 5px;
+    text-decoration: none;
+}
+
+#navBarLogo {
+    @elementHeight: 20px;
+    padding: ((@navbarHeight - @elementHeight) / 2 - 2) 20px ((@navbarHeight - @elementHeight) / 2 + 2);
+    line-height: 1;
+}
+
+#navBarGithubIcon {
+    @elementHeight: 20px;
+    padding: ((@navbarHeight - @elementHeight) / 2 - 1) 10px ((@navbarHeight - @elementHeight) / 2 + 1);
+    line-height: 19px;
+}
+
+.oneColorIconLight {
+    -webkit-filter: invert(1); /* safari 6.0 - 9.0 */
+    filter: invert(1);
+}
+
+.right {
+    margin-left: auto;
+}
+
+.footer {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    background-image: linear-gradient(45deg, #ff844f 0%, #f74a4a 60%);
+    color: white;
+    text-align: left;
+    padding:0px 10px;
+}
+
