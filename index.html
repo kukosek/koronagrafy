@@ -21,7 +21,7 @@
                 </li>
             </ul>
             
-            <div class="wrapper">
+            <div class="wrapperBasicStats">
                 <div class="box basicStats confirmedCasesLight" id="confirmedCases">
                     <img class="oneColorIconLight" width="30px" src="sick.svg"></img>
                     <div id="confirmedCasesText">
@@ -57,8 +57,24 @@
                 </div>
             </div>
             
-            <div style="width:100%; ">
-                <canvas id="chart"></canvas>
+            <div class="wrapperCharts">
+                <div class="chartsBox">
+                    <h2>Data</h2>
+                    <canvas id="chart"></canvas>
+                </div>
+                <div class="chartsBox">
+                    <h2>
+                        Predikce
+                        <img onclick="predictionConfigSH()" width="15px" src="settings.svg"></img>
+                        <button onclick="getDataCalculatePredictionAndPlot()">Kalkulovat</button>
+                    </h2>
+                    <div id="predictionConfig">
+                        
+                    </div>
+                    <div id="predictionChartDiv">
+                        
+                    </div>
+                </div>
             </div>
 		</div>
         <div class="footer">
