@@ -1,6 +1,33 @@
 .content {
   margin: 10px;
 }
+
+.wrapperNavBar {
+    display:flex;
+    flex-wrap:wrap;
+    flex-direction:row;
+    align-items: center;
+    
+}
+/*on mobile*/
+#navBarLogoDiv {order:1; flex-basis:100%;}
+#navBarInfoDiv {order:2; flex-basis:100%;}
+/*on desktop*/
+@media screen and (min-width:600px) {
+   .wrapperNavBar {
+       flex-wrap:nowrap;
+   } 
+
+    #navBarLogoDiv {
+        flex-basis:200px;
+        order:1;
+    }
+    #navBarInfoDiv {
+        flex-basis:1;
+        order:2;
+    }
+}
+
 .wrapperBasicStats {
     display: grid;
     grid-gap: 10px;
@@ -43,10 +70,10 @@
 }
 
 .wrapperCharts {
-    margin: 20px;
     display: grid;
     grid-gap: 10px;
     grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+    margin: 10px 0px 0px 0px;
     color: #444;
     justify-content: space-between;
 }
