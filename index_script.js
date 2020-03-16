@@ -6,6 +6,8 @@ function calculateInfectionDefaultProbability(daysSinceOutbreakStart, currentCon
     return ((Math.pow(currentConfirmedCases, 1/daysSinceOutbreakStart)-1)*100)/meetPerDay;
 }
 
+var predictionConfigDefaults = {infectionPeriod: 21, averageMeetPerDay: 30, infectionProbability: 30, populationSize:10649800}
+
 function loadCurrentData(){
     var datasets = {confirmed:[]};
     /* Fetch current data from kukosek's github
@@ -33,11 +35,11 @@ function loadCurrentData(){
             
             //calculate config variable for prediction
             let latestRecordDate = new Date(data["confirmed"]["date"]);
-            let outbreakStartDate = new Date(2020, 03, 02);
+            let outbreakStartDate = new Date(2020, 02, 02);
             let timeSinceOutbreakSt = Math.abs(latestRecordDate-outbreakStartDate);
             let daysSinceOutbreakSt = Math.ceil(timeSinceOutbreakSt / (1000 * 60 * 60 * 24));
-            console.log(daysSinceOutbreakSt);
-            predictionConfigDefaults["infectionProbability"] = calculateInfectionDefaultProbability(daysSinceOutbreakSt, data["confirmed"]["number"], predictionConfigDefaults["meetPerDay"]);
+            
+            predictionConfigDefaults["infectionProbability"] = calculateInfectionDefaultProbability(daysSinceOutbreakSt, data["confirmed"]["number"], predictionConfigDefaults["averageMeetPerDay"]);
         } else { // show the result
             alert(`Error ${xhr.status}: ${xhr.statusText}`); // e.g. 404: Not Found
         }
@@ -128,25 +130,25 @@ function loadCurrentData(){
         alert("Request failed");
     };
 };
-var predictionConfigDefaults = {infectionPeriod: 21, averageMeetPerDay: 45, infectionProbability: 30, populationSize:10649800}
+
 
 var predictionConfig = predictionConfigDefaults;
 
 var predictionConfigHtml = "<form> \
     <label for=\"infectionPeriod\">Doba trvání infekce:</label><br> \
-    <input type=\"number\" id=\"infectionPeriod\" name=\"infectionPeriod\" min=\"0\">dní<br> \
+    <input type=\"number\" id=\"infectionPeriod\" name=\"infectionPeriod\" onfocus=\"this.select();\" min=\"0\">dní<br> \
     \
     <label for=\"averageMeetPerDay\">Počet lidí které člověk průměrně potká za den:</label><br> \
-    <input type=\"number\" id=\"averageMeetPerDay\" name=\"averageMeetPerDay\" min=\"0\">lidí<br> \
+    <input type=\"number\" id=\"averageMeetPerDay\" name=\"averageMeetPerDay\" onfocus=\"this.select();\" min=\"0\">lidí<br> \
     \
     <label for=\"infectionProbability\">Pravděpodobnost nákazy při setkání s nakaženým</label><br> \
-    <input type=\"number\" id=\"infectionProbability\" name=\"infectionProbability\" min=\"0\" max=\"100\" step=\"0.1\">%<br> \
+    <input type=\"number\" id=\"infectionProbability\" name=\"infectionProbability\" onfocus=\"this.select();\" min=\"0\" max=\"100\" step=\"any\">%<br> \
     \
     <label for=\"populationSize\">Velikost populace</label><br> \
-    <input type=\"number\" id=\"populationSize\" name=\"populationSize\" min=\"0\">lidí<br> \
+    <input type=\"number\" id=\"populationSize\" name=\"populationSize\" onfocus=\"this.select();\" min=\"0\">lidí<br> \
 </form> ";
 
-var predictionChartHtml = "<canvas height=\"350px\" id=\"predictionChart\"></canvas>";
+var predictionChartHtml = "<canvas class=\"chartjs\" id=\"predictionChart\"></canvas>";
 
 
 
@@ -155,15 +157,18 @@ var predictionConfigShowed=false;
 function predictionConfigSH(){
     if (predictionConfigShowed == false) {
         predictionConfigShowed = true;
-        
+        document.getElementById("predictionChartDiv").innerHTML = "";
         document.getElementById("predictionConfig").innerHTML = predictionConfigHtml;
         document.getElementById("infectionPeriod").value = predictionConfig["infectionPeriod"];
         document.getElementById("averageMeetPerDay").value = predictionConfig["averageMeetPerDay"];
         document.getElementById("infectionProbability").value = predictionConfig["infectionProbability"];
         document.getElementById("populationSize").value = predictionConfig["populationSize"];
+        document.getElementById("infectionPeriod").focus()
     }else{
         predictionConfigShowed = false;
+        document.getElementById("predictionChartDiv").innerHTML = predictionChartHtml;
         document.getElementById("predictionConfig").innerHTML = "";
+        getDataCalculatePredictionAndPlot();
     }
 }
 
@@ -191,40 +196,35 @@ function getDataCalculatePredictionAndPlot(){
         predictionConfigSH();
     }
     document.getElementById("predictionChartDiv").innerHTML = predictionChartHtml;
-    var ctx = document.getElementById("predictionChart");
-    var myChart = new Chart(ctx, {
+    var ctx2 = document.getElementById("predictionChart");
+    var predictionChart = new Chart(ctx2, {
         type: 'line',
         data: {
             labels: labels,
             datasets: [{ 
                 data: peopleInfected,
-                label: "Potvrzené případy",
-                borderColor: "#f84f4a",
+                label: "Počet lidí, kteří jsou nebo byli infikováni",
+                borderColor: "#c96526",
                 fill: false
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            /*scales: {
+            scales: {
                 xAxes: [{
-                    type: 'time',
-                    time: {
-                        tooltipFormat: 'D. M. HH:mm',
-                        unit: 'day',
-                        unitStepSize: 1,
-                        displayFormats: {
-                            'day': 'D. M.'
-                        }
+                    scaleLabel: {
+                        display: true,
+                        labelString: 'Den od vypuknutí'
                     }
                 }],
                 yAxes: [{
-                    ticks: {
-                        // forces step size to be 5 units
-                        stepSize: 50 // <----- This prop sets the stepSize
+                    scaleLabel: {
+                        display: false,
+                        labelString: 'Počet lidí'
                     }
                 }]
-            }*/
+            }
         }
     });
     
@@ -258,5 +258,13 @@ function calculatePredictions(infectionPeriod, averageMeetPerDay, infectionProba
     returnObject["pandemicPeriod"] = day;
     return returnObject;
 }
+
+window.addEventListener('load', (event) => {
+    document.addEventListener('keyup', (e) => {
+        if (e.code === "Enter"){
+            predictionConfigSH();
+        }
+    });
+});
 
 loadCurrentData();
