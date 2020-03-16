@@ -7,6 +7,7 @@
     flex-wrap:wrap;
     flex-direction:row;
     align-items: center;
+    margin: 0 0 15px 0;
     
 }
 /*on mobile*/
@@ -90,22 +91,65 @@
     
     padding: 20px 20px 75px 20px;
 }
+/*this is pretty shity solution to a creepy bug but i dont know how to solve it better*/
+@media screen and (max-width:440px){
+    .chartsBox {
+        width: 78vw;
+    }
+    #navBarLogo {
+        align-items: center;
+        justify-content: center;
+    }
+}
 #predictionChart {
     height: 345px;
 }
 
 
+.predictionChartControls{
+    display:flex;
+    flex-wrap:wrap;
+    flex-direction:column;
+    align-items: center;
+}
+
 
 @navbarHeight: 60px;
 #navBar {
     list-style-type: none;
-    margin: 0;
     padding: 0;
     overflow: hidden;
     display: flex;             /* establish flex container */
     align-items: center;       /* center ul container vertically */ (optional) */
     justify-content: space-between;
 }
+
+
+/*on mobile*/
+.predictionChartControls:nth-child(0) {order:0; flex-basis:100%;}
+.predictionChartControls:nth-child(1) {order:1; flex-basis:100%;}
+/*on desktop*/
+@media screen and (min-width:600px) {
+   .predictionChartControls {
+       flex-wrap:nowrap;
+       flex-direction:row;
+   } 
+
+    .predictionChartControls:nth-child(0) {
+        flex-basis:200px;
+        order:0;
+    }
+    .predictionChartControls:nth-child(1) {
+        flex-basis:200px;
+        order:1;
+    }
+    .wrapperNavBar {
+        margin: 0 0 10px 0;
+    }
+}
+
+
+
 
 
 .navBarItem {
@@ -120,7 +164,7 @@
 #navBarLogo {
     @elementHeight: 20px;
     padding: ((@navbarHeight - @elementHeight) / 2 - 2) 20px ((@navbarHeight - @elementHeight) / 2 + 2);
-    line-height: 1;
+    line-height: 0px;
     display: flex;             /* establish flex container */
     align-items: center;       /* center ul container vertically */ (optional) */
     justify-content: space-between;

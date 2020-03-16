@@ -69,14 +69,16 @@
             <div class="wrapperCharts">
                 <div class="chartsBox">
                     <h2>Data</h2>
-                    <canvas class="chartjs "id="chart"></canvas>
+                    <canvas class="chartjs" id="chart"></canvas>
                 </div>
                 <div class="chartsBox">
-                    <h2>
-                        Predikce
-                        <img onclick="predictionConfigSH()" width="15px" src="settings.svg"></img>
-                        <button tabindex="1" onclick="getDataCalculatePredictionAndPlot()">Kalkulovat</button>
-                    </h2>
+                    <div class="predictionChartControls">
+                        <div>
+                            <h2>Predikce <img onclick="predictionConfigSH()" width="15px" src="settings.svg"></img></h2>
+                        </div>
+                        <button style="height:40%; margin:0px 0px 0px 15px; width:50%;" tabindex="1" onclick="getDataCalculatePredictionAndPlot()">Kalkulovat</button>
+                        
+                    </div>
                     <div id="predictionConfig">
                         
                     </div>
