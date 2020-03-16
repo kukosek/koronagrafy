@@ -166,6 +166,12 @@ function predictionConfigSH(){
         document.getElementById("infectionPeriod").focus()
     }else{
         predictionConfigShowed = false;
+        
+        predictionConfig["infectionPeriod"] = document.getElementById("infectionPeriod").value;
+        predictionConfig["averageMeetPerDay"] = document.getElementById("averageMeetPerDay").value;
+        predictionConfig["infectionProbability"] = document.getElementById("infectionProbability").value;
+        predictionConfig["populationSize"] = document.getElementById("populationSize").value;
+        
         document.getElementById("predictionChartDiv").innerHTML = predictionChartHtml;
         document.getElementById("predictionConfig").innerHTML = "";
         getDataCalculatePredictionAndPlot();
@@ -173,11 +179,8 @@ function predictionConfigSH(){
 }
 
 function getDataCalculatePredictionAndPlot(){
-    if (document.getElementById("predictionConfig").innerHTML == predictionConfigHtml) {
-        predictionConfig["infectionPeriod"] = document.getElementById("infectionPeriod").value;
-        predictionConfig["averageMeetPerDay"] = document.getElementById("averageMeetPerDay").value;
-        predictionConfig["infectionProbability"] = document.getElementById("infectionProbability").value;
-        predictionConfig["populationSize"] = document.getElementById("populationSize").value;
+    if (predictionConfigShowed) {
+        predictionConfigSH();
     }
     result = calculatePredictions(predictionConfig["infectionPeriod"],
                                   predictionConfig["averageMeetPerDay"], predictionConfig["infectionProbability"],
@@ -192,9 +195,7 @@ function getDataCalculatePredictionAndPlot(){
         i++;
     });
     
-    if (predictionConfigShowed) {
-        predictionConfigSH();
-    }
+    
     document.getElementById("predictionChartDiv").innerHTML = predictionChartHtml;
     var ctx2 = document.getElementById("predictionChart");
     var predictionChart = new Chart(ctx2, {

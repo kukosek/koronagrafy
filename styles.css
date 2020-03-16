@@ -89,10 +89,20 @@
     text-decoration: none;
 }
 
+
 #navBarLogo {
     @elementHeight: 20px;
     padding: ((@navbarHeight - @elementHeight) / 2 - 2) 20px ((@navbarHeight - @elementHeight) / 2 + 2);
     line-height: 1;
+    display: flex;             /* establish flex container */
+    align-items: center;       /* center ul container vertically */ (optional) */
+    justify-content: space-between;
+}
+
+.navBarLogoPart {
+    font-family: 'PT Mono', monospace;
+    display: inline-block;
+    padding: 0px 0px 0px 5px;
 }
 
 #navBarGithubIcon {
