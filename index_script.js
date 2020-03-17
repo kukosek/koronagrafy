@@ -117,6 +117,9 @@ function loadCurrentData(){
                         return row[i];
                     });
                 });
+                datasets["confirmed"] = [];
+                datasets["confirmedMaxInDay"] = [];
+                
                 let firstDate = new Date(datasetsInRows[1][0]);
                 let i = 0;
                 var lastValueConfirmed = -1;
