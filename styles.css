@@ -155,7 +155,9 @@
 }
 
 
-
+#dataChart{
+    height: 100%;
+}
 
 
 .navBarItem {

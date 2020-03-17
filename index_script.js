@@ -7,9 +7,9 @@ function calculateInfectionDefaultProbability(daysSinceOutbreakStart, currentCon
 }
 
 var predictionConfigDefaults = {infectionPeriod: 21, averageMeetPerDay: 30, infectionProbability: 30, populationSize:10649800}
-
+var dataChartHtml = "<canvas class=\"chartjs\" id=\"dataChart\"></canvas>"
 var datasets = {confirmed:[], confirmedMaxInDay:[]};
-
+var dataChartFirstLoad = true;
 function loadDataChart(){
     let dataChartDataset;
     if(document.getElementById("dataChart_dailyData").checked){
@@ -17,6 +17,8 @@ function loadDataChart(){
     }else{
         dataChartDataset = datasets["confirmed"];
     }
+    document.getElementById("dataChartDiv").innerHTML = "";
+    document.getElementById("dataChartDiv").innerHTML = dataChartHtml;
     var ctx = document.getElementById("dataChart");
     var dataChart = new Chart(ctx, {
         type: 'line',
