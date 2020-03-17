@@ -2,8 +2,10 @@ function convertDate(dateString){
     return dateString;
 }
 
+var firstRecordConfirmedCases = 4;
+
 function calculateInfectionDefaultProbability(daysSinceOutbreakStart, currentConfirmedCases, meetPerDay) {
-    let howtonamethis = ((Math.pow(currentConfirmedCases, 1/daysSinceOutbreakStart)-1));
+    let howtonamethis = ((Math.pow(currentConfirmedCases/firstRecordConfirmedCases, 1/daysSinceOutbreakStart)-1));
     if (meetPerDay!=false){
         return howtonamethis*100/meetPerDay;
     }else{
@@ -306,7 +308,7 @@ function calculateSpreadGrowthFactor(dataset){
     if (growthFactorCalcConfig["perDay"]){
         if(days == "all"){
             for(i=1; i < dataset.length; i++) {
-                let result = calculateInfectionDefaultProbability(i, data["confirmed"]["number"], false);
+                let result = calculateInfectionDefaultProbability(i, dataset[i].y, false);
                 let date = new Date(dataset[i].x);
                 date.setHours(0,0,0,0);
                 datasets["spreadGrowthFactor"].push({x: date.toISOString(), y: result});
@@ -362,8 +364,10 @@ function calculateSpreadGrowthFactorAndPlot(height){
 function calculatePredictions(infectionPeriod, averageMeetPerDay, infectionProbability, populationSize){
     returnObject = {infectedPeopleInDay:[]}
     
-    var lastResult = 1;
+    var lastResult = firstRecordConfirmedCases;
     var day = 0;
+    returnObject["infectedPeopleInDay"].push(lastResult);
+    day++;
     infectionProbability = infectionProbability*0.01; //convert it to decimal from percentual
     
     var resultBeforeInfectionPeriod = 0;

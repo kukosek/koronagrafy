@@ -1,8 +1,34 @@
 <html>
-  <head>
-    <title></title>
-    <meta content="">
-    <style></style>
-  </head>
-  <body></body>
+    <head>
+        <title>Grafy COVID-19</title>
+		<link rel="stylesheet" type="text/css" href="styles.css">
+		<link href="https://fonts.googleapis.com/css2?family=PT+Mono&display=swap" rel="stylesheet">
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.1.0/papaparse.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js"></script>
+		<script type="text/javascript" src="index_script.js"></script>
+		<meta charset="utf8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+    </head>
+    <body style="margin: 20px;">
+        <div class="wrapperNavBar">
+            <a href="index.html">
+                <div id="navBarLogoDiv">
+                    <li class="navBarItem left" id="navBarLogo">
+                        <img class="navBarLogoPart" width="35px" src="virus.svg"></img>
+                        <h1 class="navBarLogoPart">koronagrafy</h1>
+                    </li>
+                </div>
+            </a>
+            <div id ="navBarInfoDiv">
+                <ul id="navBar">
+                    <li class="navBarItem left">Pandemie COVID-19 v ČR</li>
+                    <li class="navBarItem right" id="navBarGithubIcon">about</li>
+                    <li class="navBarItem" id="navBarGithubIcon">
+                        <a href="https://github.com/kukosek/koronagrafy"><img width="20px" src="Octicons-mark-github.svg"></img></a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </body>
 </html>
