@@ -289,6 +289,11 @@ function growthFactorConfigSH(){
     }else{
         document.getElementById("growthFactorChartConfig").style.display = "initial";
         document.getElementById("growthFactorChartInfo").style.display = "none";
+        if (growthFactorCalcConfig["days"]=="all"){
+            document.getElementById("dataChart_whole").checked = true;
+        }else{
+            document.getElementById("daysToCalculateGrowthFactorOver").value = growthFactorCalcConfig["days"];
+        }
         growthFactorConfigChange();
     }
     growthFactorConfigShowed = !growthFactorConfigShowed;
