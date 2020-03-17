@@ -8,8 +8,54 @@ function calculateInfectionDefaultProbability(daysSinceOutbreakStart, currentCon
 
 var predictionConfigDefaults = {infectionPeriod: 21, averageMeetPerDay: 30, infectionProbability: 30, populationSize:10649800}
 
+var datasets = {confirmed:[], confirmedMaxInDay:[]};
+
+function loadDataChart(){
+    let dataChartDataset;
+    if(document.getElementById("dataChart_dailyData").checked){
+        dataChartDataset = datasets["confirmedMaxInDay"];
+    }else{
+        dataChartDataset = datasets["confirmed"];
+    }
+    var ctx = document.getElementById("dataChart");
+    var dataChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            datasets: [{ 
+                data: dataChartDataset,
+                label: "Potvrzené případy",
+                borderColor: "#f84f4a",
+                fill: false
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                xAxes: [{
+                    type: 'time',
+                    time: {
+                        tooltipFormat: 'D. M. HH:mm',
+                        unit: 'day',
+                        unitStepSize: 1,
+                        displayFormats: {
+                            'day': 'D. M.'
+                        }
+                    }
+                }],
+                yAxes: [{
+                    ticks: {
+                        // forces step size to be 5 units
+                        stepSize: 50 // <----- This prop sets the stepSize
+                    }
+                }]
+            }
+        }
+    });
+}
+
+
 function loadCurrentData(){
-    var datasets = {confirmed:[]};
     /* Fetch current data from kukosek's github
      * 
      */
@@ -37,8 +83,7 @@ function loadCurrentData(){
             let latestRecordDate = new Date(data["confirmed"]["date"]);
             let outbreakStartDate = new Date(2020, 02, 02);
             let timeSinceOutbreakSt = Math.abs(latestRecordDate-outbreakStartDate);
-            let daysSinceOutbreakSt = Math.ceil(timeSinceOutbreakSt / (1000 * 60 * 60 * 24));
-            
+            let daysSinceOutbreakSt = Math.round(timeSinceOutbreakSt / (1000 * 60 * 60 * 24));
             predictionConfigDefaults["infectionProbability"] = calculateInfectionDefaultProbability(daysSinceOutbreakSt, data["confirmed"]["number"], predictionConfigDefaults["averageMeetPerDay"]);
         } else { // show the result
             alert(`Error ${xhr.status}: ${xhr.statusText}`); // e.g. 404: Not Found
@@ -60,7 +105,7 @@ function loadCurrentData(){
 
     // This will be called after the response is received
     xhrConfirmed.onload = function() {
-        if (xhrConfirmed.status == 200) { // analyze HTTP status of the response
+        if (xhrConfirmed.status == 200 || xhrConfirmed.status == 304) { // analyze HTTP status of the response
             var results = Papa.parse(xhrConfirmed.response);
             if (results["errors"].length == 0){
                 columnNames = results.data[0];
@@ -70,54 +115,29 @@ function loadCurrentData(){
                         return row[i];
                     });
                 });
-
-                var i = 0;
-                var lastValue = -1;
+                let firstDate = new Date(datasetsInRows[1][0]);
+                let i = 0;
+                var lastValueConfirmed = -1;
                 datasetsInRows[1].forEach(function(entry) {
-                    var currValue = datasetsInRows[2][i];
-                    if (currValue != lastValue){
-                        var dataObject = {x: entry, y: currValue};
+                    let currValueConfirmed = datasetsInRows[2][i];
+                    if (currValueConfirmed != lastValueConfirmed){
+                        var dataObject = {x: entry, y: currValueConfirmed};
                         datasets["confirmed"].push(dataObject);
                     }
+                    if (i+1<datasetsInRows[1].length){
+                        dateOfEntry = new Date(entry);
+                        let nextDate = new Date(datasetsInRows[1][i+1]);
+                        if (nextDate.getDate() != dateOfEntry.getDate()){
+                            datasets["confirmedMaxInDay"].push({x: entry, y: currValueConfirmed});
+                        }
+                    }else{
+                        //datasets["confirmedMaxInDay"].push({x: entry, y: currValueConfirmed});
+                    }
                     i++;
-                    lastValue = currValue;
+                    lastValueConfirmed = currValueConfirmed;
                 });
                 
-                var ctx = document.getElementById("chart");
-                var myChart = new Chart(ctx, {
-                    type: 'line',
-                    data: {
-                        datasets: [{ 
-                            data: datasets["confirmed"],
-                            label: "Potvrzené případy",
-                            borderColor: "#f84f4a",
-                            fill: false
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        scales: {
-                            xAxes: [{
-                                type: 'time',
-                                time: {
-                                    tooltipFormat: 'D. M. HH:mm',
-                                    unit: 'day',
-                                    unitStepSize: 1,
-                                    displayFormats: {
-                                        'day': 'D. M.'
-                                    }
-                                }
-                            }],
-                            yAxes: [{
-                                ticks: {
-                                    // forces step size to be 5 units
-                                    stepSize: 50 // <----- This prop sets the stepSize
-                                }
-                            }]
-                        }
-                    }
-                });
+                loadDataChart();
             }else{
                 alert("Error parsing chart dataset");
             }

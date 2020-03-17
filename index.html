@@ -68,11 +68,23 @@
             
             <div class="wrapperCharts">
                 <div class="chartsBox">
-                    <h2>Data</h2>
-                    <canvas class="chartjs" id="chart"></canvas>
+                    <div class="chartControls">
+                        <h2>Data</h2>
+                        <label class="radio-inline">
+                            <input id="dataChart_allData" onclick="loadDataChart()" type="radio" name="optradio" checked>Vše
+                        </label>
+                        <label class="radio-inline">
+                            <input id="dataChart_dailyData" onclick="loadDataChart()" type="radio" name="optradio">Denně
+                        </label>
+                    </div>
+                    <canvas class="chartjs" id="dataChart"></canvas>
                 </div>
                 <div class="chartsBox">
-                    <div class="predictionChartControls">
+                    <h2>Růstový faktor nakažlivosti</h2>
+                    <canvas class="chartjs" id="infectionGrowthFactorChart"></canvas>
+                </div>
+                <div class="chartsBox">
+                    <div class="chartControls">
                         <div>
                             <h2>Predikce <img onclick="predictionConfigSH()" width="15px" src="settings.svg"></img></h2>
                         </div>
