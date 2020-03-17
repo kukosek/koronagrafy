@@ -83,17 +83,34 @@
                 </div>
                 <div class="chartsBox">
                     <div class="chartControls">
-                        <h2>Růstový faktor šíření</h2>
+                        <h2>Růstový faktor šíření <img style="cursor: pointer;" onclick="growthFactorConfigSH()" width="15px" src="settings.svg"></img></h2>
                     </div>
-                    <canvas class="chartjs" id="infectionGrowthFactorChart"></canvas>
+                    <div id="growthFactorChartConfig">
+                        <form>
+                            <label class="radio-inline">
+                                <input id="chartConfig_between" onclick="growthFactorConfigChange()" type="radio" name="optradio">Mezi dny
+                            </label>
+                            <label class="radio-inline">
+                                <input id="dataChart_whole" onclick="growthFactorConfigChange()" type="radio" name="optradio">Z celků
+                            </label><br>
+                            <label id="label_daysToCalculateGrowthFactorOver" for="daysToCalculateGrowthFactorOver">Vzdálenost dnů mezi kterýma počítat:<br>
+                                <input type="number" id="daysToCalculateGrowthFactorOver" name="daysToCalculateGrowthFactorOver" onchange="growthFactorConfigChange()" onfocus="this.select();" min="1">dnů<br>
+                            </label>
+                        </form>
+                    </div>
+                    <div id="growthFactorChartDiv">
+                        
+                    </div>
+                    <div id="growthFactorChartInfo">
+                        Zde teoreticky můžeme pozorovat, zda vládní opatření zpomalují šíření koronaviru.
+                    </div>
                 </div>
                 <div class="chartsBox">
                     <div class="chartControls">
                         <div>
-                            <h2>Predikce <img onclick="predictionConfigSH()" width="15px" src="settings.svg"></img></h2>
+                            <h2>Predikce <img style="cursor: pointer;" onclick="predictionConfigSH()" width="15px" src="settings.svg"></img></h2>
                         </div>
                         <button style="height:40%; margin:0px 0px 0px 15px; width:50%;" tabindex="1" onclick="getDataCalculatePredictionAndPlot()">Kalkulovat</button>
-                        
                     </div>
                     <div id="predictionConfig">
                         

@@ -111,7 +111,6 @@
     flex-wrap:wrap;
     flex-direction:column;
     align-items: center;
-    line-height: 0;
 }
 
 
@@ -157,6 +156,20 @@
 
 #dataChart{
     height: 100%;
+}
+
+#growthFactorChartConfig {
+    display: none;
+}
+
+#daysToCalculateGrowthFactorOver{
+    width: 50px;
+}
+#infectionGrowthFactorChart{
+    height: 77%;
+}
+#growthFactorChartInfo{
+    font-size: 14px;
 }
 
 

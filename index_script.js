@@ -3,12 +3,22 @@ function convertDate(dateString){
 }
 
 function calculateInfectionDefaultProbability(daysSinceOutbreakStart, currentConfirmedCases, meetPerDay) {
-    return ((Math.pow(currentConfirmedCases, 1/daysSinceOutbreakStart)-1)*100)/meetPerDay;
+    let howtonamethis = ((Math.pow(currentConfirmedCases, 1/daysSinceOutbreakStart)-1));
+    if (meetPerDay!=false){
+        return howtonamethis*100/meetPerDay;
+    }else{
+        return howtonamethis;
+    }
 }
 
 var predictionConfigDefaults = {infectionPeriod: 21, averageMeetPerDay: 30, infectionProbability: 30, populationSize:10649800}
+var predictionConfig = predictionConfigDefaults;
+
+var growthFactorCalcConfigDefaults = {days: 1, perDay: true};
+var growthFactorCalcConfig = growthFactorCalcConfigDefaults;
+
 var dataChartHtml = "<canvas class=\"chartjs\" id=\"dataChart\"></canvas>"
-var datasets = {confirmed:[], confirmedMaxInDay:[]};
+var datasets = {confirmed:[], confirmedMaxInDay:[], spreadGrowthFactor:[]};
 var dataChartFirstLoad = true;
 function loadDataChart(){
     let dataChartDataset;
@@ -19,8 +29,8 @@ function loadDataChart(){
     }
     document.getElementById("dataChartDiv").innerHTML = "";
     document.getElementById("dataChartDiv").innerHTML = dataChartHtml;
-    var ctx = document.getElementById("dataChart");
-    var dataChart = new Chart(ctx, {
+    let ctx = document.getElementById("dataChart");
+    let dataChart = new Chart(ctx, {
         type: 'line',
         data: {
             datasets: [{ 
@@ -56,7 +66,7 @@ function loadDataChart(){
     });
 }
 
-
+var data;
 function loadCurrentData(){
     /* Fetch current data from kukosek's github
      * 
@@ -141,8 +151,10 @@ function loadCurrentData(){
                     i++;
                     lastValueConfirmed = currValueConfirmed;
                 });
-                
                 loadDataChart();
+                
+                //calculate spread growth factors from confirmed dataset
+                calculateSpreadGrowthFactorAndPlot("77%");
             }else{
                 alert("Error parsing chart dataset");
             }
@@ -157,7 +169,6 @@ function loadCurrentData(){
 };
 
 
-var predictionConfig = predictionConfigDefaults;
 
 var predictionConfigHtml = "<form> \
     <label for=\"infectionPeriod\">Doba trvání infekce:</label><br> \
@@ -256,6 +267,92 @@ function getDataCalculatePredictionAndPlot(){
     
 }
 
+function growthFactorConfigChange(){
+    if (document.getElementById("dataChart_whole").checked){
+        document.getElementById("label_daysToCalculateGrowthFactorOver").style.color = "grey";
+        document.getElementById("daysToCalculateGrowthFactorOver").disabled = true;
+        growthFactorCalcConfig["days"] = "all";
+    }else{
+        document.getElementById("label_daysToCalculateGrowthFactorOver").style.color = "#444";
+        document.getElementById("daysToCalculateGrowthFactorOver").disabled = false;
+        growthFactorCalcConfig["days"] = document.getElementById("daysToCalculateGrowthFactorOver").value;
+    }
+    calculateSpreadGrowthFactorAndPlot("50%");
+}
+
+var growthFactorConfigShowed = false;
+function growthFactorConfigSH(){
+    if(growthFactorConfigShowed){
+        calculateSpreadGrowthFactorAndPlot("77%");
+        document.getElementById("growthFactorChartConfig").style.display = "none";
+        document.getElementById("growthFactorChartInfo").style.display = "initial";
+    }else{
+        document.getElementById("growthFactorChartConfig").style.display = "initial";
+        document.getElementById("growthFactorChartInfo").style.display = "none";
+        growthFactorConfigChange();
+    }
+    growthFactorConfigShowed = !growthFactorConfigShowed;
+    
+}
+
+function calculateSpreadGrowthFactor(dataset){
+    datasets["spreadGrowthFactor"] = [];
+    days = growthFactorCalcConfig["days"];
+    if (growthFactorCalcConfig["perDay"]){
+        if(days == "all"){
+            for(i=1; i < dataset.length; i++) {
+                let result = calculateInfectionDefaultProbability(i, data["confirmed"]["number"], false);
+                let date = new Date(dataset[i].x);
+                date.setHours(0,0,0,0);
+                datasets["spreadGrowthFactor"].push({x: date.toISOString(), y: result});
+            }
+        }else{
+            for(i=days; i < dataset.length; i++) {
+                let result = Math.pow(dataset[i].y/dataset[i-days].y, 1/days)-1;
+                let date = new Date(dataset[i-days].x)
+                date.setHours(0,0,0,0);
+                datasets["spreadGrowthFactor"].push({x: date.toISOString(), y: result});
+            }
+        }
+    } //TODO if not perday
+}
+growthFactorChartHtml = "<canvas class=\"chartjs\" id=\"infectionGrowthFactorChart\"></canvas>";
+function calculateSpreadGrowthFactorAndPlot(height){
+    calculateSpreadGrowthFactor(datasets["confirmedMaxInDay"]);
+    
+    document.getElementById("growthFactorChartDiv").innerHTML = "";
+    document.getElementById("growthFactorChartDiv").innerHTML = growthFactorChartHtml;
+    document.getElementById("infectionGrowthFactorChart").style.height = height;
+    let ctx = document.getElementById("infectionGrowthFactorChart");
+    var infectionGrowthFactorChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            datasets: [{ 
+                data: datasets["spreadGrowthFactor"],
+                label: "Faktor šíření",
+                borderColor: "#5e00c9",
+                fill: false
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                xAxes: [{
+                    type: 'time',
+                    time: {
+                        tooltipFormat: 'D. M. HH:mm',
+                        unit: 'day',
+                        unitStepSize: 1,
+                        displayFormats: {
+                            'day': 'D. M.'
+                        }
+                    }
+                }]
+            }
+        }
+    });
+}
 
 function calculatePredictions(infectionPeriod, averageMeetPerDay, infectionProbability, populationSize){
     returnObject = {infectedPeopleInDay:[]}
