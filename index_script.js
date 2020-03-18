@@ -13,7 +13,17 @@ function calculateInfectionDefaultProbability(daysSinceOutbreakStart, currentCon
     }
 }
 
-var predictionConfigDefaults = {infectionPeriod: 21, averageMeetPerDay: 30, infectionProbability: 30, populationSize:10649800}
+var predictionConfigDefaults = {functionName: "henry1",
+                                startValue: 4,
+                                startDate: new Date(2020, 02, 02),
+                                infectionPeriod: 21,
+                                growthFactor: "fixedFromCurrentValue",
+                                averageMeetPerDay: 30,
+                                infectionProbability: 30,
+                                populationSize:10649800,
+                                plotPredictionToDataChart: false,
+                                plotPredictionToDataChartAddDays: 1
+}
 var predictionConfig = predictionConfigDefaults;
 
 var growthFactorCalcConfigDefaults = {days: 1, perDay: true};
@@ -22,12 +32,19 @@ var growthFactorCalcConfig = growthFactorCalcConfigDefaults;
 var dataChartHtml = "<canvas class=\"chartjs\" id=\"dataChart\"></canvas>"
 var datasets = {confirmed:[], confirmedMaxInDay:[], spreadGrowthFactor:[]};
 var dataChartFirstLoad = true;
-function loadDataChart(){
+function loadDataChart(optionalDataset){
     let dataChartDataset;
     if(document.getElementById("dataChart_dailyData").checked){
         dataChartDataset = datasets["confirmedMaxInDay"];
     }else{
         dataChartDataset = datasets["confirmed"];
+    }
+    if(optionalDataset != null){
+        for(var i=0; i<dataChartDataset.length; i++){
+            blablaDate = new Date(dataChartDataset[i].x);
+            blablaDate.setHours(0,0,0,0);
+            dataChartDataset[i].x = blablaDate.toISOString();
+        }
     }
     document.getElementById("dataChartDiv").innerHTML = "";
     document.getElementById("dataChartDiv").innerHTML = dataChartHtml;
@@ -40,7 +57,14 @@ function loadDataChart(){
                 label: "Potvrzené případy",
                 borderColor: "#f84f4a",
                 fill: false
-            }]
+            },{
+                data: optionalDataset,
+                label: "Predikce",
+                borderColor: "#c96526",
+                fill: false
+            }
+                
+            ]
         },
         options: {
             responsive: true,
@@ -67,7 +91,7 @@ function loadDataChart(){
         }
     });
 }
-
+var daysSinceOutbreakSt;
 var data;
 function loadCurrentData(){
     /* Fetch current data from kukosek's github
@@ -97,7 +121,7 @@ function loadCurrentData(){
             let latestRecordDate = new Date(data["confirmed"]["date"]);
             let outbreakStartDate = new Date(2020, 02, 02);
             let timeSinceOutbreakSt = Math.abs(latestRecordDate-outbreakStartDate);
-            let daysSinceOutbreakSt = Math.round(timeSinceOutbreakSt / (1000 * 60 * 60 * 24));
+            daysSinceOutbreakSt = Math.round(timeSinceOutbreakSt / (1000 * 60 * 60 * 24));
             predictionConfigDefaults["infectionProbability"] = calculateInfectionDefaultProbability(daysSinceOutbreakSt, data["confirmed"]["number"], predictionConfigDefaults["averageMeetPerDay"]);
         } else { // show the result
             alert(`Error ${xhr.status}: ${xhr.statusText}`); // e.g. 404: Not Found
@@ -153,7 +177,7 @@ function loadCurrentData(){
                     i++;
                     lastValueConfirmed = currValueConfirmed;
                 });
-                loadDataChart();
+                loadDataChart(null);
                 
                 //calculate spread growth factors from confirmed dataset
                 calculateSpreadGrowthFactorAndPlot("77%");
@@ -182,22 +206,56 @@ function predictionConfigSH(){
         predictionConfigShowed = true;
         document.getElementById("predictionChartDiv").innerHTML = "";
         document.getElementById("predictionConfig").style.display = "initial";
+        document.getElementById("predictionFunctionName").value = predictionConfig["functionName"];
+        document.getElementById("mTimesPway").value = predictionConfig["growthFactor"];
         document.getElementById("infectionPeriod").value = predictionConfig["infectionPeriod"];
         document.getElementById("averageMeetPerDay").value = predictionConfig["averageMeetPerDay"];
         document.getElementById("infectionProbability").value = predictionConfig["infectionProbability"];
         document.getElementById("populationSize").value = predictionConfig["populationSize"];
+        document.getElementById("plotPredictionToDataChart").checked = predictionConfig["plotPredictionToDataChart"];
+        document.getElementById("plotPredictionToDataChartAddDays").value = predictionConfig["plotPredictionToDataChartAddDays"];
+        dynamicInputAdjust();
+        predictionConfigMtimesPwayChange();
+        plotPredictionToDataChartCbChange();
         document.getElementById("infectionPeriod").focus()
     }else{
         predictionConfigShowed = false;
         
+        predictionConfig["functionName"] = document.getElementById("predictionFunctionName").value;
+        predictionConfig["growthFactor"] = document.getElementById("mTimesPway").value;
         predictionConfig["infectionPeriod"] = document.getElementById("infectionPeriod").value;
         predictionConfig["averageMeetPerDay"] = document.getElementById("averageMeetPerDay").value;
         predictionConfig["infectionProbability"] = document.getElementById("infectionProbability").value;
         predictionConfig["populationSize"] = document.getElementById("populationSize").value;
-        
+        predictionConfig["plotPredictionToDataChart"] = document.getElementById("plotPredictionToDataChart").checked;
+        predictionConfig["plotPredictionToDataChartAddDays"] = document.getElementById("plotPredictionToDataChartAddDays").value;
         document.getElementById("predictionChartDiv").innerHTML = predictionChartHtml;
         document.getElementById("predictionConfig").style.display = "none";
         getDataCalculatePredictionAndPlot();
+    }
+}
+
+function predictionConfigMtimesPwayChange(){
+    if (document.getElementById("mTimesPway").value == "customFixed") {
+        document.getElementById("customFixedValueConfig").style.display = "initial";
+    }else{
+        document.getElementById("customFixedValueConfig").style.display = "none";
+    }
+}
+function plotPredictionToDataChartCbChange(){
+    if(document.getElementById("plotPredictionToDataChart").checked){
+        document.getElementById("plotPredictionToDataChartAddDays").disabled = false;
+        document.getElementById("label_plotPredictionToDataChartAddDays").style.color = "#444";
+    }else{
+        document.getElementById("plotPredictionToDataChartAddDays").disabled = true;
+        document.getElementById("label_plotPredictionToDataChartAddDays").style.color = "grey";
+    }
+}
+
+function dynamicInputAdjust(){
+    let inputBoxes = document.getElementsByClassName("dynamicInput");
+    for(i = 0; i < inputBoxes.length; i++) {
+        inputBoxes[i].style.width = ((inputBoxes[i].value.length + 1) * 8)+36 + 'px';
     }
 }
 
@@ -205,17 +263,15 @@ function getDataCalculatePredictionAndPlot(){
     if (predictionConfigShowed) {
         predictionConfigSH();
     }
-    result = calculatePredictions(predictionConfig["infectionPeriod"],
-                                  predictionConfig["averageMeetPerDay"], predictionConfig["infectionProbability"],
-                                  predictionConfig["populationSize"]);
-    var predictionDataset = [];
+    result = calculatePredictions();
     labels = [];
-    var peopleInfected = []
-    var i = 0;
+    let predDataset = [];
+    //round the results
     result["infectedPeopleInDay"].forEach(function(entry) {
-        peopleInfected.push(Math.round(entry));
-        labels.push(i);
-        i++;
+        predDataset.push({
+            x: entry.x,
+            y: Math.round(entry.y)
+        });
     });
     
     
@@ -224,9 +280,8 @@ function getDataCalculatePredictionAndPlot(){
     var predictionChart = new Chart(ctx2, {
         type: 'line',
         data: {
-            labels: labels,
-            datasets: [{ 
-                data: peopleInfected,
+            datasets: [{
+                data: predDataset,
                 label: "Počet lidí, kteří jsou nebo byli infikováni",
                 borderColor: "#c96526",
                 fill: false
@@ -237,9 +292,13 @@ function getDataCalculatePredictionAndPlot(){
             maintainAspectRatio: false,
             scales: {
                 xAxes: [{
-                    scaleLabel: {
-                        display: true,
-                        labelString: 'Den od vypuknutí'
+                    type: 'time',
+                    time: {
+                        tooltipFormat: 'D. M.',
+                        unit: 'day',
+                        displayFormats: {
+                            'day': 'D. M.'
+                        }
                     }
                 }],
                 yAxes: [{
@@ -251,7 +310,11 @@ function getDataCalculatePredictionAndPlot(){
             }
         }
     });
-    
+    if(predictionConfig["plotPredictionToDataChart"]){
+        let endOf = parseInt(daysSinceOutbreakSt)+parseInt(predictionConfig["plotPredictionToDataChartAddDays"]);
+        console.log(endOf);
+        loadDataChart(predDataset.slice(0,endOf));
+    }
 }
 
 function growthFactorConfigChange(){
@@ -295,21 +358,21 @@ function calculateSpreadGrowthFactor(dataset){
             for(i=1; i < dataset.length; i++) {
                 let result = calculateInfectionDefaultProbability(i, dataset[i].y, false);
                 let date = new Date(dataset[i].x);
-                date.setHours(0,0,0,0);
+                date.setHours(12,0,0,0);
                 datasets["spreadGrowthFactor"].push({x: date.toISOString(), y: result});
             }
         }else{
             for(i=days; i < dataset.length; i++) {
                 let result = Math.pow(dataset[i].y/dataset[i-days].y, 1/days)-1;
                 let date = new Date(dataset[i-days].x)
-                date.setHours(0,0,0,0);
+                date.setHours(12,0,0,0);
                 datasets["spreadGrowthFactor"].push({x: date.toISOString(), y: result});
             }
         }
     } //TODO if not perday
 }
 growthFactorChartHtml = "<canvas class=\"chartjs\" id=\"infectionGrowthFactorChart\"></canvas>";
-function calculateSpreadGrowthFactorAndPlot(height){
+function calculateSpreadGrowthFactorAndPlot(height){//TODO dont call this twice like idiot
     calculateSpreadGrowthFactor(datasets["confirmedMaxInDay"]);
     
     document.getElementById("growthFactorChartDiv").innerHTML = "";
@@ -335,7 +398,6 @@ function calculateSpreadGrowthFactorAndPlot(height){
                     time: {
                         tooltipFormat: 'D. M. HH:mm',
                         unit: 'day',
-                        unitStepSize: 1,
                         displayFormats: {
                             'day': 'D. M.'
                         }
@@ -346,33 +408,65 @@ function calculateSpreadGrowthFactorAndPlot(height){
     });
 }
 
-function calculatePredictions(infectionPeriod, averageMeetPerDay, infectionProbability, populationSize){
+function calculatePredictions(){
     returnObject = {infectedPeopleInDay:[]}
     
-    var lastResult = firstRecordConfirmedCases;
-    var day = 0;
-    returnObject["infectedPeopleInDay"].push(lastResult);
-    day++;
-    infectionProbability = infectionProbability*0.01; //convert it to decimal from percentual
-    
-    var resultBeforeInfectionPeriod = 0;
-    while(lastResult <= populationSize && Math.round(lastResult) != Math.round(resultBeforeInfectionPeriod) ){
-        if (day-infectionPeriod >= 0){
-            resultBeforeInfectionPeriod = returnObject["infectedPeopleInDay"][day-infectionPeriod];
-        }else{
-            resultBeforeInfectionPeriod = 0;
+    let lastResult = predictionConfig["startValue"];
+    let date = new Date(predictionConfig["startDate"].getTime());
+    let day = 0;
+    returnObject["infectedPeopleInDay"].push({x: date.toISOString(), y: lastResult});
+    let indexOfStartSpreadGrowthFactor = -1;
+    if(predictionConfig["growthFactor"] == "continuousFromExistingData") {
+        for(var i=0; i<datasets["spreadGrowthFactor"].length; i++){
+            anotherDate = new Date(datasets["spreadGrowthFactor"][i].x);
+            if(anotherDate.getDate() == date.getDate()){
+                indexOfStartSpreadGrowthFactor = i;
+            }
         }
-        var result = lastResult + averageMeetPerDay*infectionProbability*(1-(lastResult/populationSize))*(lastResult-resultBeforeInfectionPeriod);
-        
-        if (result <= populationSize){
-            returnObject["infectedPeopleInDay"].push(result);
-        }else{
-            returnObject["infectedPeopleInDay"].push(populationSize);
+        if(indexOfStartSpreadGrowthFactor == -1){
+            alert("Error: not a value in growthFactors for startdate");
         }
-        day++;
-        lastResult = result;
     }
-    returnObject["pandemicPeriod"] = day;
+    day++;
+    date.setDate(date.getDate() + 1);
+    let lastMTimesP = 0;
+    let resultBeforeInfectionPeriod = 0;
+    if(predictionConfig["functionName"] == "henry1"){
+        while(lastResult <= predictionConfig["populationSize"] && Math.round(lastResult) != Math.round(resultBeforeInfectionPeriod) ){
+            if (day-predictionConfig["infectionPeriod"] >= 0){
+                resultBeforeInfectionPeriod = returnObject["infectedPeopleInDay"][day-predictionConfig["infectionPeriod"]].y;
+            }else{
+                resultBeforeInfectionPeriod = 0;
+            }
+            
+            let MtimesP;
+            if(predictionConfig["growthFactor"] == "continuousFromExistingData"){
+                let indexOfSGF = indexOfStartSpreadGrowthFactor+day-1;
+                if (indexOfSGF<datasets["spreadGrowthFactor"].length){
+                    MtimesP = datasets["spreadGrowthFactor"][indexOfSGF].y;
+                    lastMTimesP = MtimesP;
+                }else{
+                    MtimesP = lastMTimesP;
+                }
+            }else if(predictionConfig["growthFactor"] == "customFixed"){
+                MtimesP = predictionConfig["averageMeetPerDay"]*predictionConfig["infectionProbability"]*0.01;
+            }else if(predictionConfig["growthFactor"] == "fixedFromCurrentValue"){
+                MtimesP = predictionConfigDefaults["averageMeetPerDay"]*predictionConfigDefaults["infectionProbability"]*0.01;
+            }
+            var result = lastResult + MtimesP*(1-(lastResult/predictionConfig["populationSize"]))*(lastResult-resultBeforeInfectionPeriod);
+            
+            if (result <= predictionConfig["populationSize"]){
+                returnObject["infectedPeopleInDay"].push({x: date.toISOString(), y: result});
+            }else{
+                returnObject["infectedPeopleInDay"].push({x: date.toISOString(), y: predictionConfig["populationSize"]});
+            }
+            day++;
+            date.setDate(date.getDate() + 1);
+            lastResult = result;
+        }
+        returnObject["pandemicPeriod"] = day;
+        returnObject["pandemicEndDate"] = date;
+    }
     return returnObject;
 }
 

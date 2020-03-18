@@ -91,6 +91,13 @@
     
     padding: 20px 20px 75px 20px;
 }
+#dataChart{
+    height: 100%;
+}
+#predictionChart {
+    height: 345px;
+}
+
 /*this is pretty shity solution to a creepy bug but i dont know how to solve it better*/
 @media screen and (max-width:440px){
     .chartsBox {
@@ -100,9 +107,15 @@
         align-items: center;
         justify-content: center;
     }
+    
 }
-#predictionChart {
-    height: 345px;
+@media screen and (max-width:600px){
+    #predictionChart {
+        height: 320px;
+    }
+    #dataChartDiv {
+        height: 300px;
+    }
 }
 
 #predictionConfig {
@@ -161,9 +174,7 @@
 }
 
 
-#dataChart{
-    height: 100%;
-}
+
 
 #growthFactorChartConfig {
     display: none;
@@ -237,11 +248,6 @@
     max-width: 420px;
 }
 
-@media screen and (min-width:700px) {
-    .mathExpressionImg {
-        align-self: center;
-    }
-}
 .functionDescription {
     margin: 0 0 0 25px;
 }
