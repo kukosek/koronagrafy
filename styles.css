@@ -105,6 +105,10 @@
     height: 345px;
 }
 
+#predictionConfig {
+    display: none;
+}
+
 
 .chartControls{
     display:flex;

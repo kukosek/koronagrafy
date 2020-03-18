@@ -171,21 +171,6 @@ function loadCurrentData(){
 };
 
 
-
-var predictionConfigHtml = "<form> \
-    <label for=\"infectionPeriod\">Doba trvání infekce:</label><br> \
-    <input type=\"number\" id=\"infectionPeriod\" name=\"infectionPeriod\" onfocus=\"this.select();\" min=\"0\">dní<br> \
-    \
-    <label for=\"averageMeetPerDay\">Počet lidí které člověk průměrně potká za den:</label><br> \
-    <input type=\"number\" id=\"averageMeetPerDay\" name=\"averageMeetPerDay\" onfocus=\"this.select();\" min=\"0\">lidí<br> \
-    \
-    <label for=\"infectionProbability\">Pravděpodobnost nákazy při setkání s nakaženým</label><br> \
-    <input type=\"number\" id=\"infectionProbability\" name=\"infectionProbability\" onfocus=\"this.select();\" min=\"0\" max=\"100\" step=\"any\">%<br> \
-    \
-    <label for=\"populationSize\">Velikost populace</label><br> \
-    <input type=\"number\" id=\"populationSize\" name=\"populationSize\" onfocus=\"this.select();\" min=\"0\">lidí<br> \
-</form> ";
-
 var predictionChartHtml = "<canvas class=\"chartjs\" id=\"predictionChart\"></canvas>";
 
 
@@ -196,7 +181,7 @@ function predictionConfigSH(){
     if (predictionConfigShowed == false) {
         predictionConfigShowed = true;
         document.getElementById("predictionChartDiv").innerHTML = "";
-        document.getElementById("predictionConfig").innerHTML = predictionConfigHtml;
+        document.getElementById("predictionConfig").style.display = "initial";
         document.getElementById("infectionPeriod").value = predictionConfig["infectionPeriod"];
         document.getElementById("averageMeetPerDay").value = predictionConfig["averageMeetPerDay"];
         document.getElementById("infectionProbability").value = predictionConfig["infectionProbability"];
@@ -211,7 +196,7 @@ function predictionConfigSH(){
         predictionConfig["populationSize"] = document.getElementById("populationSize").value;
         
         document.getElementById("predictionChartDiv").innerHTML = predictionChartHtml;
-        document.getElementById("predictionConfig").innerHTML = "";
+        document.getElementById("predictionConfig").style.display = "none";
         getDataCalculatePredictionAndPlot();
     }
 }

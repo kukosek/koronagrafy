@@ -113,7 +113,19 @@
                         <button style="height:40%; margin:0px 0px 0px 15px; width:50%;" tabindex="1" onclick="getDataCalculatePredictionAndPlot()">Kalkulovat</button>
                     </div>
                     <div id="predictionConfig">
-                        
+                        <form> 
+                            <label for="infectionPeriod">Doba trvání infekce:</label><br> 
+                            <input type="number" id="infectionPeriod" name="infectionPeriod" onfocus="this.select();" min="0">dní<br> 
+                            
+                            <label for="averageMeetPerDay">Počet lidí které člověk průměrně potká za den:</label><br> 
+                            <input type="number" id="averageMeetPerDay" name="averageMeetPerDay" onfocus="this.select();" min="0">lidí<br> 
+                            
+                            <label for="infectionProbability">Pravděpodobnost nákazy při setkání s nakaženým</label><br> 
+                            <input type="number" id="infectionProbability" name="infectionProbability" onfocus="this.select();" min="0" max="100" step="any">%<br> 
+                            
+                            <label for="populationSize">Velikost populace</label><br> 
+                            <input type="number" id="populationSize" name="populationSize" onfocus="this.select();" min="0">lidí<br> 
+                        </form>
                     </div>
                     <div id="predictionChartDiv">
                         
