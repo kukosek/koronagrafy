@@ -3,9 +3,6 @@
         <title>Grafy COVID-19</title>
 		<link rel="stylesheet" type="text/css" href="styles.css">
 		<link href="https://fonts.googleapis.com/css2?family=PT+Mono&display=swap" rel="stylesheet">
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.1.0/papaparse.min.js"></script>
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js"></script>
 		<script type="text/javascript" src="index_script.js"></script>
 		<meta charset="utf8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
@@ -31,6 +28,36 @@
             </div>
         </div>
         
-        Tady bude jak to funguje atd
+        <h1>Jak to funguje</h1>
+            <h2>Predikce</h2>
+                <h4 style="line-height: 0;">Parametry funkcí</h4>
+                <div style="margin: 0 0 0 25px;">
+                    <i>
+                    <br>
+                    M<sub>r</sub> = Počet lidí, které člověk průměrně potká za den<br>
+                    M<sub>g</sub> = Velikost populace<br>
+                    p<sub>i</sub> = Pravděpodobnost nákazy při setkání s nakaženým<br>
+                    f(x) = Počet potvrzených případů nákazy v den "x"<br>
+                    T = Infekční doba<br>
+                    </i>
+                </div>
+                <h4>Henryova první epidemická funkce (Logistická)</h4>
+                <div style="margin: 0 0 0 25px;">
+                    <center><img src="predpis_Henryova-prvni.png"></img><br></center>
+                    Jedná se v podstatě o rekurzivní předpis exponenciální posloupnosti, která neroste do nekonečna, ale pouze do určitého maxima, čímž se její růst ke konci opět zpomaluje díky tomu, že vylučuje možnost
+                    nakažení lidí, kteří už jsou nebo byli dříve nakaženi. Zároveň počítá s tím, že nakažení jsou nakažlivý
+                    pouze po určitou dobu. Nezapočítává úmrtnost, možnost opětovného nakažení po vyléčení a jejím
+                    největším problémem je, že nevylučuje možnost několikanásobného nakažení stejné osoby v jeden
+                    den.
+                </div>
+                <h4>coming soon: Henryova druhá epidemická funkce (Pravděpodobnostní)</h4>
+                <div style="margin: 0 0 0 25px;">
+                    <center><img src="predpis_Henryova-druha.png"></img><br></center>
+                    Z důvodu spousty problémů první funkce, které jsou náročné na vylazení je v tomto případě zvolen trochu jiný přístup. Funkce vypočítává pravděpodobnost, že se člověk daný den nakazí, která se poté zvyšuje s průměrným množstvím lidí, které za den potká. Tato pravděpodobnost je následně vynásobená množstvím zdravých lidí a výsledkem je, kolik lidí se ten den nakazilo.
+                    <br><b>Pravděpodobnost nákazy</b><br>
+                    <center><img src="pravdepodobnost_Henryova-druha.png"></img><br></center>
+                </div>
+                
+                    
     </body>
 </html>
