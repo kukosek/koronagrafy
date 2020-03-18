@@ -34,7 +34,8 @@ var datasets = {confirmed:[], confirmedMaxInDay:[], spreadGrowthFactor:[]};
 var dataChartFirstLoad = true;
 function loadDataChart(optionalDataset){
     let dataChartDataset;
-    if(document.getElementById("dataChart_dailyData").checked){
+    if(document.getElementById("dataChart_dailyData").checked || optionalDataset != null){
+        document.getElementById("dataChart_dailyData").checked = true;
         dataChartDataset = datasets["confirmedMaxInDay"];
     }else{
         dataChartDataset = datasets["confirmed"];
