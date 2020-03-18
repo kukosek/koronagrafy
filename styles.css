@@ -108,6 +108,9 @@
 #predictionConfig {
     display: none;
 }
+#customFixedValueConfig {
+    display: none;
+}
 
 
 .chartControls{
@@ -227,3 +230,18 @@
     padding:0px 10px;
 }
 
+
+/* ABOUT.HTML */
+.mathExpressionImg {
+    width: 100%;
+    max-width: 420px;
+}
+
+@media screen and (min-width:700px) {
+    .mathExpressionImg {
+        align-self: center;
+    }
+}
+.functionDescription {
+    margin: 0 0 0 25px;
+}
