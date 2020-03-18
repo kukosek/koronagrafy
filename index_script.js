@@ -312,7 +312,6 @@ function getDataCalculatePredictionAndPlot(){
     });
     if(predictionConfig["plotPredictionToDataChart"]){
         let endOf = parseInt(daysSinceOutbreakSt)+parseInt(predictionConfig["plotPredictionToDataChartAddDays"]);
-        console.log(endOf);
         loadDataChart(predDataset.slice(0,endOf));
     }
 }
