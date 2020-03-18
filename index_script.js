@@ -39,20 +39,14 @@ function loadDataChart(optionalDataset){
     }else{
         dataChartDataset = datasets["confirmed"];
     }
+    let feeddatasets;
     if(optionalDataset != null){
         for(var i=0; i<dataChartDataset.length; i++){
             blablaDate = new Date(dataChartDataset[i].x);
             blablaDate.setHours(0,0,0,0);
             dataChartDataset[i].x = blablaDate.toISOString();
         }
-    }
-    document.getElementById("dataChartDiv").innerHTML = "";
-    document.getElementById("dataChartDiv").innerHTML = dataChartHtml;
-    let ctx = document.getElementById("dataChart");
-    let dataChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-            datasets: [{ 
+        feeddatasets = [{ 
                 data: dataChartDataset,
                 label: "Potvrzené případy",
                 borderColor: "#f84f4a",
@@ -64,7 +58,23 @@ function loadDataChart(optionalDataset){
                 fill: false
             }
                 
-            ]
+        ];
+    }else{
+        feeddatasets = [{ 
+                data: dataChartDataset,
+                label: "Potvrzené případy",
+                borderColor: "#f84f4a",
+                fill: false
+            }
+        ];
+    }
+    document.getElementById("dataChartDiv").innerHTML = "";
+    document.getElementById("dataChartDiv").innerHTML = dataChartHtml;
+    let ctx = document.getElementById("dataChart");
+    let dataChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            datasets: feeddatasets
         },
         options: {
             responsive: true,
