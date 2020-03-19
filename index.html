@@ -115,7 +115,7 @@
                     <div id="predictionConfig">
                         <form> 
                             <label for="predictionFunctionName">Funkce
-                                <select id="predictionFunctionName">
+                                <select onchange="predictionCongigFunctionNameChange()" id="predictionFunctionName">
                                     <option value="henry1">Henryova 1.</option>
                                     <option value="henryProbabilistic">Henryova pravděpodobnostní</option>
                                 </select>
@@ -141,11 +141,12 @@
                                 </label>
                             </div>
                             <div id="customFixedValueConfig">
-                                <label for="averageMeetPerDay">Člověk průměrně potká za den</label>
-                                <input type="number" class="dynamicInput" onInput="dynamicInputAdjust()" id="averageMeetPerDay" name="averageMeetPerDay" onfocus="this.select();" min="0">&nbsplidí,
-                                
-                                <label for="infectionProbability">pravděpodobnost nákazy při setkání je</label> 
-                                <input class="dynamicInput" onInput="dynamicInputAdjust()" type="number" id="infectionProbability" name="infectionProbability" onfocus="this.select();" min="0" max="100" step="any">&nbsp%<br> 
+                                <label id="label_averageMeetPerDay" for="averageMeetPerDay">Člověk průměrně potká za den
+                                    <input type="number" class="dynamicInput" onInput="dynamicInputAdjust()" id="averageMeetPerDay" name="averageMeetPerDay" onfocus="this.select();" min="0">&nbsplidí,
+                                </label>
+                                <label id="label_infectionProbability" for="infectionProbability">pravděpodobnost nákazy při setkání je
+                                    <input class="dynamicInput" onInput="dynamicInputAdjust()" type="number" id="infectionProbability" name="infectionProbability" onfocus="this.select();" min="0" max="100" step="any">&nbsp%<br> 
+                                </label> 
                             </div>
                             <label for="populationSize"><br><b>Velikost populace:</b></label><br> 
                             <input class="dynamicInput" onInput="dynamicInputAdjust()" type="number" id="populationSize" name="populationSize" onfocus="this.select();" min="0">lidí<br> 

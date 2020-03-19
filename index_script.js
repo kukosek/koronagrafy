@@ -257,15 +257,49 @@ function predictionConfigSH(){
 function predictionConfigMtimesPwayChange(){
     if (document.getElementById("mTimesPway").value == "customFixed") {
         document.getElementById("customFixedValueConfig").style.display = "initial";
+        document.getElementById("label_averageMeetPerDay").style.display = "initial";
+        document.getElementById("label_infectionProbability").style.display = "initial";
         document.getElementById("continuousFromExistingDataConfig").style.display = "none";
-    }else if(document.getElementById("mTimesPway").value == "continuousFromExistingData") {
-        document.getElementById("customFixedValueConfig").style.display = "none";
+        
+    }else if (document.getElementById("predictionFunctionName").value == "henryProbabilistic" &&  document.getElementById("mTimesPway").value == "continuousFromExistingData") {
         document.getElementById("continuousFromExistingDataConfig").style.display = "initial";
+        document.getElementById("customFixedValueConfig").style.display = "initial";
+        document.getElementById("label_averageMeetPerDay").style.display = "none";
+        document.getElementById("label_infectionProbability").style.display = "initial";
+    }else if (document.getElementById("predictionFunctionName").value == "henryProbabilistic" && document.getElementById("mTimesPway").value == "fixedFromCurrentValue"){
+        document.getElementById("continuousFromExistingDataConfig").style.display = "none";
+        document.getElementById("customFixedValueConfig").style.display = "initial";
+        document.getElementById("label_averageMeetPerDay").style.display = "none";
+        document.getElementById("label_infectionProbability").style.display = "initial";
+    }else if(document.getElementById("mTimesPway").value == "continuousFromExistingData") {
+        document.getElementById("continuousFromExistingDataConfig").style.display = "initial";
+        document.getElementById("customFixedValueConfig").style.display = "none";
+        document.getElementById("label_averageMeetPerDay").style.display = "none";
+        document.getElementById("label_infectionProbability").style.display = "none";
     }else{
         document.getElementById("customFixedValueConfig").style.display = "none";
         document.getElementById("continuousFromExistingDataConfig").style.display = "none";
     }
 }
+
+function predictionCongigFunctionNameChange(){
+    console.log(1);
+    if (document.getElementById("predictionFunctionName").value == "henryProbabilistic" &&  document.getElementById("mTimesPway").value == "continuousFromExistingData") {
+        console.log(2);
+        document.getElementById("customFixedValueConfig").style.display = "initial";
+        document.getElementById("label_averageMeetPerDay").style.display = "none";
+        document.getElementById("label_infectionProbability").style.display = "initial";
+    }else if(document.getElementById("predictionFunctionName").value == "henryProbabilistic" && document.getElementById("mTimesPway").value == "fixedFromCurrentValue"){
+        document.getElementById("continuousFromExistingDataConfig").style.display = "none";
+        document.getElementById("customFixedValueConfig").style.display = "initial";
+        document.getElementById("label_averageMeetPerDay").style.display = "none";
+        document.getElementById("label_infectionProbability").style.display = "initial";
+    }else{
+        document.getElementById("label_averageMeetPerDay").style.display = "none";
+        document.getElementById("label_infectionProbability").style.display = "none";
+    }
+}
+
 function plotPredictionToDataChartCbChange(){
     if(document.getElementById("plotPredictionToDataChart").checked){
         document.getElementById("plotPredictionToDataChartAddDays").disabled = false;
