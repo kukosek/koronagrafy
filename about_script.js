@@ -1,6 +1,6 @@
 var licenseReq = new XMLHttpRequest();
 licenseReq.onload = function(e) {
-    document.getElementById("licenseArea").innerHTML = licenseReq.responseText.replace("\n", "<br>\n"); // not responseText
+    document.getElementById("licenseArea").innerHTML = licenseReq.responseText.replace(/\n/g, "<br>\n"); // not responseText
     /* ... */
 }
 licenseReq.onerror = function(e) {
