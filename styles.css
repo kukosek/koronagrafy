@@ -255,7 +255,8 @@
         /* Below are styles for the codebox (not the code itself) */
         border:1px solid black;
         background-color:#EEEEFF;
-        width:300px;
+        max-width:666px;
         overflow:auto;    
         padding:10px;
+        margin: 15px;
 }
