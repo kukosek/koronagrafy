@@ -32,6 +32,8 @@ var predictionConfig = predictionConfigDefaults;
 var growthFactorCalcConfigDefaults = {days: 1, perDay: true};
 var growthFactorCalcConfig = growthFactorCalcConfigDefaults;
 
+var myMeetPerDayConf = 20;
+
 var dataChartHtml = "<canvas class=\"chartjs\" id=\"dataChart\"></canvas>"
 var datasets = {confirmed:[], confirmedMaxInDay:[], spreadGrowthFactor:[]};
 var dataChartFirstLoad = true;
@@ -195,6 +197,11 @@ function loadCurrentData(){
                 
                 //calculate spread growth factors from confirmed dataset
                 calculateSpreadGrowthFactorAndPlot("77%");
+                
+                //load default value into did i got the virus today box inputBox
+                document.getElementById("myMeetPerDay").value = myMeetPerDayConf;
+                myTodayInfectedProbability();
+                
             }else{
                 alert("Error parsing chart dataset");
             }
@@ -594,6 +601,20 @@ function calculatePredictions(){
     returnObject["pandemicPeriod"] = day;
     returnObject["pandemicEndDate"] = date;
     return returnObject;
+}
+
+function myTodayInfectedProbability() {
+    let myMeetPerDay = document.getElementById("myMeetPerDay").value;
+    let indexOfRBIP = datasets["confirmedMaxInDay"].length-predictionConfig["infectionPeriod"];
+    let resultBeforeInfectionPeriod;
+    if (indexOfRBIP >= 0){
+        resultBeforeInfectionPeriod = datasets["confirmedMaxInDay"][indexOfRBIP];
+    }else{
+        resultBeforeInfectionPeriod = 0;
+    }
+    let probabilityIamInfected = 1-Math.pow((1 - predictionConfig["infectionProbability"]*0.01*(data["confirmed"]["number"]-resultBeforeInfectionPeriod)/predictionConfig["populationSize"]),myMeetPerDay)
+    
+    document.getElementById("probabilityOfBeingInfectedToday").innerHTML = (probabilityIamInfected*100).toString()+"%";
 }
 
 window.addEventListener('load', (event) => {

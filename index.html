@@ -159,6 +159,23 @@
                         
                     </div>
                 </div>
+                <div class="chartsBox">
+                    <div class="chartControls">
+                        <h2>Nakazil jsem se dnes?</h2>
+                    </div>
+                    <div>
+                        <label for="myMeetPerDay">
+                            Dnes jsem potkal/a
+                            <input class="dynamicInput" onInput="dynamicInputAdjust(); myTodayInfectedProbability();" type="number" id="myMeetPerDay" name="myMeetPerDay" onfocus="this.select();" min="0">lidí
+                        </label>
+                    </div>
+                    <p>
+                    Šance, že jste se dnes nakazil/a, je
+                    <div id="probabilityOfBeingInfectedToday">
+                        
+                    </div>
+                    </p>
+                </div>
             </div>
 		</div>
         <div class="footer">

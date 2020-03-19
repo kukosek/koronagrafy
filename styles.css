@@ -244,6 +244,15 @@
     padding:0px 10px;
 }
 
+#probabilityOfBeingInfectedToday {
+    font-size: 5vw;
+}
+
+@media screen and (min-width: 840px) {
+    #probabilityOfBeingInfectedToday {
+        font-size: 28px;
+    }
+}
 
 /* ABOUT.HTML */
 .mathExpressionImg {
