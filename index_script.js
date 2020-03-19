@@ -342,7 +342,7 @@ function getDataCalculatePredictionAndPlot(){
     result["infectedPeopleInDay"].forEach(function(entry) {
         predDataset.push({
             x: entry.x,
-            y: entry.y
+            y: Math.round(entry.y)
         });
     });
     
