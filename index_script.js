@@ -420,18 +420,16 @@ function calculateSpreadGrowthFactor(dataset){
     datasets["spreadGrowthFactor"] = [];
     days = parseInt(growthFactorCalcConfig["days"]);
     if (growthFactorCalcConfig["perDay"]){
-        if(days == "all"){
+        if(growthFactorCalcConfig["days"] == "all"){
             for(i=1; i < dataset.length; i++) {
+                
                 let result = calculateInfectionDefaultProbability(i, dataset[i].y, false);
-                let date = new Date(dataset[i].x);
+                let date = new Date(dataset[i-1].x);
                 date.setHours(12,0,0,0);
                 datasets["spreadGrowthFactor"].push({x: date.toISOString(), y: result});
             }
         }else{
-            for(i=0; i < dataset.length-days; i++) {//i was days in V1
-                //let result = Math.pow(dataset[i].y/dataset[i-days].y, 1/days)-1; //V1
-                
-                //let date = new Date(dataset[i-days].x) //V1
+            for(i=0; i < dataset.length-days; i++) {
                 let upperSide = dataset[i+days].y - dataset[i].y;
                 let bottomSidePart1 = 0;
                 let bottomSidePart2 = 0;
