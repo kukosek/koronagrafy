@@ -29,6 +29,10 @@
         </div>
         
         <h1>Jak to funguje</h1>
+            <h2>Data</h2>
+                Stránka na klientské straně načítání  stáhne data z <a href="https://github.com/kukosek/czech-covid-db">githubu czech-covid-db</a>. Tento repozitář je aktualizovaný programem <a href="https://github.com/kukosek/czech-covid-db-wikipediaparser">czech-covid-db-wikipediaparser</a>, který každou minutu kontroluje článek na wikipedii <a href="https://cs.wikipedia.org/wiki/Pandemie_COVID-19_v_%C4%8Cesku">Pandemie COVID-19 v Česku</a>, zda se nezměnily informace. Pokud zjistí, že se informace změnili, uloží je jako záznam do tabulky .csv, kterou pak pošle na github.
+                <br><b>Proč zrovna wikipedie?</b>
+                    Chtěl jsem stahovat data z <a href="https://onemocneni-aktualne.mzcr.cz/covid-19">officiální stránky ministerstva zdravotnictví</a>, bohužel jsem ale zjistil, že používá dost komplikované API od googlu, které potřebuje proměnné plné přístupových klíčů na to aby jste vůbec získali nějaké data. Pokud bych to měl reverse-engineerovat, zabralo by to zbytečně moc času. Tak jsem zvolil cestu s wikipedií a ukázalo se, že to nebyla zas tak špatná volba, protože aktuální údaje se někdy dostanou rychleji na wikipedii než na stránky MZČR.
             <h2>Predikce</h2>
                 <h4 style="line-height: 0;">Parametry funkcí</h4>
                 <div class="functionDescription">

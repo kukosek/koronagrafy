@@ -18,6 +18,7 @@ var predictionConfigDefaults = {functionName: "henry1",
                                 startDate: new Date(2020, 02, 02),
                                 infectionPeriod: 21,
                                 growthFactor: "continuousFromExistingData",
+                                growthFactorDataUntilDate: -1, //This will be good when we would want to know how our predictions from day X matched current data
                                 averageMeetPerDay: 30,
                                 infectionProbability: 30,
                                 continuous_endCustom: false,
@@ -283,9 +284,7 @@ function predictionConfigMtimesPwayChange(){
 }
 
 function predictionCongigFunctionNameChange(){
-    console.log(1);
     if (document.getElementById("predictionFunctionName").value == "henryProbabilistic" &&  document.getElementById("mTimesPway").value == "continuousFromExistingData") {
-        console.log(2);
         document.getElementById("customFixedValueConfig").style.display = "initial";
         document.getElementById("label_averageMeetPerDay").style.display = "none";
         document.getElementById("label_infectionProbability").style.display = "initial";
@@ -516,9 +515,14 @@ function calculatePredictions(){
     date.setDate(date.getDate() + 1);
     let lastMTimesP = 0;
     let resultBeforeInfectionPeriod = 0;
-    
-    
     let populationSize = parseInt(predictionConfig["populationSize"]);
+    let growthFactorUntilDate;
+    if (predictionConfig["growthFactorDataUntilDate"] == -1){
+        growthFactorUntilDate = new Date(datasets["confirmedMaxInDay"][datasets["confirmedMaxInDay"].length-1].x);
+    }else{
+        growthFactorUntilDate = new Date(predictionConfig["growthFactorDataUntilDate"]);
+    }
+    growthFactorUntilDate.setHours(0,0,0,0);
     while(lastResult <= populationSize && Math.round(lastResult) != Math.round(resultBeforeInfectionPeriod) ){
         if (day-predictionConfig["infectionPeriod"] >= 0){
             resultBeforeInfectionPeriod = returnObject["infectedPeopleInDay"][day-predictionConfig["infectionPeriod"]].y;
@@ -530,10 +534,16 @@ function calculatePredictions(){
         if(predictionConfig["growthFactor"] == "continuousFromExistingData"){
             let indexOfSGF = indexOfStartSpreadGrowthFactor+day-1;
             if (indexOfSGF<datasets["spreadGrowthFactor"].length){
-                MtimesP = datasets["spreadGrowthFactor"][indexOfSGF].y;
-                lastMTimesP = MtimesP;
+                let dateOfPotentialIndex = new Date(datasets["spreadGrowthFactor"][indexOfSGF].x);
+                dateOfPotentialIndex.setHours(0,0,0,0);
+                if(dateOfPotentialIndex.getTime() <= growthFactorUntilDate.getTime()){
+                    MtimesP = datasets["spreadGrowthFactor"][indexOfSGF].y;
+                    lastMTimesP = MtimesP;
+                }else{
+                    MtimesP = lastMTimesP;
+                }
             }else{
-                if(predictionConfig["continuous_endCustom"]){
+                if(predictionConfig["continuous_endCustom"] && date.getTime() > growthFactorUntilDate.getTime()){
                     MtimesP = predictionConfig["continuos_endCustom_val"];
                 }else{
                     MtimesP = lastMTimesP;
@@ -549,6 +559,7 @@ function calculatePredictions(){
             result = lastResult + MtimesP*(1-(lastResult/populationSize))*(lastResult-resultBeforeInfectionPeriod);
         }else if (predictionConfig["functionName"] == "henryProbabilistic"){
             let probabilisticProbability = predictionConfig["infectionProbability"]*0.01; //When you run out of variable names
+            console.log(probabilisticProbability);
             let meetInThisDay = MtimesP / probabilisticProbability;
             result = populationSize*(1 - (1-lastResult/populationSize)*Math.pow((1- probabilisticProbability*(lastResult-resultBeforeInfectionPeriod)/populationSize),meetInThisDay));
         }
