@@ -483,48 +483,52 @@ function calculatePredictions(){
     let lastMTimesP = 0;
     let resultBeforeInfectionPeriod = 0;
     
-    if(predictionConfig["functionName"] == "henry1"){
-        let populationSize = parseInt(predictionConfig["populationSize"]);
-        while(lastResult <= populationSize && Math.round(lastResult) != Math.round(resultBeforeInfectionPeriod) ){
-            if (day-predictionConfig["infectionPeriod"] >= 0){
-                resultBeforeInfectionPeriod = returnObject["infectedPeopleInDay"][day-predictionConfig["infectionPeriod"]].y;
-            }else{
-                resultBeforeInfectionPeriod = 0;
-            }
-            
-            let MtimesP;
-            if(predictionConfig["growthFactor"] == "continuousFromExistingData"){
-                let indexOfSGF = indexOfStartSpreadGrowthFactor+day-1;
-                if (indexOfSGF<datasets["spreadGrowthFactor"].length){
-                    MtimesP = datasets["spreadGrowthFactor"][indexOfSGF].y;
-                    lastMTimesP = MtimesP;
-                }else{
-                    if(predictionConfig["continuous_endCustom"]){
-                        MtimesP = predictionConfig["continuos_endCustom_val"];
-                    }else{
-                        MtimesP = lastMTimesP;
-                    }
-                }
-                
-            }else if(predictionConfig["growthFactor"] == "customFixed"){
-                MtimesP = predictionConfig["averageMeetPerDay"]*predictionConfig["infectionProbability"]*0.01;
-            }else if(predictionConfig["growthFactor"] == "fixedFromCurrentValue"){
-                MtimesP = predictionConfigDefaults["averageMeetPerDay"]*predictionConfigDefaults["infectionProbability"]*0.01;
-            }
-            var result = lastResult + MtimesP*(1-(lastResult/populationSize))*(lastResult-resultBeforeInfectionPeriod);
-            
-            if (result <= populationSize){
-                returnObject["infectedPeopleInDay"].push({x: date.toISOString(), y: result});
-            }else{
-                returnObject["infectedPeopleInDay"].push({x: date.toISOString(), y: populationSize});
-            }
-            day++;
-            date.setDate(date.getDate() + 1);
-            lastResult = result;
+    
+    let populationSize = parseInt(predictionConfig["populationSize"]);
+    while(lastResult <= populationSize && Math.round(lastResult) != Math.round(resultBeforeInfectionPeriod) ){
+        if (day-predictionConfig["infectionPeriod"] >= 0){
+            resultBeforeInfectionPeriod = returnObject["infectedPeopleInDay"][day-predictionConfig["infectionPeriod"]].y;
+        }else{
+            resultBeforeInfectionPeriod = 0;
         }
-        returnObject["pandemicPeriod"] = day;
-        returnObject["pandemicEndDate"] = date;
+        
+        let MtimesP;
+        if(predictionConfig["growthFactor"] == "continuousFromExistingData"){
+            let indexOfSGF = indexOfStartSpreadGrowthFactor+day-1;
+            if (indexOfSGF<datasets["spreadGrowthFactor"].length){
+                MtimesP = datasets["spreadGrowthFactor"][indexOfSGF].y;
+                lastMTimesP = MtimesP;
+            }else{
+                if(predictionConfig["continuous_endCustom"]){
+                    MtimesP = predictionConfig["continuos_endCustom_val"];
+                }else{
+                    MtimesP = lastMTimesP;
+                }
+            }
+        }else if(predictionConfig["growthFactor"] == "customFixed"){
+            MtimesP = predictionConfig["averageMeetPerDay"]*predictionConfig["infectionProbability"]*0.01;
+        }else if(predictionConfig["growthFactor"] == "fixedFromCurrentValue"){
+            MtimesP = predictionConfigDefaults["averageMeetPerDay"]*predictionConfigDefaults["infectionProbability"]*0.01;
+        }
+        let result;
+        if(predictionConfig["functionName"] == "henry1"){
+            result = lastResult + MtimesP*(1-(lastResult/populationSize))*(lastResult-resultBeforeInfectionPeriod);
+        }else if (predictionConfig["functionName"] == "henryProbabilistic"){
+            let probabilisticProbability = predictionConfig["infectionProbability"]*0.01; //When you run out of variable names
+            let meetInThisDay = MtimesP / probabilisticProbability;
+            result = populationSize*(1 - (1-lastResult/populationSize)*Math.pow((1- probabilisticProbability*(lastResult-resultBeforeInfectionPeriod)/populationSize),meetInThisDay));
+        }
+        if (result <= populationSize){
+            returnObject["infectedPeopleInDay"].push({x: date.toISOString(), y: result});
+        }else{
+            returnObject["infectedPeopleInDay"].push({x: date.toISOString(), y: populationSize});
+        }
+        day++;
+        date.setDate(date.getDate() + 1);
+        lastResult = result;
     }
+    returnObject["pandemicPeriod"] = day;
+    returnObject["pandemicEndDate"] = date;
     return returnObject;
 }
 
