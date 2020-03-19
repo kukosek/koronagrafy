@@ -124,6 +124,9 @@
 #customFixedValueConfig {
     display: none;
 }
+#continuousFromExistingDataConfig {
+    display: none;
+}
 
 
 .chartControls{

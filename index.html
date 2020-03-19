@@ -123,13 +123,23 @@
                             <label for="infectionPeriod">Doba trvání nakazování ostatních:</label>
                             <input type="number" class="dynamicInput" onInput="dynamicInputAdjust()" id="infectionPeriod" name="infectionPeriod" onfocus="this.select();" min="0">&nbspdní<br> 
                             
-                            <label for="mTimesPway">Růstový faktor
+                            <label for="mTimesPway"><b>Růstový faktor</b>
                                 <select id="mTimesPway" onchange="predictionConfigMtimesPwayChange()">
                                     <option value="continuousFromExistingData">Průběžný podle grafu růstového faktoru</option>
-                                    <option value="fixedFromCurrentValue">Pevný z aktuálních hodnot</option>
-                                    <option value="customFixed">Pevný vlastní</option>
+                                    <option value="fixedFromCurrentValue">Konstantní z aktuálních hodnot</option>
+                                    <option value="customFixed">Konstantní vlastní</option>
                                 </select>
                             </label><br>
+                            <div id="continuousFromExistingDataConfig">
+                                Konstanta po konci dat:
+                                <label id="label_continuous_endLast" class="radio-inline">
+                                    <input id="continuous_endLast" onclick="predictionConfigValAtEndChange()" type="radio" name="optradio" checked>Poslední hodnota
+                                </label>
+                                <label class="radio-inline">
+                                    <input id="continuous_endCustom" onclick="predictionConfigValAtEndChange()" type="radio" name="optradio">
+                                        <input class="dynamicInput" onInput="dynamicInputAdjust()" type="number" id="valueAfterDataFromGrowthChart" name="valueAfterDataFromGrowthChart" onfocus="this.select();" min="0" max="100" step="any">
+                                </label>
+                            </div>
                             <div id="customFixedValueConfig">
                                 <label for="averageMeetPerDay">Člověk průměrně potká za den</label>
                                 <input type="number" class="dynamicInput" onInput="dynamicInputAdjust()" id="averageMeetPerDay" name="averageMeetPerDay" onfocus="this.select();" min="0">&nbsplidí,
@@ -137,7 +147,7 @@
                                 <label for="infectionProbability">pravděpodobnost nákazy při setkání je</label> 
                                 <input class="dynamicInput" onInput="dynamicInputAdjust()" type="number" id="infectionProbability" name="infectionProbability" onfocus="this.select();" min="0" max="100" step="any">&nbsp%<br> 
                             </div>
-                            <label for="populationSize">Velikost populace</label><br> 
+                            <label for="populationSize"><br><b>Velikost populace:</b></label><br> 
                             <input class="dynamicInput" onInput="dynamicInputAdjust()" type="number" id="populationSize" name="populationSize" onfocus="this.select();" min="0">lidí<br> 
                             <input type="checkbox" onchange="plotPredictionToDataChartCbChange()" id="plotPredictionToDataChart" name="plotPredictionToDataChart"><label for="plotPredictionToDataChart">Vykreslit do DataChartu</label>
                             <label id="label_plotPredictionToDataChartAddDays" for="plotPredictionToDataChart"> navíc +</label>
