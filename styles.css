@@ -251,3 +251,11 @@
 .functionDescription {
     margin: 0 0 0 25px;
 }
+.codebox {
+        /* Below are styles for the codebox (not the code itself) */
+        border:1px solid black;
+        background-color:#EEEEFF;
+        width:300px;
+        overflow:auto;    
+        padding:10px;
+}
