@@ -337,7 +337,7 @@ function getDataCalculatePredictionAndPlot(){
     result["infectedPeopleInDay"].forEach(function(entry) {
         predDataset.push({
             x: entry.x,
-            y: Math.round(entry.y)
+            y: entry.y
         });
     });
     
@@ -418,7 +418,7 @@ function growthFactorConfigSH(){
 
 function calculateSpreadGrowthFactor(dataset){
     datasets["spreadGrowthFactor"] = [];
-    days = growthFactorCalcConfig["days"];
+    days = parseInt(growthFactorCalcConfig["days"]);
     if (growthFactorCalcConfig["perDay"]){
         if(days == "all"){
             for(i=1; i < dataset.length; i++) {
@@ -428,9 +428,26 @@ function calculateSpreadGrowthFactor(dataset){
                 datasets["spreadGrowthFactor"].push({x: date.toISOString(), y: result});
             }
         }else{
-            for(i=days; i < dataset.length; i++) {
-                let result = Math.pow(dataset[i].y/dataset[i-days].y, 1/days)-1;
-                let date = new Date(dataset[i-days].x)
+            for(i=0; i < dataset.length-days; i++) {//i was days in V1
+                //let result = Math.pow(dataset[i].y/dataset[i-days].y, 1/days)-1; //V1
+                
+                //let date = new Date(dataset[i-days].x) //V1
+                let upperSide = dataset[i+days].y - dataset[i].y;
+                let bottomSidePart1 = 0;
+                let bottomSidePart2 = 0;
+                for (j = 0; j<days; j++){
+                    bottomSidePart1 += parseInt(dataset[i+j].y);
+                    let indexOfMyPoop = i-predictionConfig["infectionPeriod"]+j;
+                    if (indexOfMyPoop < 0) {
+                        bottomSidePart2 += 0;
+                    }else{
+                        bottomSidePart2 +=  parseInt(dataset[indexOfMyPoop].y);
+                    }
+                }
+                let bottomSide = bottomSidePart1 - bottomSidePart2;
+                
+                let result = upperSide/bottomSide;
+                let date = new Date(dataset[i].x) //V2
                 date.setHours(12,0,0,0);
                 datasets["spreadGrowthFactor"].push({x: date.toISOString(), y: result});
             }
@@ -524,8 +541,8 @@ function calculatePredictions(){
     }
     growthFactorUntilDate.setHours(0,0,0,0);
     while(lastResult <= populationSize && Math.round(lastResult) != Math.round(resultBeforeInfectionPeriod) ){
-        if (day-predictionConfig["infectionPeriod"] >= 0){
-            resultBeforeInfectionPeriod = returnObject["infectedPeopleInDay"][day-predictionConfig["infectionPeriod"]].y;
+        if (day-predictionConfig["infectionPeriod"]-1 >= 0){
+            resultBeforeInfectionPeriod = returnObject["infectedPeopleInDay"][day-predictionConfig["infectionPeriod"]-1].y;
         }else{
             resultBeforeInfectionPeriod = 0;
         }
@@ -559,7 +576,6 @@ function calculatePredictions(){
             result = lastResult + MtimesP*(1-(lastResult/populationSize))*(lastResult-resultBeforeInfectionPeriod);
         }else if (predictionConfig["functionName"] == "henryProbabilistic"){
             let probabilisticProbability = predictionConfig["infectionProbability"]*0.01; //When you run out of variable names
-            console.log(probabilisticProbability);
             let meetInThisDay = MtimesP / probabilisticProbability;
             result = populationSize*(1 - (1-lastResult/populationSize)*Math.pow((1- probabilisticProbability*(lastResult-resultBeforeInfectionPeriod)/populationSize),meetInThisDay));
         }
