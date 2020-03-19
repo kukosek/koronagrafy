@@ -318,7 +318,12 @@ function predictionConfigValAtEndChange(){
         document.getElementById("label_continuous_endLast").style.color = "#444";
     }
 }
-
+function infectionPeriodGrowthFactorChange() {
+    predictionConfig["infectionPeriod"] = document.getElementById("infectionPeriod").value;
+    if (growthFactorCalcConfig["days"] != "all"){
+        calculateSpreadGrowthFactorAndPlot("77%");
+    }
+}
 function dynamicInputAdjust(){
     let inputBoxes = document.getElementsByClassName("dynamicInput");
     for(i = 0; i < inputBoxes.length; i++) {

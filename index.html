@@ -121,7 +121,7 @@
                                 </select>
                             </label><br>
                             <label for="infectionPeriod">Doba trvání nakazování ostatních:</label>
-                            <input type="number" class="dynamicInput" onInput="dynamicInputAdjust()" id="infectionPeriod" name="infectionPeriod" onfocus="this.select();" min="0">&nbspdní<br> 
+                            <input type="number" class="dynamicInput" onInput="dynamicInputAdjust(); infectionPeriodGrowthFactorChange();" id="infectionPeriod" name="infectionPeriod" onfocus="this.select();" min="0">&nbspdní<br> 
                             
                             <label for="mTimesPway"><b>Růstový faktor</b>
                                 <select id="mTimesPway" onchange="predictionConfigMtimesPwayChange()">
