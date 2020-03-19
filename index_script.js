@@ -605,7 +605,7 @@ function calculatePredictions(){
 
 function myTodayInfectedProbability() {
     let myMeetPerDay = document.getElementById("myMeetPerDay").value;
-    let indexOfRBIP = datasets["confirmedMaxInDay"].length-predictionConfig["infectionPeriod"];
+    let indexOfRBIP = datasets["confirmedMaxInDay"].length-parseInt(predictionConfig["infectionPeriod"].y);
     let resultBeforeInfectionPeriod;
     if (indexOfRBIP >= 0){
         resultBeforeInfectionPeriod = datasets["confirmedMaxInDay"][indexOfRBIP];
