@@ -350,7 +350,12 @@ function loadPredictionConfigFile(evt){
         var reader = new FileReader();
         reader.readAsText(file);
         reader.onload=function(){
-            predictionConfig = JSON.parse(reader.result);
+            try{
+                let loadedDict = JSON.parse(reader.result);
+                predictionConfig = JSON.parse(reader.result);
+            }catch(err){
+                alert("Chyba při čtení souboru:\n"+err.message);
+            }
         }
     } else {
         alert('The File APIs are not fully supported in this browser.');
