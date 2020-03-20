@@ -398,7 +398,7 @@ function predictionConfigMtimesPwayChange(){
     }
 }
 
-function predictionCongigFunctionNameChange(){
+function predictionConfigFunctionNameChange(){
     if (document.getElementById("predictionFunctionName").value == "henryProbabilistic" &&  document.getElementById("mTimesPway").value == "continuousFromExistingData") {
         document.getElementById("customFixedValueConfig").style.display = "initial";
         document.getElementById("label_averageMeetPerDay").style.display = "none";
@@ -463,10 +463,11 @@ function predictionConfigDateLimitCbChange() {
 }
 
 function infectionPeriodGrowthFactorChange() {
-    predictionConfig["infectionPeriod"] = document.getElementById("infectionPeriod").value;
+    predictionConfig["infectionPeriod"] = parseInt(document.getElementById("infectionPeriod").value);
     if (growthFactorCalcConfig["days"] != "all"){
         calculateSpreadGrowthFactorAndPlot("77%");
     }
+    myTodayInfectedProbability();
 }
 function dynamicInputAdjust(){
     let inputBoxes = document.getElementsByClassName("dynamicInput");
