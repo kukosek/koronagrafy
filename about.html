@@ -30,9 +30,29 @@
         
         <h1>Jak to funguje</h1>
             <h2>Data</h2>
-                Stránka na klientské straně načítání  stáhne data z <a href="https://github.com/kukosek/czech-covid-db">githubu czech-covid-db</a>. Tento repozitář je aktualizovaný programem <a href="https://github.com/kukosek/czech-covid-db-wikipediaparser">czech-covid-db-wikipediaparser</a>, který každou minutu kontroluje článek na wikipedii <a href="https://cs.wikipedia.org/wiki/Pandemie_COVID-19_v_%C4%8Cesku">Pandemie COVID-19 v Česku</a>, zda se nezměnily informace. Pokud zjistí, že se informace změnili, uloží je jako záznam do tabulky .csv, kterou pak pošle na github.
+                Stránka na klientské straně stáhne data z <a href="https://github.com/kukosek/czech-covid-db">githubu czech-covid-db</a>. Tento repozitář je aktualizovaný programem <a href="https://github.com/kukosek/czech-covid-db-wikipediaparser">czech-covid-db-wikipediaparser</a>, který každou minutu kontroluje článek na wikipedii <a href="https://cs.wikipedia.org/wiki/Pandemie_COVID-19_v_%C4%8Cesku">Pandemie COVID-19 v Česku</a>, zda se nezměnily informace. Pokud zjistí, že se informace změnili, uloží je jako záznam do tabulky .csv, kterou pak pošle na github.
                 <br><b>Proč zrovna wikipedie?</b>
                     Chtěl jsem stahovat data z <a href="https://onemocneni-aktualne.mzcr.cz/covid-19">officiální stránky ministerstva zdravotnictví</a>, bohužel jsem ale zjistil, že používá dost komplikované API od googlu, které potřebuje proměnné plné přístupových klíčů na to aby jste vůbec získali nějaké data. Pokud bych to měl reverse-engineerovat, zabralo by to zbytečně moc času. Tak jsem zvolil cestu s wikipedií a ukázalo se, že to nebyla zas tak špatná volba, protože aktuální údaje se někdy dostanou rychleji na wikipedii než na stránky MZČR.
+            <h2>Růstový faktor</h2>
+                <i>
+                f(x) = Počet potvrzených případů nákazy v den "x"<br>
+                t = pořadí dnu, pro který počítat růstový faktor<br>
+                T = Infekční doba<br>
+                </i>
+                <h4 style="line-height: 0;">Mezi dny</h4>
+                <div class="functionDescription">
+                    <i>D = Vzdálenost dnů mezi kterýma počítat</i><br>
+                    <img class="longMathExpressionImg" src="predpis_faktor_mezi.png"></img><br>
+                    <p>
+                    Pokud <i>t-T+(0,1,2,3,...)</i> menší než nula, pak je <i>f(t-T+(0,1,2,3,...))</i> nahrazena hodnotou nula.
+                    </p>
+                </div>
+                <h4 style="line-height: 0;">Z celků</h4>
+                <div class="functionDescription">
+                    <img class="smallMathExpressionImg" src="predpis_faktor_zcelku.png"></img><br>
+                    <p>
+                        Růstový faktor z celků nevylučuje lidi, kteří už jsou v karanténně a není vhodný pro predikci.
+                </div>
             <h2>Predikce</h2>
                 <h4 style="line-height: 0;">Parametry funkcí</h4>
                 <div class="functionDescription">
@@ -62,7 +82,7 @@
                         <br><b>Pravděpodobnost nákazy</b><br>
                         <img class="mathExpressionImg" src="pravdepodobnost_Henryova-druha.png"></img><br>
                         Tento vzorec je používaný pro výpočet šance, že se dnes nakazíte.
-                    </p
+                    </p>
                 </div>
         <h1>License</h1>
             <div class="codebox" id="licenseArea">

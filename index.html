@@ -131,13 +131,16 @@
                                 </select>
                             </label><br>
                             <div id="continuousFromExistingDataConfig">
-                                Konstanta po konci dat:
+                                Konstanta po konci dat:<br>
                                 <label id="label_continuous_endLast" class="radio-inline">
                                     <input id="continuous_endLast" onclick="predictionConfigValAtEndChange()" type="radio" name="optradio" checked>Poslední hodnota
                                 </label>
                                 <label class="radio-inline">
                                     <input id="continuous_endCustom" onclick="predictionConfigValAtEndChange()" type="radio" name="optradio">
                                         <input class="dynamicInput" onInput="dynamicInputAdjust()" type="number" id="valueAfterDataFromGrowthChart" name="valueAfterDataFromGrowthChart" onfocus="this.select();" min="0" max="100" step="any">
+                                </label>
+                                <label class="radio-inline">
+                                    <input id="continuous_endCustomVars" onclick="predictionConfigValAtEndChange()" type="radio" name="optradio">Měnná<br>
                                 </label>
                                 <label for="growthFactorDateLimit">
                                     Limitovat data

@@ -24,9 +24,32 @@ var predictionConfigDefaults = {functionName: "henry1",
                                 continuous_endCustom: false,
                                 continuos_endCustom_val: 0.5,
                                 populationSize:10649800,
+                                continuous_endVar: false,
+                                continuous_endVarValues: "-1; 0.4*5; 0.25*10; 0.2*9",
                                 plotPredictionToDataChart: false,
                                 plotPredictionToDataChartAddDays: 1
 }
+
+function parseEndVarValues(varValues){
+    let returnList = [];
+    let entries = varValues.split(";");
+    for (i=0; i<entries.length; i++){
+        let entry = entries[i].trim();
+        if (entry.includes('*')) {
+            let valueAndTimes = entry.split("*");
+            let value = parseFloat(valueAndTimes[0].trim().replace(",", "."));
+            let times = parseInt(valueAndTimes[1].trim());
+            for(j=0; j<times; j++){
+                returnList.push(value);
+            }
+        }else{
+            returnList.push(parseFloat(entry));
+        }
+    }
+    return returnList;
+}
+
+
 var predictionConfig = predictionConfigDefaults;
 
 var growthFactorCalcConfigDefaults = {days: 1, perDay: true};
@@ -345,9 +368,27 @@ function predictionConfigValAtEndChange(){
     if(document.getElementById("continuous_endCustom").checked){
         document.getElementById("valueAfterDataFromGrowthChart").disabled = false;
         document.getElementById("label_continuous_endLast").style.color = "grey";
-    }else{
+        predictionConfig["continuous_endVar"] = false;
+    }else if(document.getElementById("continuous_endLast").checked){
         document.getElementById("valueAfterDataFromGrowthChart").disabled = true;
         document.getElementById("label_continuous_endLast").style.color = "#444";
+        predictionConfig["continuous_endVar"] = false;
+    }else{
+        predictionConfig["continuous_endVar"] = true;
+        let specifiedEndVars = prompt("Zadejte ve formátu: hodnota1(*kolikrát); hodnota2(*kolikrát),...\n hodnota -1 znamená poslední použítá hodnota.", predictionConfig["continuous_endVarValues"]);
+        try {
+            let output =parseEndVarValues(specifiedEndVars);
+            if (output.length>0 && !output.includes(NaN)){
+                predictionConfig["continuous_endVarValues"] = specifiedEndVars;
+            }else{
+                alert("Něco nevyšlo, možná jste zadali špatný formát. Zkuste to znovu");
+                predictionConfigValAtEndChange();
+            }
+        }catch(err){
+            if (err.message != "varValues is null"){
+                alert("Něco nevyšlo, možná jste zadali špatný formát. "+err.message);
+            }
+        }
     }
 }
 
@@ -598,6 +639,11 @@ function calculatePredictions(){
         growthFactorUntilDate = new Date(predictionConfig["growthFactorDataUntilDate"]);
     }
     growthFactorUntilDate.setHours(0,0,0,0);
+    let endVarsIndex = 0;
+    let endVars;
+    if(predictionConfig["continuous_endVar"] == true){
+        endVars = parseEndVarValues(predictionConfig["continuous_endVarValues"]);
+    }
     while(lastResult <= populationSize && Math.round(lastResult) != Math.round(resultBeforeInfectionPeriod) ){
         if (day-predictionConfig["infectionPeriod"]-1 >= 0){
             resultBeforeInfectionPeriod = returnObject["infectedPeopleInDay"][day-predictionConfig["infectionPeriod"]-1].y;
@@ -620,6 +666,19 @@ function calculatePredictions(){
             }else{
                 if(predictionConfig["continuous_endCustom"] && date.getTime() > growthFactorUntilDate.getTime()){
                     MtimesP = predictionConfig["continuos_endCustom_val"];
+                }else if(predictionConfig["continuous_endVar"] == true){
+                    if (endVarsIndex<endVars.length){
+                        endVarFromList = endVars[endVarsIndex];
+                        if (endVarFromList == -1) {
+                            MtimesP = lastMTimesP;
+                        }else{
+                            MtimesP = endVarFromList;
+                            lastMTimesP = MtimesP;
+                        }
+                        endVarsIndex++;
+                    }else{
+                        MtimesP = lastMTimesP;
+                    }
                 }else{
                     MtimesP = lastMTimesP;
                 }
