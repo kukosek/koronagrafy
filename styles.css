@@ -155,6 +155,12 @@
 .chartControls:nth-child(2) {order:1; flex-basis:100%;}
 /*on desktop*/
 @media screen and (min-width:600px) {
+    .wrapperNavBar {
+        margin: 0 0 10px 0;
+    }
+}
+
+@media screen and (min-width:280px) {
    .chartControls {
        flex-wrap:nowrap;
        flex-direction:row;
@@ -172,12 +178,7 @@
         flex-basis:200px;
         order:1;
     }
-    .wrapperNavBar {
-        margin: 0 0 10px 0;
-    }
 }
-
-
 
 
 #growthFactorChartConfig {
@@ -235,14 +236,14 @@
 }
 
 .footer {
-    position: relative;
-    left: 0;
-    bottom: 0;
-    width: 100%;
-    background-image: linear-gradient(45deg, #ff844f 0%, #f74a4a 60%);
-    color: white;
+    margin: 8px 0 0 0;
+    background-image: linear-gradient(45deg, #a1bfff 0%, #ecadff 60%);
+    color: #444;
     text-align: left;
     padding:0px 10px;
+    font-size: 12px;
+    padding: 7px;
+    border-radius: 5px;
 }
 
 #probabilityOfBeingInfectedToday {
