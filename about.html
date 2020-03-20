@@ -33,11 +33,20 @@
                 Stránka na klientské straně stáhne data z <a href="https://github.com/kukosek/czech-covid-db">githubu czech-covid-db</a>. Tento repozitář je aktualizovaný programem <a href="https://github.com/kukosek/czech-covid-db-wikipediaparser">czech-covid-db-wikipediaparser</a>, který každou minutu kontroluje článek na wikipedii <a href="https://cs.wikipedia.org/wiki/Pandemie_COVID-19_v_%C4%8Cesku">Pandemie COVID-19 v Česku</a>, zda se nezměnily informace. Pokud zjistí, že se informace změnili, uloží je jako záznam do tabulky .csv, kterou pak pošle na github.
                 <br><b>Proč zrovna wikipedie?</b>
                     Chtěl jsem stahovat data z <a href="https://onemocneni-aktualne.mzcr.cz/covid-19">officiální stránky ministerstva zdravotnictví</a>, bohužel jsem ale zjistil, že používá dost komplikované API od googlu, které potřebuje proměnné plné přístupových klíčů na to aby jste vůbec získali nějaké data. Pokud bych to měl reverse-engineerovat, zabralo by to zbytečně moc času. Tak jsem zvolil cestu s wikipedií a ukázalo se, že to nebyla zas tak špatná volba, protože aktuální údaje se někdy dostanou rychleji na wikipedii než na stránky MZČR.
+                <p>
+                    Hlavně bych chtěl zdůraznit, že vzhledem k těmto okolnostem prosím <b>neberte data zde zobrazená jako důvěryhodné</b>. Kdykoli se může stát, že někdo do wikipedie zadá falešnou hodnotu a ta se zobrazí i zde. Časy u záznamů berte jenom orientačně, jde o čas, kdy někdo změnil informaci na wikipedii. A možná ani to ne, protože se stává, že na wikipedii změní formát nějaké informace, což způsobí chybu v mém skriptu. Já si toho po nějaké době všimnu a skript změně přizpůsobím.
+                </p>
+                <p>
+                    Na webu MZČR o COVID-19 se píše, že připravují otevřenou datovou sadu. Jestli tak opravdu učiní, budu se snažit aby koronagrafy využívali jejich officiální data.
+                </p>
             <h2>Růstový faktor</h2>
+                <p>
+                    Náš růstový faktor se liší od běžně používaného <a href="https://en.wikipedia.org/wiki/Basic_reproduction_number">R<sub>0</sub> faktoru</a> (O kterém jsme donedávna nevěděli, že existuje). Zatímco epidemiology užívaný R<sub>0</sub> faktor udává kolik lidí infikuje infikovaný <b>za infekční dobu</b>, námi používaný růstový faktor udává kolik lidí infikuje infikovaný <b>za jeden den</b>.
+                </p>
                 <i>
                 f(x) = Počet potvrzených případů nákazy v den "x"<br>
                 t = pořadí dnu, pro který počítat růstový faktor<br>
-                T = Infekční doba<br>
+                T = Infekční doba (doba, po kterou je člověk infekční a ještě není v karanténě)<br>
                 </i>
                 <h4 style="line-height: 0;">Mezi dny</h4>
                 <div class="functionDescription">
@@ -62,7 +71,7 @@
                     M<sub>g</sub> = Velikost populace<br>
                     p<sub>i</sub> = Pravděpodobnost nákazy při setkání s nakaženým<br>
                     f(x) = Počet potvrzených případů nákazy v den "x"<br>
-                    T = Infekční doba<br>
+                    T = Infekční doba (doba, po kterou je člověk infekční a ještě není v karanténě)<br>
                     </i>
                 </div>
                 <h4>Henryova první epidemická funkce (Logistická)</h4>
