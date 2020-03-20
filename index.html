@@ -139,6 +139,15 @@
                                     <input id="continuous_endCustom" onclick="predictionConfigValAtEndChange()" type="radio" name="optradio">
                                         <input class="dynamicInput" onInput="dynamicInputAdjust()" type="number" id="valueAfterDataFromGrowthChart" name="valueAfterDataFromGrowthChart" onfocus="this.select();" min="0" max="100" step="any">
                                 </label>
+                                <label for="growthFactorDateLimit">
+                                    Limitovat data
+                                    <label class="radio-inline">
+                                        <input id="continuous_limitData" onclick="predictionConfigDateLimitCbChange()" type="checkbox">
+                                        <input type="date" id="growthFactorDateLimit" disabled onclick=""> 
+                                    </label>
+                                    
+                                    
+                                </label>
                             </div>
                             <div id="customFixedValueConfig">
                                 <label id="label_averageMeetPerDay" for="averageMeetPerDay">Člověk průměrně potká za den
