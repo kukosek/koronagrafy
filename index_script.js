@@ -233,7 +233,7 @@ function loadCurrentData(){
                 
                 //calculate spread growth factors from confirmed dataset
                 calculateSpreadGrowthFactorAndPlot("77%");
-                
+                getDataCalculatePredictionAndPlot();
                 
                 
             }else{
@@ -253,61 +253,115 @@ function loadCurrentData(){
 var predictionChartHtml = "<canvas class=\"chartjs\" id=\"predictionChart\"></canvas>";
 
 
+function loadPredictionConfigIntoHTML(){
+    document.getElementById("predictionChartDiv").innerHTML = "";
+    document.getElementById("predictionFunctionName").value = predictionConfig["functionName"];
+    document.getElementById("mTimesPway").value = predictionConfig["growthFactor"];
+    document.getElementById("infectionPeriod").value = predictionConfig["infectionPeriod"];
+    document.getElementById("averageMeetPerDay").value = predictionConfig["averageMeetPerDay"];
+    document.getElementById("infectionProbability").value = predictionConfig["infectionProbability"];
+    document.getElementById("continuous_endLast").checked = !predictionConfig["continuous_endCustom"];
+    document.getElementById("continuous_endCustom").checked = predictionConfig["continuous_endCustom"];
+    document.getElementById("continuous_endCustomVars").checked = predictionConfig["continuous_endVar"];
+    if (predictionConfig["growthFactorDataUntilDate"] == -1) {
+        document.getElementById("continuous_limitData").checked = false;
+    }else{
+        document.getElementById("continuous_limitData").checked = true;
+        document.getElementById("growthFactorDateLimit").value = predictionConfig["growthFactorDataUntilDate"].toISOString().substr(0, 10);
+    }
+    predictionConfigDateLimitCbChange();
+    document.getElementById("valueAfterDataFromGrowthChart").value = predictionConfig["continuos_endCustom_val"];
+    document.getElementById("populationSize").value = predictionConfig["populationSize"];
+    document.getElementById("plotPredictionToDataChart").checked = predictionConfig["plotPredictionToDataChart"];
+    document.getElementById("plotPredictionToDataChartAddDays").value = predictionConfig["plotPredictionToDataChartAddDays"];
+    dynamicInputAdjust();
+    predictionConfigMtimesPwayChange();
+    predictionConfigValAtEndChange(false);
+    plotPredictionToDataChartCbChange();
+}
+function saveHTMLtoPredictionConfig(){
+    predictionConfig["functionName"] = document.getElementById("predictionFunctionName").value;
+    predictionConfig["growthFactor"] = document.getElementById("mTimesPway").value;
+    predictionConfig["infectionPeriod"] = document.getElementById("infectionPeriod").value;
+    predictionConfig["averageMeetPerDay"] = document.getElementById("averageMeetPerDay").value;
+    predictionConfig["infectionProbability"] = document.getElementById("infectionProbability").value;
+    predictionConfig["continuous_endCustom"] = document.getElementById("continuous_endCustom").checked;
+    predictionConfig["continuos_endCustom_val"] = document.getElementById("valueAfterDataFromGrowthChart").value;
+    if (document.getElementById("continuous_limitData").checked) {
+        predictionConfig["growthFactorDataUntilDate"] = new Date(document.getElementById("growthFactorDateLimit").value);
+    }else{
+        predictionConfig["growthFactorDataUntilDate"] = -1;
+    }
+    predictionConfig["populationSize"] = document.getElementById("populationSize").value;
+    predictionConfig["plotPredictionToDataChart"] = document.getElementById("plotPredictionToDataChart").checked;
+    predictionConfig["plotPredictionToDataChartAddDays"] = document.getElementById("plotPredictionToDataChartAddDays").value;
+}
+
 
 var predictionConfigShowed=false;
-
 function predictionConfigSH(calculate){
     if (predictionConfigShowed == false) {
         predictionConfigShowed = true;
-        document.getElementById("predictionChartDiv").innerHTML = "";
-        document.getElementById("predictionConfig").style.display = "initial";
-        document.getElementById("predictionFunctionName").value = predictionConfig["functionName"];
-        document.getElementById("mTimesPway").value = predictionConfig["growthFactor"];
-        document.getElementById("infectionPeriod").value = predictionConfig["infectionPeriod"];
-        document.getElementById("averageMeetPerDay").value = predictionConfig["averageMeetPerDay"];
-        document.getElementById("infectionProbability").value = predictionConfig["infectionProbability"];
-        document.getElementById("continuous_endLast").checked = !predictionConfig["continuous_endCustom"];
-        document.getElementById("continuous_endCustom").checked = predictionConfig["continuous_endCustom"];
-        document.getElementById("continuous_endCustomVars").checked = predictionConfig["continuous_endVar"];
-        if (predictionConfig["growthFactorDataUntilDate"] == -1) {
-            document.getElementById("continuous_limitData").checked = false;
-        }else{
-            document.getElementById("continuous_limitData").checked = true;
-            document.getElementById("growthFactorDateLimit").value = predictionConfig["growthFactorDataUntilDate"].toISOString().substr(0, 10);
+        document.getElementById("settingsApplyButton").src="apply.svg";
+        let fghjkl = document.getElementsByClassName("showedInPredictionConfig");
+        for (i=0; i<fghjkl.length; i++){
+            fghjkl[i].style.display = "initial";
         }
-        predictionConfigDateLimitCbChange();
-        document.getElementById("valueAfterDataFromGrowthChart").value = predictionConfig["continuos_endCustom_val"];
-        document.getElementById("populationSize").value = predictionConfig["populationSize"];
-        document.getElementById("plotPredictionToDataChart").checked = predictionConfig["plotPredictionToDataChart"];
-        document.getElementById("plotPredictionToDataChartAddDays").value = predictionConfig["plotPredictionToDataChartAddDays"];
-        dynamicInputAdjust();
-        predictionConfigMtimesPwayChange();
-        predictionConfigValAtEndChange(false);
-        plotPredictionToDataChartCbChange();
-        document.getElementById("infectionPeriod").focus()
+        
+        document.getElementById("predictionConfig").style.display = "initial";
+        loadPredictionConfigIntoHTML();
+        document.getElementById('config-input').addEventListener('change', loadPredictionConfigFile, false);
     }else{
         predictionConfigShowed = false;
-        
-        predictionConfig["functionName"] = document.getElementById("predictionFunctionName").value;
-        predictionConfig["growthFactor"] = document.getElementById("mTimesPway").value;
-        predictionConfig["infectionPeriod"] = document.getElementById("infectionPeriod").value;
-        predictionConfig["averageMeetPerDay"] = document.getElementById("averageMeetPerDay").value;
-        predictionConfig["infectionProbability"] = document.getElementById("infectionProbability").value;
-        predictionConfig["continuous_endCustom"] = document.getElementById("continuous_endCustom").checked;
-        predictionConfig["continuos_endCustom_val"] = document.getElementById("valueAfterDataFromGrowthChart").value;
-        if (document.getElementById("continuous_limitData").checked) {
-            predictionConfig["growthFactorDataUntilDate"] = new Date(document.getElementById("growthFactorDateLimit").value);
-        }else{
-            predictionConfig["growthFactorDataUntilDate"] = -1;
+        document.getElementById("settingsApplyButton").src="settings.svg";
+        let fghjkl = document.getElementsByClassName("showedInPredictionConfig");
+        for (i=0; i<fghjkl.length; i++){
+            fghjkl[i].style.display = "none";
         }
-        predictionConfig["populationSize"] = document.getElementById("populationSize").value;
-        predictionConfig["plotPredictionToDataChart"] = document.getElementById("plotPredictionToDataChart").checked;
-        predictionConfig["plotPredictionToDataChartAddDays"] = document.getElementById("plotPredictionToDataChartAddDays").value;
+        
+        saveHTMLtoPredictionConfig();
         document.getElementById("predictionChartDiv").innerHTML = predictionChartHtml;
         document.getElementById("predictionConfig").style.display = "none";
         if(calculate){
             getDataCalculatePredictionAndPlot();
         }
+    }
+}
+
+function savePredictionConfigFile(){
+    saveHTMLtoPredictionConfig();
+    var pom = document.createElement('a');
+    pom.setAttribute('href', 'data:application/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(predictionConfig)));
+    pom.setAttribute('download', "koronagrafy-prediction-config.json");
+
+    if (document.createEvent) {
+        var event = document.createEvent('MouseEvents');
+        event.initEvent('click', true, true);
+        pom.dispatchEvent(event);
+    }
+    else {
+        pom.click();
+    }
+}
+function loadPredictionConfigFile(evt){
+    if (window.File && window.FileReader && window.FileList && window.Blob) {
+        // Great success! All the File APIs are supported.
+        var file = evt.target.files[0];
+        var reader = new FileReader();
+        reader.readAsText(file);
+        reader.onload=function(){
+            predictionConfig = JSON.parse(reader.result);
+        }
+    } else {
+        alert('The File APIs are not fully supported in this browser.');
+    }
+    loadPredictionConfigIntoHTML()
+}
+
+function resetPredictionConfigToDefault(){
+    if (confirm('Opravdu chcete obnovit výchozí hodnoty konfigurace?')) {
+        predictionConfig = predictionConfigDefaults;
+        loadPredictionConfigIntoHTML();
     }
 }
 

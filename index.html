@@ -108,9 +108,17 @@
                 <div class="chartsBox">
                     <div class="chartControls">
                         <div>
-                            <h2>Predikce <img style="cursor: pointer;" onclick="predictionConfigSH(true)" width="15px" src="settings.svg"></img></h2>
+                            <h2>Predikce
+                                <img id="settingsApplyButton" style="cursor: pointer;" onclick="predictionConfigSH(true)" width="15px" src="settings.svg"></img>
+                                <img class="showedInPredictionConfig" title="Stáhnout konfiguraci" style="cursor: pointer;" onclick="savePredictionConfigFile()" width="15px" src="download.svg"></img>
+                                <label class="showedInPredictionConfig" for="config-input">
+                                    <img title="Načíst konfiguraci" style="cursor: pointer;" width="15px" src="upload.svg"></img>
+                                </label>
+                                <input style="display: none;" id="config-input" type="file" accept=".json"/>
+                                <img class="showedInPredictionConfig" title="Výchozí konfigurace" style="cursor: pointer;" onclick="resetPredictionConfigToDefault()" width="15px" src="reload.svg"></img>
+                            </h2>
                         </div>
-                        <button style="height:40%; margin:0px 0px 0px 15px; width:50%;" tabindex="1" onclick="getDataCalculatePredictionAndPlot()">Kalkulovat</button>
+                        
                     </div>
                     <div id="predictionConfig">
                         <form> 
@@ -165,7 +173,9 @@
                             <input type="checkbox" onchange="plotPredictionToDataChartCbChange()" id="plotPredictionToDataChart" name="plotPredictionToDataChart"><label for="plotPredictionToDataChart">Vykreslit do DataChartu</label>
                             <label id="label_plotPredictionToDataChartAddDays" for="plotPredictionToDataChart"> navíc +</label>
                             <input class="dynamicInput" onInput="dynamicInputAdjust()" type="number" id="plotPredictionToDataChartAddDays" name="plotPredictionToDataChartAddDays" onfocus="this.select();" min="0">dní
+                            
                         </form>
+                        
                     </div>
                     <div id="predictionChartDiv">
                         
