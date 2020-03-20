@@ -16,18 +16,18 @@ function calculateInfectionDefaultProbability(daysSinceOutbreakStart, currentCon
 var predictionConfigDefaults = {functionName: "henry1",
                                 startValue: 4,
                                 startDate: new Date(2020, 02, 02),
-                                infectionPeriod: 21,
+                                infectionPeriod: 6,
                                 growthFactor: "continuousFromExistingData",
-                                growthFactorDataUntilDate: -1, //This will be good when we would want to know how our predictions from day X matched current data
+                                growthFactorDataUntilDate: new Date("2020-03-09T00:00:00.000Z"), //This will be good when we would want to know how our predictions from day X matched current data
                                 averageMeetPerDay: 30,
                                 infectionProbability: 30,
                                 continuous_endCustom: false,
                                 continuos_endCustom_val: 0.5,
                                 populationSize:10649800,
-                                continuous_endVar: false,
-                                continuous_endVarValues: "-1; 0.4*5; 0.25*10; 0.2*9",
-                                plotPredictionToDataChart: false,
-                                plotPredictionToDataChartAddDays: 1
+                                continuous_endVar: true,
+                                continuous_endVarValues: "0.27*12; 0.2*10; 0.12",
+                                plotPredictionToDataChart: true,
+                                plotPredictionToDataChartAddDays: 4
 }
 
 function parseEndVarValues(varValues){
@@ -52,7 +52,7 @@ function parseEndVarValues(varValues){
 
 var predictionConfig = predictionConfigDefaults;
 
-var growthFactorCalcConfigDefaults = {days: 1, perDay: true};
+var growthFactorCalcConfigDefaults = {days: 4, perDay: true};
 var growthFactorCalcConfig = growthFactorCalcConfigDefaults;
 
 var myMeetPerDayConf = 20;

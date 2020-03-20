@@ -99,7 +99,7 @@
                             <label class="radio-inline">
                                 <input id="dataChart_whole" onclick="growthFactorConfigChange()" type="radio" name="optradio">Z celků
                             </label><br>
-                            <label id="label_daysToCalculateGrowthFactorOver" for="daysToCalculateGrowthFactorOver">Vzdálenost dnů mezi kterýma počítat:<br>
+                            <label id="label_daysToCalculateGrowthFactorOver" for="daysToCalculateGrowthFactorOver">Interval růstu:<br>
                                 <input type="number" id="daysToCalculateGrowthFactorOver" name="daysToCalculateGrowthFactorOver" onchange="growthFactorConfigChange()" onfocus="this.select();" min="1">dnů<br>
                             </label>
                         </form>
@@ -134,7 +134,7 @@
                                     <option value="henryProbabilistic">Henryova pravděpodobnostní</option>
                                 </select>
                             </label><br>
-                            <label for="infectionPeriod">Doba trvání nakazování ostatních:</label>
+                            <label for="infectionPeriod">Infekční doba:</label>
                             <input type="number" class="dynamicInput" onInput="dynamicInputAdjust(); infectionPeriodGrowthFactorChange();" id="infectionPeriod" name="infectionPeriod" onfocus="this.select();" min="0">&nbspdní<br> 
                             
                             <label for="mTimesPway"><b>Růstový faktor</b>
