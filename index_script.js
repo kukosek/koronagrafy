@@ -201,6 +201,7 @@ function loadCurrentData(){
                 //load default value into did i got the virus today box inputBox
                 document.getElementById("myMeetPerDay").value = myMeetPerDayConf;
                 myTodayInfectedProbability();
+                dynamicInputAdjust();
                 
             }else{
                 alert("Error parsing chart dataset");
@@ -222,7 +223,7 @@ var predictionChartHtml = "<canvas class=\"chartjs\" id=\"predictionChart\"></ca
 
 var predictionConfigShowed=false;
 
-function predictionConfigSH(){
+function predictionConfigSH(calculate){
     if (predictionConfigShowed == false) {
         predictionConfigShowed = true;
         document.getElementById("predictionChartDiv").innerHTML = "";
@@ -258,7 +259,9 @@ function predictionConfigSH(){
         predictionConfig["plotPredictionToDataChartAddDays"] = document.getElementById("plotPredictionToDataChartAddDays").value;
         document.getElementById("predictionChartDiv").innerHTML = predictionChartHtml;
         document.getElementById("predictionConfig").style.display = "none";
-        getDataCalculatePredictionAndPlot();
+        if(calculate){
+            getDataCalculatePredictionAndPlot();
+        }
     }
 }
 
@@ -340,7 +343,7 @@ function dynamicInputAdjust(){
 
 function getDataCalculatePredictionAndPlot(){
     if (predictionConfigShowed) {
-        predictionConfigSH();
+        predictionConfigSH(false);
     }
     result = calculatePredictions();
     labels = [];
@@ -620,7 +623,7 @@ function myTodayInfectedProbability() {
 window.addEventListener('load', (event) => {
     document.addEventListener('keyup', (e) => {
         if (e.code === "Enter"){
-            predictionConfigSH();
+            predictionConfigSH(true);
         }
     });
 });
