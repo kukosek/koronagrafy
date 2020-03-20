@@ -268,6 +268,7 @@ function predictionConfigSH(calculate){
         document.getElementById("infectionProbability").value = predictionConfig["infectionProbability"];
         document.getElementById("continuous_endLast").checked = !predictionConfig["continuous_endCustom"];
         document.getElementById("continuous_endCustom").checked = predictionConfig["continuous_endCustom"];
+        document.getElementById("continuous_endCustomVars").checked = predictionConfig["continuous_endVar"];
         if (predictionConfig["growthFactorDataUntilDate"] == -1) {
             document.getElementById("continuous_limitData").checked = false;
         }else{
@@ -281,7 +282,7 @@ function predictionConfigSH(calculate){
         document.getElementById("plotPredictionToDataChartAddDays").value = predictionConfig["plotPredictionToDataChartAddDays"];
         dynamicInputAdjust();
         predictionConfigMtimesPwayChange();
-        predictionConfigValAtEndChange();
+        predictionConfigValAtEndChange(false);
         plotPredictionToDataChartCbChange();
         document.getElementById("infectionPeriod").focus()
     }else{
@@ -364,7 +365,7 @@ function plotPredictionToDataChartCbChange(){
     }
 }
 
-function predictionConfigValAtEndChange(){
+function predictionConfigValAtEndChange(promptT){
     if(document.getElementById("continuous_endCustom").checked){
         document.getElementById("valueAfterDataFromGrowthChart").disabled = false;
         document.getElementById("label_continuous_endLast").style.color = "grey";
@@ -374,19 +375,21 @@ function predictionConfigValAtEndChange(){
         document.getElementById("label_continuous_endLast").style.color = "#444";
         predictionConfig["continuous_endVar"] = false;
     }else{
-        predictionConfig["continuous_endVar"] = true;
-        let specifiedEndVars = prompt("Zadejte ve formátu: hodnota1(*kolikrát); hodnota2(*kolikrát),...\n hodnota -1 znamená poslední použítá hodnota.", predictionConfig["continuous_endVarValues"]);
-        try {
-            let output =parseEndVarValues(specifiedEndVars);
-            if (output.length>0 && !output.includes(NaN)){
-                predictionConfig["continuous_endVarValues"] = specifiedEndVars;
-            }else{
-                alert("Něco nevyšlo, možná jste zadali špatný formát. Zkuste to znovu");
-                predictionConfigValAtEndChange();
-            }
-        }catch(err){
-            if (err.message != "varValues is null"){
-                alert("Něco nevyšlo, možná jste zadali špatný formát. "+err.message);
+        if (promptT){
+            predictionConfig["continuous_endVar"] = true;
+            let specifiedEndVars = prompt("Zadejte ve formátu: hodnota1(*kolikrát); hodnota2(*kolikrát),...\n hodnota -1 znamená poslední použítá hodnota.", predictionConfig["continuous_endVarValues"]);
+            try {
+                let output =parseEndVarValues(specifiedEndVars);
+                if (output.length>0 && !output.includes(NaN)){
+                    predictionConfig["continuous_endVarValues"] = specifiedEndVars;
+                }else{
+                    alert("Něco nevyšlo, možná jste zadali špatný formát. Zkuste to znovu");
+                    predictionConfigValAtEndChange();
+                }
+            }catch(err){
+                if (err.message != "varValues is null"){
+                    alert("Něco nevyšlo, možná jste zadali špatný formát. "+err.message);
+                }
             }
         }
     }
