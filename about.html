@@ -66,6 +66,27 @@
                 <p>
                     Výchozí parametry predikce jsou zadané podle našeho vlastního aktuálního odhadu. Nejsme žádní epidemiologové, proto doporučuju zkusit si nastavit vlastní parametry. Pak si konfiguraci můžete uložit a třeba se s kamarádem vsadit o to, kdo se trefí líp.
                 </p>
+                <p>
+                    Predikce se nepočítá od dnešních hodnot, ale začíná ve dni 0, kdy byli nakažení 4 lidé.
+                </p>
+                <h4>Predikce s růstovým faktorem podle grafy růstového faktoru</h4>
+                    <div class="functionDescription">
+                    Růstový faktor se pro každý výpočet aktualizuje na hodnotu z grafu růstového faktoru. Konfigurace grafu růstového faktoru se do predikce taky promítne.<br>
+                    <p>
+                    <b>Nastavení</b>
+                    <ul>
+                        <li><b>Hodnota po konci dat</b> - možnost nastavit, jaké hodnoty se budou do funkce dosazovat po použití poslední hodnoty z grafu růstového faktoru</li>
+                        <li><b>Limitovat data</b> umožňuje stanovit datum, do kterého používat hodnoty z grafu růstového faktoru. Pro vybrání tohoto data stačí kliknout na určitý bod v grafu růstového faktoru nebo v grafu dat.</li>
+                    </ul>
+                    <p>
+                        Pokud byste chtěli, aby křivka grafu predikce přesně napodobila dosavadní křivku dat, musíte
+                        <ul>
+                            <li>v růstovém faktoru šíření nastavit funkci "Mezi dny" s hodnotou intervalu jednoho dnu</li>
+                            <li>V konfiguraci predikce vypnout funkčnost "limitovat data"</li>
+                        </ul>
+                    </p>
+                    </div>
+                <h3>Funkce</h3>
                 <h4 style="line-height: 0;">Parametry funkcí</h4>
                 <div class="functionDescription">
                     <i>
@@ -77,7 +98,6 @@
                     T = Infekční doba (doba, po kterou je člověk infekční a ještě není v karanténě)<br>
                     </i>
                 </div>
-                <h3>Funkce</h3>
                 <h4>Henryova první epidemická funkce (Logistická)</h4>
                 <div class="functionDescription">
                     <img class="mathExpressionImg" src="predpis_Henryova-prvni.png"></img><br>
