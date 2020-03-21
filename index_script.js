@@ -436,7 +436,7 @@ function predictionConfigValAtEndChange(promptT){
     }else{
         if (promptT){
             predictionConfig["continuous_endVar"] = true;
-            let specifiedEndVars = prompt("Zadejte ve formátu: hodnota1(*kolikrát); hodnota2(*kolikrát),...\n hodnota -1 znamená poslední použítá hodnota.", predictionConfig["continuous_endVarValues"]);
+            let specifiedEndVars = prompt("Zadejte ve formátu: hodnota1(*kolik dní); hodnota2(*kolik dní),...\n hodnota -1 znamená poslední použítá hodnota.", predictionConfig["continuous_endVarValues"]);
             try {
                 let output =parseEndVarValues(specifiedEndVars);
                 if (output.length>0 && !output.includes(NaN)){
@@ -544,6 +544,7 @@ function growthFactorConfigChange(){
         growthFactorCalcConfig["days"] = document.getElementById("daysToCalculateGrowthFactorOver").value;
     }
     calculateSpreadGrowthFactorAndPlot("50%");
+    getDataCalculatePredictionAndPlot();
 }
 
 var growthFactorConfigShowed = false;
@@ -558,9 +559,10 @@ function growthFactorConfigSH(){
         if (growthFactorCalcConfig["days"]=="all"){
             document.getElementById("dataChart_whole").checked = true;
         }else{
+            document.getElementById("chartConfig_between").checked = true;
             document.getElementById("daysToCalculateGrowthFactorOver").value = growthFactorCalcConfig["days"];
         }
-        growthFactorConfigChange();
+        calculateSpreadGrowthFactorAndPlot("50%");
     }
     growthFactorConfigShowed = !growthFactorConfigShowed;
     
