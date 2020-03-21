@@ -69,6 +69,7 @@ function loadDataChart(optionalDataset){
         dataChartDataset = datasets["confirmed"];
     }
     let feeddatasets;
+    let ttformat;
     if(optionalDataset != null){
         for(var i=0; i<dataChartDataset.length; i++){
             blablaDate = new Date(dataChartDataset[i].x);
@@ -88,6 +89,7 @@ function loadDataChart(optionalDataset){
             }
                 
         ];
+        ttformat = 'D. M.';
     }else{
         feeddatasets = [{ 
                 data: dataChartDataset,
@@ -96,6 +98,7 @@ function loadDataChart(optionalDataset){
                 fill: false
             }
         ];
+        ttformat = 'D. M. H:mm';
     }
     document.getElementById("dataChartDiv").innerHTML = "";
     document.getElementById("dataChartDiv").innerHTML = dataChartHtml;
@@ -112,7 +115,7 @@ function loadDataChart(optionalDataset){
                 xAxes: [{
                     type: 'time',
                     time: {
-                        tooltipFormat: 'D. M. HH:mm',
+                        tooltipFormat: ttformat,
                         unit: 'day',
                         unitStepSize: 1,
                         displayFormats: {
@@ -635,7 +638,7 @@ function calculateSpreadGrowthFactorAndPlot(height){//TODO dont call this twice 
                 xAxes: [{
                     type: 'time',
                     time: {
-                        tooltipFormat: 'D. M. HH:mm',
+                        tooltipFormat: 'D. M.',
                         unit: 'day',
                         displayFormats: {
                             'day': 'D. M.'
