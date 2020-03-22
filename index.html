@@ -28,7 +28,15 @@
                 </div>
                 <div id ="navBarInfoDiv">
                     <ul id="navBar">
-                        <li class="navBarItem left">Pandemie COVID-19 v ČR</li>
+                        <li class="navBarItem left">Pandemie COVID-19
+                            <select id="databasePick" onchange="databaseChange()">
+                                <option value="czech-covid-db">czech-covid-db</option>
+                                <option value="CSSE COVID-19 Dataset">CSSE COVID-19</option>
+                            </select>
+                            <select id="stateSelect" onchange="countryNameChange()">
+
+                            </select>
+                        </li>
                         <li class="navBarItem right" id="navBarGithubIcon"><a href="about.html">about</a></li>
                         <li class="navBarItem" id="navBarGithubIcon">
                             <a href="https://github.com/kukosek/koronagrafy"><img width="20px" src="Octicons-mark-github.svg"></img></a>
@@ -141,7 +149,7 @@
                             <label for="mTimesPway"><b>Růstový faktor</b>
                                 <select id="mTimesPway" onchange="predictionConfigMtimesPwayChange()">
                                     <option value="continuousFromExistingData">Průběžný podle grafu růstového faktoru</option>
-                                    <option value="fixedFromCurrentValue">Konstantní z aktuálních hodnot</option>
+                                    <option value="fixedFromCurrentValue" disabled>Konstantní z aktuálních hodnot</option>
                                     <option value="customFixed">Konstantní vlastní</option>
                                 </select>
                             </label><br>
