@@ -279,11 +279,11 @@ function csseParse(){
 
     //calculate config variable for prediction
     
-
     loadDataChart(null);
     //calculate spread growth factors from confirmed dataset
     calculateSpreadGrowthFactorAndPlot("77%");
     getDataCalculatePredictionAndPlot();
+    myTodayInfectedProbability();
 }
 
 
@@ -443,7 +443,6 @@ function loadCurrentData(databaseName){
                         document.getElementById("stateSelect").appendChild(optionToAdd);
                     }
                     csseParse();
-                    myTodayInfectedProbability();
                }else{
                    alert("Error parsing chart dataset");
                }
