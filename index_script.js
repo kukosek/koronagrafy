@@ -797,12 +797,11 @@ function calculateSpreadGrowthFactor(dataset){
                 for (j = 0; j<days; j++){
                     bottomSidePart1 += parseInt(dataset[i+j].y);
                     let indexOfMyPoop = i-predictionConfig["infectionPeriod"]+j;
-                    if (indexOfMyPoop < 0) {
-                        bottomSidePart2 += 0;
-                    }else{
+                    if (indexOfMyPoop > 0) {
                         bottomSidePart2 +=  parseInt(dataset[indexOfMyPoop].y);
                     }
                 }
+                
                 let bottomSide = bottomSidePart1 - bottomSidePart2;
                 let result;
                 if (bottomSide == 0){
@@ -810,6 +809,20 @@ function calculateSpreadGrowthFactor(dataset){
                 }else{
                     result = upperSide/bottomSide;
                 }
+                if (result == 0){
+                    if (bottomSidePart1 != 0){
+                        for (c=i; c<dataset.length; c++){
+                            if (dataset[c].y != dataset[i]) {
+                                result = upperSide/bottomSidePart1;
+                                break;
+                            }
+                        }
+                    }else{
+                        result = 0;
+                    }
+                }
+                
+                
                 let date = new Date(dataset[i].x) //V2
                 date.setHours(12,0,0,0);
                 datasets["spreadGrowthFactor"].push({x: date.toISOString(), y: result});
@@ -921,6 +934,7 @@ function calculatePredictions(){
         endVars = parseEndVarValues(predictionConfig["continuous_endVarValues"]);
     }
     while(lastResult <= populationSize && Math.round(lastResult) != Math.round(resultBeforeInfectionPeriod) ){
+        
         if (day-predictionConfig["infectionPeriod"]-1 >= 0){
             resultBeforeInfectionPeriod = returnObject["infectedPeopleInDay"][day-predictionConfig["infectionPeriod"]-1].y;
         }else{
@@ -938,6 +952,17 @@ function calculatePredictions(){
                     lastMTimesP = MtimesP;
                 }else{
                     MtimesP = lastMTimesP;
+                }
+                
+                if (indexOfSGF > 0){
+                    if (lastResult-resultBeforeInfectionPeriod == 0 && datasets["spreadGrowthFactor"][indexOfSGF-1].y == 0){
+                        for (i=indexOfStartSpreadGrowthFactor+day; i<datasets["spreadGrowthFactor"].length; i++){
+                            if (datasets["spreadGrowthFactor"][i].y != 0) {
+                                resultBeforeInfectionPeriod = 0;
+                                break;
+                            }
+                        }
+                    }
                 }
             }else{
                 if(predictionConfig["continuous_endCustom"] && date.getTime() > growthFactorUntilDate.getTime()){
@@ -978,8 +1003,8 @@ function calculatePredictions(){
             returnObject["infectedPeopleInDay"].push({x: date.toISOString(), y: populationSize});
         }
         day++;
-        date.setDate(date.getDate() + 1);
         lastResult = result;
+        date.setDate(date.getDate() + 1);
     }
     returnObject["pandemicPeriod"] = day;
     returnObject["pandemicEndDate"] = date;
