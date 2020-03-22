@@ -27,7 +27,7 @@ var predictionConfigCzechDefaults = {functionName: "henry1",
                                 startDate: new Date(2020, 02, 02),
                                 infectionPeriod: 6,
                                 growthFactor: "continuousFromExistingData",
-                                growthFactorDataUntilDate: new Date("2020-03-20T00:00:00.000Z"), //This will be good when we would want to know how our predictions from day X matched current data
+                                growthFactorDataUntilDate: -2, //This will be good when we would want to know how our predictions from day X matched current data
                                 averageMeetPerDay: 30,
                                 infectionProbability: 30,
                                 continuous_endCustom: false,
@@ -473,6 +473,9 @@ function loadPredictionConfigIntoHTML(){
     document.getElementById("continuous_endCustomVars").checked = predictionConfig["continuous_endVar"];
     if (predictionConfig["growthFactorDataUntilDate"] == -1) {
         document.getElementById("continuous_limitData").checked = false;
+    }else if (predictionConfig["growthFactorDataUntilDate"] < -1){
+        document.getElementById("continuous_limitData").checked = true;
+        document.getElementById("growthFactorDateLimit").value = new Date(new Date().setDate(new Date().getDate()+(predictionConfig.growthFactorDataUntilDate+1))).toISOString().substr(0, 10);
     }else{
         document.getElementById("continuous_limitData").checked = true;
         document.getElementById("growthFactorDateLimit").value = predictionConfig["growthFactorDataUntilDate"].toISOString().substr(0, 10);
@@ -921,8 +924,8 @@ function calculatePredictions(){
     let resultBeforeInfectionPeriod = 0;
     let populationSize = parseInt(predictionConfig["populationSize"]);
     let growthFactorUntilDate;
-    if (predictionConfig["growthFactorDataUntilDate"] == -1){
-        growthFactorUntilDate = new Date(datasets["confirmedMaxInDay"][datasets["confirmedMaxInDay"].length-1].x);
+    if (predictionConfig["growthFactorDataUntilDate"] < 0){
+        growthFactorUntilDate = new Date(datasets["confirmedMaxInDay"][datasets["confirmedMaxInDay"].length+predictionConfig["growthFactorDataUntilDate"]].x);
     }else{
         growthFactorUntilDate = new Date(predictionConfig["growthFactorDataUntilDate"]);
     }
@@ -1061,7 +1064,9 @@ if (haveParams){
     if(urlSettings.hasOwnProperty("predictionConfig")){
         console.log(urlSettings["predictionConfig"]);
         urlSettings["predictionConfig"] = JSON.parse(decodeURIComponent(urlSettings["predictionConfig"]));
-        urlSettings["predictionConfig"].growthFactorDataUntilDate = new Date(urlSettings["predictionConfig"].growthFactorDataUntilDate);
+        if (urlSettings["predictionConfig"].growthFactorDataUntilDate > 0){
+            urlSettings["predictionConfig"].growthFactorDataUntilDate = new Date(urlSettings["predictionConfig"].growthFactorDataUntilDate);
+        }
         predictionConfig=urlSettings["predictionConfig"];
     }
     if(urlSettings.hasOwnProperty("growthFactorCalcConfig")){
