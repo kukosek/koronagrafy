@@ -27,14 +27,14 @@ var predictionConfigCzechDefaults = {functionName: "henry1",
                                 startDate: new Date(2020, 02, 02),
                                 infectionPeriod: 6,
                                 growthFactor: "continuousFromExistingData",
-                                growthFactorDataUntilDate: new Date("2020-03-09T00:00:00.000Z"), //This will be good when we would want to know how our predictions from day X matched current data
+                                growthFactorDataUntilDate: new Date("2020-03-20T00:00:00.000Z"), //This will be good when we would want to know how our predictions from day X matched current data
                                 averageMeetPerDay: 30,
                                 infectionProbability: 30,
                                 continuous_endCustom: false,
                                 continuos_endCustom_val: 0.5,
                                 populationSize:10649800,
                                 continuous_endVar: true,
-                                continuous_endVarValues: "0.27*12; 0.2*10; 0.12",
+                                continuous_endVarValues: "0.25*10; 0.2*10; 0.12",
                                 plotPredictionToDataChart: true,
                                 plotPredictionToDataChartAddDays: 4
 }
@@ -55,7 +55,7 @@ var predictionConfigWorldDefaults = {functionName: "henry1",
                                 plotPredictionToDataChart: true,
                                 plotPredictionToDataChartAddDays: 4
 }
-var growthFactorCalcConfigCzechDefaults = {days: 4, perDay: true};
+var growthFactorCalcConfigCzechDefaults = {days: 1, perDay: true};
 var growthFactorCalcConfigWorldDefaults = {days: 1, perDay: true};
 
 var populations = {world: 7800000000, Germany: 83149300, Italy: 60243406,
@@ -1036,6 +1036,7 @@ if (haveParams){
     }
     if(urlSettings.hasOwnProperty("predictionConfig")){
         urlSettings["predictionConfig"] = JSON.parse(decodeURIComponent(urlSettings["predictionConfig"]));
+        urlSettings["predictionConfig"].growthFactorDataUntilDate = new Date(urlSettings["predictionConfig"].growthFactorDataUntilDate);
         predictionConfig=urlSettings["predictionConfig"];
     }
     if(urlSettings.hasOwnProperty("growthFactorCalcConfig")){
