@@ -120,7 +120,7 @@ function loadDataChart(optionalDataset){
             },{
                 data: optionalDataset,
                 label: "Predikce",
-                borderColor: "#c96526",
+                borderColor: "#964906",
                 fill: false
             }
                 
@@ -709,7 +709,7 @@ function getDataCalculatePredictionAndPlot(){
             datasets: [{
                 data: predDataset,
                 label: "Počet lidí, kteří jsou nebo byli infikováni",
-                borderColor: "#c96526",
+                borderColor: "#964906",
                 fill: false
             }]
         },
@@ -1060,6 +1060,7 @@ if (haveParams){
         urlSelectedCountry = urlSettings["countryName"];
     }
     if(urlSettings.hasOwnProperty("predictionConfig")){
+        console.log(urlSettings["predictionConfig"]);
         urlSettings["predictionConfig"] = JSON.parse(decodeURIComponent(urlSettings["predictionConfig"]));
         urlSettings["predictionConfig"].growthFactorDataUntilDate = new Date(urlSettings["predictionConfig"].growthFactorDataUntilDate);
         predictionConfig=urlSettings["predictionConfig"];
