@@ -321,7 +321,6 @@ function loadCurrentData(databaseName){
                 
                 //load default value into did i got the virus today box inputBox
                 document.getElementById("myMeetPerDay").value = myMeetPerDayConf;
-                myTodayInfectedProbability();
                 dynamicInputAdjust();
             } else { // show the result
                 alert(`Error ${xhr.status}: ${xhr.statusText}`); // e.g. 404: Not Found
@@ -394,7 +393,7 @@ function loadCurrentData(databaseName){
                     //calculate spread growth factors from confirmed dataset
                     calculateSpreadGrowthFactorAndPlot("77%");
                     getDataCalculatePredictionAndPlot();
-                    
+                    myTodayInfectedProbability();
                     
                 }else{
                     alert("Error parsing chart dataset");
@@ -444,6 +443,7 @@ function loadCurrentData(databaseName){
                         document.getElementById("stateSelect").appendChild(optionToAdd);
                     }
                     csseParse();
+                    myTodayInfectedProbability();
                }else{
                    alert("Error parsing chart dataset");
                }
@@ -1020,7 +1020,7 @@ function myTodayInfectedProbability() {
     }else{
         resultBeforeInfectionPeriod = 0;
     }
-    let probabilityIamInfected = 1-Math.pow((1 - predictionConfig["infectionProbability"]*0.01*(data["confirmed"]["number"]-resultBeforeInfectionPeriod)/predictionConfig["populationSize"]),myMeetPerDay)
+    let probabilityIamInfected = 1-Math.pow((1 - predictionConfig["infectionProbability"]*0.01*(datasets["confirmedMaxInDay"][datasets["confirmedMaxInDay"].length-1].y-resultBeforeInfectionPeriod)/predictionConfig["populationSize"]),myMeetPerDay)
     
     document.getElementById("probabilityOfBeingInfectedToday").innerHTML = (probabilityIamInfected*100).toString()+"%";
 }
