@@ -20,7 +20,7 @@ function calculateInfectionDefaultProbability(daysSinceOutbreakStart, currentCon
         return howtonamethis;
     }
 }
-var defaultDatabase = "czech-covid-db";
+var databaseName = "czech-covid-db";
 
 var predictionConfigCzechDefaults = {functionName: "henry1",
                                 startValue: 4,
@@ -63,6 +63,9 @@ var populations = {world: 7800000000, Germany: 83149300, Italy: 60243406,
                     "Korea, South": 51780579, France: 67069000,
                     China: 1401841400, Netherlands: 17446481
                 }
+var data = {"confirmed":{"number":"", "date":""},
+"recovered":{"number":"", "date":""},
+"deaths":     {"number":"", "date":""}};
 
 function parseEndVarValues(varValues){
     let returnList = [];
@@ -220,7 +223,14 @@ function csseParse(){
         datasets["confirmedMaxInDay"].push({x: dateOfColumn, y: 0});
     }
     
-    let stateName = document.getElementById("stateSelect").value;
+    let stateName;
+    if (urlSelectedCountry==null){
+        stateName = document.getElementById("stateSelect").value;
+    }else{
+        stateName = urlSelectedCountry;
+        document.getElementById("stateSelect").value = stateName;
+        urlSelectedCountry = null;
+    }
     for(i=0; i<dataFromCsse.length; i++){
         let currStateName = dataFromCsse[i][1];
         if (stateName == currStateName || stateName == "world"){
@@ -278,9 +288,10 @@ function csseParse(){
 
 
 
-var data;
+
 function loadCurrentData(databaseName){
     if (databaseName == "czech-covid-db"){
+        urlSelectedCountry=null;
         /* Fetch current data from kukosek's github
         * 
         */
@@ -406,6 +417,7 @@ function loadCurrentData(databaseName){
 
        // This will be called after the response is received
        xhrConfirmed.onload = function() {
+           document.getElementById("databasePick").value = databaseName;
            if (xhrConfirmed.status == 200 || xhrConfirmed.status == 304) { // analyze HTTP status of the response
                var results = Papa.parse(xhrConfirmed.response);
                if (results["errors"].length == 0){
@@ -996,4 +1008,40 @@ window.addEventListener('load', (event) => {
     });
 });
 
-loadCurrentData(defaultDatabase);
+function shareCurrentView() {
+    let obj = {"databaseName": databaseName,
+           "countryName": stateName = document.getElementById("stateSelect").value,
+           "predictionConfig" : JSON.stringify(predictionConfig),
+           "growthFactorCalcConfig": JSON.stringify(growthFactorCalcConfig)
+    };
+    paramsEncoded = new URLSearchParams(obj).toString();
+    let url = location.protocol + '//' + location.host + location.pathname+"?"+paramsEncoded;
+    prompt("Následující adresu si zkopírujte a někomu pošlete:",url);
+}
+
+var urlSelectedCountry=null;
+var search = location.search.substring(1);
+let haveParams = false;
+try{
+    var urlSettings = JSON.parse('{"' + decodeURI(search).replace(/"/g, '\\"').replace(/&/g, '","').replace(/=/g,'":"').replace(/\+/g,' ') + '"}');
+    haveParams = true;
+}catch(err){}
+
+if (haveParams){
+    if(urlSettings.hasOwnProperty("databaseName")){
+        databaseName=urlSettings["databaseName"];
+    }
+    if(urlSettings.hasOwnProperty("countryName")){
+        urlSelectedCountry = urlSettings["countryName"];
+    }
+    if(urlSettings.hasOwnProperty("predictionConfig")){
+        urlSettings["predictionConfig"] = JSON.parse(decodeURIComponent(urlSettings["predictionConfig"]));
+        predictionConfig=urlSettings["predictionConfig"];
+    }
+    if(urlSettings.hasOwnProperty("growthFactorCalcConfig")){
+        urlSettings["growthFactorCalcConfig"] = JSON.parse(decodeURIComponent(urlSettings["growthFactorCalcConfig"]));
+        growthFactorCalcConfig=urlSettings["growthFactorCalcConfig"];
+    }
+}
+
+loadCurrentData(databaseName);
