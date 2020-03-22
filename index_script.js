@@ -797,7 +797,7 @@ function calculateSpreadGrowthFactor(dataset){
                 for (j = 0; j<days; j++){
                     bottomSidePart1 += parseInt(dataset[i+j].y);
                     let indexOfMyPoop = i-predictionConfig["infectionPeriod"]+j;
-                    if (indexOfMyPoop > 0) {
+                    if (indexOfMyPoop >= 0) {
                         bottomSidePart2 +=  parseInt(dataset[indexOfMyPoop].y);
                     }
                 }
