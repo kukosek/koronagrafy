@@ -93,7 +93,8 @@ var growthFactorCalcConfig = growthFactorCalcConfigCzechDefaults;
 
 var myMeetPerDayConf = 20;
 
-var dataChartHtml = "<canvas class=\"chartjs\" id=\"dataChart\"></canvas>"
+var dataChartHtml = "<canvas class=\"chartjs\" id=\"dataChart\"></canvas>";
+var dataChart;
 var datasets = {confirmed:[], confirmedMaxInDay:[], spreadGrowthFactor:[]};
 var dataChartFirstLoad = true;
 function loadDataChart(optionalDataset){
@@ -122,8 +123,7 @@ function loadDataChart(optionalDataset){
                 label: "Predikce",
                 borderColor: "#964906",
                 fill: false
-            }
-                
+            }   
         ];
         ttformat = 'D. M.';
     }else{
@@ -136,46 +136,52 @@ function loadDataChart(optionalDataset){
         ];
         ttformat = 'D. M. H:mm';
     }
-    document.getElementById("dataChartDiv").innerHTML = "";
-    document.getElementById("dataChartDiv").innerHTML = dataChartHtml;
-    let ctx = document.getElementById("dataChart");
-    var dataChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-            datasets: feeddatasets
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                xAxes: [{
-                    type: 'time',
-                    time: {
-                        tooltipFormat: ttformat,
-                        unit: 'day',
-                        unitStepSize: 1,
-                        displayFormats: {
-                            'day': 'D. M.'
+    if(dataChart == undefined){
+        console.log("poprve");
+        document.getElementById("dataChartDiv").innerHTML = "";
+        document.getElementById("dataChartDiv").innerHTML = dataChartHtml;
+        let ctx = document.getElementById("dataChart");
+        dataChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                datasets: feeddatasets
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    xAxes: [{
+                        type: 'time',
+                        time: {
+                            tooltipFormat: ttformat,
+                            unit: 'day',
+                            unitStepSize: 1,
+                            displayFormats: {
+                                'day': 'D. M.'
+                            }
                         }
-                    }
-                }],
-                yAxes: [{
-                    ticks: {
-                        // forces step size to be 5 units
-                        stepSize: 50 // <----- This prop sets the stepSize
-                    }
-                }]
+                    }],
+                    yAxes: [{
+                        ticks: {
+                            // forces step size to be 5 units
+                            stepSize: 50 // <----- This prop sets the stepSize
+                        }
+                    }]
+                }
             }
-        }
-    });
-    document.getElementById("dataChart").onclick = function (evt) {
-        var activePoints = dataChart.getElementsAtEventForMode(evt, 'point', dataChart.options);
-        if(activePoints.length > 0 && predictionConfigShowed && document.getElementById("mTimesPway").value == "continuousFromExistingData" && document.getElementById("continuous_limitData").checked){
-            var firstPointIndex = activePoints[0]._index;
-            let dateOfClickedPoint = new Date(datasets["spreadGrowthFactor"][firstPointIndex].x);
-            document.getElementById("growthFactorDateLimit").value = dateOfClickedPoint.toISOString().substr(0, 10);
-        }
-    };
+        });
+        document.getElementById("dataChart").onclick = function (evt) {
+            var activePoints = dataChart.getElementsAtEventForMode(evt, 'point', dataChart.options);
+            if(activePoints.length > 0 && predictionConfigShowed && document.getElementById("mTimesPway").value == "continuousFromExistingData" && document.getElementById("continuous_limitData").checked){
+                var firstPointIndex = activePoints[0]._index;
+                let dateOfClickedPoint = new Date(datasets["spreadGrowthFactor"][firstPointIndex].x);
+                document.getElementById("growthFactorDateLimit").value = dateOfClickedPoint.toISOString().substr(0, 10);
+            }
+        };
+    }else{
+        dataChart.data.datasets = feeddatasets;
+        dataChart.update();
+    }
 }
 var csseArr = [];
 var csseCountriesList = [];
@@ -687,6 +693,7 @@ function dynamicInputAdjust(){
     }
 }
 
+var predictionChart;
 function getDataCalculatePredictionAndPlot(){
     if (predictionConfigShowed) {
         predictionConfigSH(false);
@@ -705,7 +712,7 @@ function getDataCalculatePredictionAndPlot(){
     
     document.getElementById("predictionChartDiv").innerHTML = predictionChartHtml;
     var ctx2 = document.getElementById("predictionChart");
-    var predictionChart = new Chart(ctx2, {
+    predictionChart = new Chart(ctx2, {
         type: 'line',
         data: {
             datasets: [{
@@ -833,52 +840,57 @@ function calculateSpreadGrowthFactor(dataset){
     } //TODO if not perday
 }
 
-
-
+var lastHeight = 0;
+var infectionGrowthFactorChart;
 growthFactorChartHtml = "<canvas class=\"chartjs\" id=\"infectionGrowthFactorChart\"></canvas>";
 function calculateSpreadGrowthFactorAndPlot(height){//TODO dont call this twice like idiot
     calculateSpreadGrowthFactor(datasets["confirmedMaxInDay"]);
-    
-    document.getElementById("growthFactorChartDiv").innerHTML = "";
-    document.getElementById("growthFactorChartDiv").innerHTML = growthFactorChartHtml;
-    document.getElementById("infectionGrowthFactorChart").style.height = height;
-    var ctx = document.getElementById("infectionGrowthFactorChart");
-    
-    var infectionGrowthFactorChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-            datasets: [{ 
-                data: datasets["spreadGrowthFactor"],
-                label: "Faktor šíření",
-                borderColor: "#5e00c9",
-                fill: false
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                xAxes: [{
-                    type: 'time',
-                    time: {
-                        tooltipFormat: 'D. M.',
-                        unit: 'day',
-                        displayFormats: {
-                            'day': 'D. M.'
-                        }
-                    }
+    if (infectionGrowthFactorChart == undefined || height.localeCompare(lastHeight) != 0){
+        document.getElementById("growthFactorChartDiv").innerHTML = "";
+        document.getElementById("growthFactorChartDiv").innerHTML = growthFactorChartHtml;
+        document.getElementById("infectionGrowthFactorChart").style.height = height;
+        var ctx = document.getElementById("infectionGrowthFactorChart");
+        
+        infectionGrowthFactorChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                datasets: [{ 
+                    data: datasets["spreadGrowthFactor"],
+                    label: "Faktor šíření",
+                    borderColor: "#5e00c9",
+                    fill: false
                 }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    xAxes: [{
+                        type: 'time',
+                        time: {
+                            tooltipFormat: 'D. M.',
+                            unit: 'day',
+                            displayFormats: {
+                                'day': 'D. M.'
+                            }
+                        }
+                    }]
+                }
             }
-        }
-    });
-    document.getElementById("infectionGrowthFactorChart").onclick = function (evt) {
-        var activePoints = infectionGrowthFactorChart.getElementsAtEventForMode(evt, 'point', infectionGrowthFactorChart.options);
-        if(activePoints.length > 0 && predictionConfigShowed && document.getElementById("mTimesPway").value == "continuousFromExistingData" && document.getElementById("continuous_limitData").checked){
-            var firstPointIndex = activePoints[0]._index;
-            let dateOfClickedPoint = new Date(datasets["spreadGrowthFactor"][firstPointIndex].x);
-            document.getElementById("growthFactorDateLimit").value = dateOfClickedPoint.toISOString().substr(0, 10);
-        }
-    };
+        });
+        document.getElementById("infectionGrowthFactorChart").onclick = function (evt) {
+            var activePoints = infectionGrowthFactorChart.getElementsAtEventForMode(evt, 'point', infectionGrowthFactorChart.options);
+            if(activePoints.length > 0 && predictionConfigShowed && document.getElementById("mTimesPway").value == "continuousFromExistingData" && document.getElementById("continuous_limitData").checked){
+                var firstPointIndex = activePoints[0]._index;
+                let dateOfClickedPoint = new Date(datasets["spreadGrowthFactor"][firstPointIndex].x);
+                document.getElementById("growthFactorDateLimit").value = dateOfClickedPoint.toISOString().substr(0, 10);
+            }
+        };
+        lastHeight = height;
+    }else{
+        infectionGrowthFactorChart.data.datasets[0].data = datasets.spreadGrowthFactor;
+        infectionGrowthFactorChart.update();
+    }
 }
 
 function calculatePredictions(){
