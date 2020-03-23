@@ -289,7 +289,7 @@ function csseParse(datasetName){
         }
     }
     //clean start zeros and same values
-    let valuesStart;
+    let valuesStart = null;
     for(i=0; i<datasets[datasetNameMaxInDay].length; i++){
         let currValConfirmed = parseInt(datasets[datasetNameMaxInDay][i].y);
         if (currValConfirmed >0 )  {
@@ -297,8 +297,12 @@ function csseParse(datasetName){
             break;
         }
     }
-    datasets[datasetNameMaxInDay].splice(0,valuesStart);
-    
+    console.log(valuesStart);
+    if (valuesStart == null){
+        datasets[datasetNameMaxInDay] = [datasets[datasetNameMaxInDay][datasets[datasetNameMaxInDay].length-1]];
+    }else{
+        datasets[datasetNameMaxInDay].splice(0,valuesStart);
+    }
     if (datasetName == "confirmed"){
         predictionConfig.startDate = new Date(datasets[datasetNameMaxInDay][0].x);
         predictionConfig.startValue = datasets[datasetNameMaxInDay][0].y;
