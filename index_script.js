@@ -20,6 +20,7 @@ function calculateInfectionDefaultProbability(daysSinceOutbreakStart, currentCon
         return howtonamethis;
     }
 }
+NProgress.configure({ showSpinner: false });
 var databaseName = "czech-covid-db";
 
 var predictionConfigCzechDefaults = {functionName: "henry1",
@@ -200,10 +201,14 @@ var csseCountriesList = [];
 function databaseChange() {
     databaseName = document.getElementById("databasePick").value;
     if (databaseName == "CSSE COVID-19 Dataset"){
+        if (!progressBarShowed){
+            NProgress.start();
+            progressBarShowed = true;
+        }
+        csseArrParsed = {confirmed: false, recovered: false, deaths: false};
         predictionConfig = predictionConfigWorldDefaults;
         growthFactorCalcConfig = growthFactorCalcConfigWorldDefaults;
         if (csseArr.confirmed.length == 0) {
-            czechCovidDbArrParsed = {confirmed: false, recovered: false, deaths: false};
             loadCurrentData(databaseName)
         }else{
             document.getElementById("stateSelect").innerHTML = "";
@@ -218,20 +223,38 @@ function databaseChange() {
                 optionToAdd.innerHTML = currContryName;
                 document.getElementById("stateSelect").appendChild(optionToAdd);
             }
-            csseArrParsed = {confirmed: false, recovered: false, deaths: false};
             csseParse("confirmed");
+            NProgress.inc();
             csseParse("recovered");
+            NProgress.inc();
             csseParse("deaths");
         }
     }else if (databaseName == "czech-covid-db"){
+        if (!progressBarShowed){
+            NProgress.start();
+            progressBarShowed = true;
+        }
+        czechCovidDbArrParsed = {confirmed: false, recovered: false, deaths: false};
         predictionConfig = predictionConfigCzechDefaults;
         growthFactorCalcConfig = growthFactorCalcConfigCzechDefaults;
-        loadCurrentData(databaseName);
+        if (czechCovidDbArr.length==0){
+            loadCurrentData(databaseName);
+        }else{
+            czechCovidDbParse("confirmed");
+            if (progressBarShowed){NProgress.inc();}
+            czechCovidDbParse("recovered");
+            if (progressBarShowed){NProgress.inc();}
+            czechCovidDbParse("deaths");
+        }
     }
 }
 
 function countryNameChange(){
     if (document.getElementById("databasePick").value == "CSSE COVID-19 Dataset"){
+        if (!progressBarShowed){
+            NProgress.start();
+            progressBarShowed = true;
+        }
         csseArrParsed = {confirmed: false, recovered: false, deaths: false};
         csseParse("confirmed");
         csseParse("recovered");
@@ -291,6 +314,14 @@ function csseParse(datasetName){
     document.getElementById(datasetName+"Text").getElementsByClassName("statNumber")[0].innerHTML = data[datasetName]["number"];
     document.getElementById(datasetName+"Text").getElementsByClassName("statDate")[0].innerHTML = convertDate(data[datasetName]["date"]);
     
+    if(datasetName == "confirmed"){
+        //calculate spread growth factors from confirmed dataset
+        calculateSpreadGrowthFactorAndPlot("77%");
+        myTodayInfectedProbability();
+        
+        progressBarShowed = false;
+    }
+
     datasets[datasetName]= datasets[datasetNameMaxInDay];
 
     //calculate config variable for prediction
@@ -298,15 +329,15 @@ function csseParse(datasetName){
     if (csseArrParsed.confirmed == true && csseArrParsed.recovered == true && csseArrParsed.deaths == true) {
         if (predictionConfig.plotPredictionToDataChart){
             getDataCalculatePredictionAndPlot();
+            if (progressBarShowed){NProgress.inc();};
         }else{
             loadDataChart(null);
+            if (progressBarShowed){NProgress.inc();};
             getDataCalculatePredictionAndPlot();
         }
-    }
-    if(datasetName == "confirmed"){
-        //calculate spread growth factors from confirmed dataset
-        calculateSpreadGrowthFactorAndPlot("77%");
-        myTodayInfectedProbability();
+        NProgress.done();
+    }else{
+        if (progressBarShowed){NProgress.inc();};
     }
 }
 
@@ -354,6 +385,14 @@ function czechCovidDbParse(datasetName){
         i++;
         lastValueConfirmed = currValueConfirmed;
     });
+
+    data[datasetName].number = datasets[datasetNameMaxInDay][datasets[datasetNameMaxInDay].length-1].y;
+    data[datasetName].date = datasets[datasetNameMaxInDay][datasets[datasetNameMaxInDay].length-1].x;
+
+    //basic stats cases box
+    document.getElementById(datasetName+"Text").getElementsByClassName("statNumber")[0].innerHTML = data[datasetName]["number"];
+    document.getElementById(datasetName+"Text").getElementsByClassName("statDate")[0].innerHTML = convertDate(data[datasetName]["date"]);
+
     if(datasetName == "confirmed"){
         predictionConfig.startDate = new Date(datasets.confirmedMaxInDay[0].x);
         predictionConfig.startValue = parseInt(datasets.confirmedMaxInDay[0].y);
@@ -364,6 +403,7 @@ function czechCovidDbParse(datasetName){
         //calculate spread growth factors from confirmed dataset
         calculateSpreadGrowthFactorAndPlot("77%");
         myTodayInfectedProbability();
+        if (progressBarShowed){NProgress.inc();};
     }
     czechCovidDbArrParsed[datasetName] = true;
     if (czechCovidDbArrParsed.confirmed == true && czechCovidDbArrParsed.recovered == true && czechCovidDbArrParsed.deaths == true) {
@@ -373,11 +413,14 @@ function czechCovidDbParse(datasetName){
             loadDataChart(null);        
             getDataCalculatePredictionAndPlot();
         }
+        NProgress.done();
+        progressBarShowed = false;
     }
 }
 
-
+var progressBarShowed = false;
 function loadCurrentData(databaseName){
+    progressBarShowed = true;
     if (databaseName == "czech-covid-db"){
         urlSelectedCountry=null;
         /* Fetch current data from kukosek's github
@@ -434,6 +477,7 @@ function loadCurrentData(databaseName){
                 if (results["errors"].length == 0){
                     czechCovidDbArr["confirmed"] = results.data;
                     czechCovidDbParse("confirmed");
+                    if(progressBarShowed) {NProgress.inc();}
                 }else{
                     alert("Error parsing chart dataset");
                 }
@@ -455,6 +499,7 @@ function loadCurrentData(databaseName){
                 if (results["errors"].length == 0){
                     czechCovidDbArr["recovered"] = results.data;
                     czechCovidDbParse("recovered");
+                    if(progressBarShowed) {NProgress.inc();}
                 }else{
                     alert("Error parsing chart dataset");
                 }
@@ -476,6 +521,7 @@ function loadCurrentData(databaseName){
                 if (results["errors"].length == 0){
                     czechCovidDbArr["deaths"] = results.data;
                     czechCovidDbParse("deaths");
+                    if(progressBarShowed) {NProgress.inc();}
                 }else{
                     alert("Error parsing chart dataset");
                 }
