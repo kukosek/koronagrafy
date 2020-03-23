@@ -28,7 +28,7 @@ var predictionConfigCzechDefaults = {functionName: "henry1",
                                 startDate: new Date(2020, 02, 02),
                                 infectionPeriod: 6,
                                 growthFactor: "continuousFromExistingData",
-                                growthFactorDataUntilDate: -2, //This will be good when we would want to know how our predictions from day X matched current data
+                                growthFactorDataUntilDate: -3, //This will be good when we would want to know how our predictions from day X matched current data
                                 averageMeetPerDay: 30,
                                 infectionProbability: 30,
                                 continuous_endCustom: false,
