@@ -1,5 +1,10 @@
 function convertDate(dateString){
-    return dateString;
+    let mmnt = moment(dateString);
+    if (mmnt.hours() == 0 && mmnt.minutes() == 0){
+        return mmnt.format("D.M. YYYY");
+    }else{
+        return mmnt.format("D.M. YYYY H:mm");
+    }
 }
 
 var firstRecordConfirmedCases = 4;
@@ -284,7 +289,9 @@ function csseParse(datasetName){
         let currStateName = dataFromCsse[i][1];
         if (stateName == currStateName || stateName == "world"){
             for (j=0; j<datasets[datasetNameMaxInDay].length; j++){
-                datasets[datasetNameMaxInDay][j].y += parseInt(dataFromCsse[i][j+4]);
+                if (dataFromCsse[i][j+4] != ""){
+                    datasets[datasetNameMaxInDay][j].y += parseInt(dataFromCsse[i][j+4]);
+                }
             }
         }
     }
@@ -297,12 +304,14 @@ function csseParse(datasetName){
             break;
         }
     }
-    console.log(valuesStart);
+    
     if (valuesStart == null){
         datasets[datasetNameMaxInDay] = [datasets[datasetNameMaxInDay][datasets[datasetNameMaxInDay].length-1]];
     }else{
         datasets[datasetNameMaxInDay].splice(0,valuesStart);
     }
+    datasets[datasetName]= datasets[datasetNameMaxInDay];
+    
     if (datasetName == "confirmed"){
         predictionConfig.startDate = new Date(datasets[datasetNameMaxInDay][0].x);
         predictionConfig.startValue = datasets[datasetNameMaxInDay][0].y;
@@ -316,7 +325,13 @@ function csseParse(datasetName){
 
     //basic stats cases box
     document.getElementById(datasetName+"Text").getElementsByClassName("statNumber")[0].innerHTML = data[datasetName]["number"];
-    document.getElementById(datasetName+"Text").getElementsByClassName("statDate")[0].innerHTML = convertDate(data[datasetName]["date"]);
+    if(datasetName == "recovered"){
+        document.getElementsByClassName("box")[1].style.fontSize = "11px";
+        document.getElementById(datasetName+"Text").getElementsByClassName("statDate")[0].innerHTML = "JHO CSSE nyní nemá funkční dataset zotavených.";
+        document.getElementById(datasetName+"Text").getElementsByClassName("statDate")[0].style.fontSize = "10px";
+    }else{
+        document.getElementById(datasetName+"Text").getElementsByClassName("statDate")[0].innerHTML = convertDate(data[datasetName]["date"]);
+    }
     
     if(datasetName == "confirmed"){
         //calculate spread growth factors from confirmed dataset
@@ -326,7 +341,7 @@ function csseParse(datasetName){
         progressBarShowed = false;
     }
 
-    datasets[datasetName]= datasets[datasetNameMaxInDay];
+    
 
     //calculate config variable for prediction
     csseArrParsed[datasetName] = true;
@@ -395,6 +410,8 @@ function czechCovidDbParse(datasetName){
 
     //basic stats cases box
     document.getElementById(datasetName+"Text").getElementsByClassName("statNumber")[0].innerHTML = data[datasetName]["number"];
+    document.getElementsByClassName("box")[1].style.fontSize = "150%";
+    document.getElementsByClassName("statDate")[1].style.fontSize = "8px";
     document.getElementById(datasetName+"Text").getElementsByClassName("statDate")[0].innerHTML = convertDate(data[datasetName]["date"]);
 
     if(datasetName == "confirmed"){
@@ -542,7 +559,7 @@ function loadCurrentData(databaseName){
        * 
        */
        let xhrConfirmed = new XMLHttpRequest();
-       xhrConfirmed.open('GET', 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Confirmed.csv');
+       xhrConfirmed.open('GET', 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv');
        xhrConfirmed.send();
 
        // This will be called after the response is received
@@ -611,7 +628,7 @@ function loadCurrentData(databaseName){
        };
        
        let xhrDeaths = new XMLHttpRequest();
-       xhrDeaths.open('GET', 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Deaths.csv');
+       xhrDeaths.open('GET', 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_global.csv');
        xhrDeaths.send();
 
        // This will be called after the response is received
