@@ -295,7 +295,7 @@ function databaseChange() {
         czechCovidDbArrParsed = {confirmed: false, recovered: false, deaths: false};
         predictionConfig = predictionConfigCzechDefaults;
         growthFactorCalcConfig = growthFactorCalcConfigCzechDefaults;
-        if (czechCovidDbArr.length==0){
+        if (czechCovidDbArr.confirmed.length==0){
             loadCurrentData(databaseName);
         }else{
             czechCovidDbParse("confirmed");
