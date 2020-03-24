@@ -6,7 +6,7 @@
                 let currUrl = window.location.toString().replace("/index.html", "/");
                 var userLang = navigator.language || navigator.userLanguage;
                 
-                if(userLang == "cs"){
+                if(userLang == "cs" || userLang == "cs-CZ"){
                     window.location.href = currUrl+"cs/index.html";
                 }else{
                     window.location.href =currUrl+"en/index.html";
