@@ -25,8 +25,55 @@ function calculateInfectionDefaultProbability(daysSinceOutbreakStart, currentCon
         return howtonamethis;
     }
 }
+
 NProgress.configure({ showSpinner: false });
-var databaseName = "czech-covid-db";
+var czechCovidDbURLs = {currentNumbers: 'https://raw.githubusercontent.com/kukosek/czech-covid-db/master/current_numbers.json',
+                        confirmed: 'https://raw.githubusercontent.com/kukosek/czech-covid-db/master/records_confirmed.csv',
+                        recovered: 'https://raw.githubusercontent.com/kukosek/czech-covid-db/master/records_recovered.csv',
+                        deaths: 'https://raw.githubusercontent.com/kukosek/czech-covid-db/master/records_deaths.csv',
+}
+var csseURLs = {confirmed: 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv',
+            recovered: 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Recovered.csv',
+            deaths: 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_global.csv'
+}
+var csStrings = {world: "Svět",
+             czechia: "Česko",
+             jhoRecoveredUnavailable: "JHO CSSE nyní nemá funkční dataset zotavených.",
+             copyAndShareURL: "Následující adresu si zkopírujte a někomu pošlete:",
+             endVarsPrompt: "Zadejte ve formátu: hodnota1(*kolik dní); hodnota2(*kolik dní),... \n\
+             hodnota -1 znamená poslední použítá hodnota.",
+             endVarsBadFormat: "Něco nevyšlo, možná jste zadali špatný formát.",
+             tryItAgaing: "Zkuste to znovu",
+             errorReadingFile: "Chyba při čtení souboru:\n",
+             fileApiNotSupported: "Nahrávání soborů není podporováno vaším prohlížečem",
+             predictionLabel: "Počet lidí, kteří jsou nebo byli infikováni",
+             predictionTooltipLabel: 'Počet lidí',
+             growthFactorChartLabel: "Faktor šíření",
+             dataChartConfirmedLabel: "Potvrzené případy",
+             dataChartRecoveredLabel: "Zotavení",
+             dataChartDeathsLabel: "Úmrtí",
+             dataChartPredictionLabel: "Predikce",
+             idiotError: "Error - co delas ty blazne??",
+            }
+var enStrings = {world: "World",
+             czechia: "Czechia",
+             jhoRecoveredUnavailable: "JHO CSSE haven't got the recovered dataset working.",
+             copyAndShareURL: "Copy and send this adress to someone:",
+             endVarsPrompt: "Enter in format: value1(*how many days); value2(*how many days),... \n\
+             value -1 means last used value.",
+             endVarsBadFormat: "Exception occured, maybe you entered it in bad format.",
+             tryItAgaing: "Try it again.",
+             errorReadingFile: "Error reading file:\n",
+             fileApiNotSupported: "The File API is not supported by your browser.",
+             predictionLabel: "Number of people that are or were infected",
+             predictionTooltipLabel: 'Number of people',
+             growthFactorChartLabel: "Growth factor",
+             dataChartConfirmedLabel: "Confirmed cases",
+             dataChartRecoveredLabel: "Recovered",
+             dataChartDeathsLabel: "Deaths",
+             dataChartPredictionLabel: "Prediction",
+             idiotError: "Error - you doing weird things",
+            }
 
 var predictionConfigCzechDefaults = {functionName: "henry1",
                                 startValue: 4,
@@ -92,11 +139,17 @@ function parseEndVarValues(varValues){
     return returnList;
 }
 
-
-var predictionConfig = predictionConfigCzechDefaults;
-
-var growthFactorCalcConfig = growthFactorCalcConfigCzechDefaults;
-
+if (window.location.toString().includes("cs")){
+    var databaseName = "czech-covid-db";
+    var strings = csStrings;
+    var predictionConfig = predictionConfigCzechDefaults;
+    var growthFactorCalcConfig = growthFactorCalcConfigCzechDefaults;
+}else{
+    var databaseName = "CSSE COVID-19 Dataset";
+    var strings = enStrings;
+    var predictionConfig = predictionConfigWorldDefaults;
+    var growthFactorCalcConfig = growthFactorCalcConfigWorldDefaults;
+}
 var myMeetPerDayConf = 20;
 
 var dataChartHtml = "<canvas class=\"chartjs\" id=\"dataChart\"></canvas>";
@@ -128,17 +181,17 @@ function loadDataChart(optionalDataset){
 
     feeddatasets = [{ 
         data: datasets["confirmed"+datasetNameMaxString],
-        label: "Potvrzené případy",
+        label: strings.dataChartConfirmedLabel,
         borderColor: "#f84f4a",
         fill: 1
             },{
         data: datasets["recovered"+datasetNameMaxString],
-        label: "Zotavení",
+        label: strings.dataChartRecoveredLabel,
         borderColor: "#1261ff",
         fill: false
             },{
         data: datasets["deaths"+datasetNameMaxString],
-        label: "Úmrtí",
+        label: strings.dataChartDeathsLabel,
         borderColor: "#383838",
         fill: false
         }
@@ -146,7 +199,7 @@ function loadDataChart(optionalDataset){
     if (optionalDataset != null){
         feeddatasets.push({
             data: optionalDataset,
-            label: "Predikce",
+            label: strings.dataChartPredictionLabel,
             borderColor: "#964906",
             fill: false
         });
@@ -219,7 +272,7 @@ function databaseChange() {
             document.getElementById("stateSelect").innerHTML = "";
             let optionToAdd = document.createElement("option");
             optionToAdd.value = "world";
-            optionToAdd.innerHTML = "Svět";
+            optionToAdd.innerHTML = strings.world;
             document.getElementById("stateSelect").appendChild(optionToAdd);
             for(i=1; i<csseCountriesList.length; i++){
                 let currContryName = csseCountriesList[i];
@@ -327,7 +380,7 @@ function csseParse(datasetName){
     document.getElementById(datasetName+"Text").getElementsByClassName("statNumber")[0].innerHTML = data[datasetName]["number"];
     if(datasetName == "recovered"){
         document.getElementsByClassName("box")[1].style.fontSize = "11px";
-        document.getElementById(datasetName+"Text").getElementsByClassName("statDate")[0].innerHTML = "JHO CSSE nyní nemá funkční dataset zotavených.";
+        document.getElementById(datasetName+"Text").getElementsByClassName("statDate")[0].innerHTML = strings.jhoRecoveredUnavailable;
         document.getElementById(datasetName+"Text").getElementsByClassName("statDate")[0].style.fontSize = "10px";
     }else{
         document.getElementById(datasetName+"Text").getElementsByClassName("statDate")[0].innerHTML = convertDate(data[datasetName]["date"]);
@@ -367,7 +420,7 @@ function czechCovidDbParse(datasetName){
 
     let optionToAdd = document.createElement("option");
     optionToAdd.value = "czechia";
-    optionToAdd.innerHTML = "Česko";
+    optionToAdd.innerHTML = strings.czechia;
     document.getElementById("stateSelect").innerHTML="";
     document.getElementById("stateSelect").appendChild(optionToAdd);
 
@@ -450,7 +503,7 @@ function loadCurrentData(databaseName){
         
 
         let xhr = new XMLHttpRequest();
-        xhr.open('GET', 'https://raw.githubusercontent.com/kukosek/czech-covid-db/master/current_numbers.json');
+        xhr.open('GET', czechCovidDbURLs.currentNumbers);
         xhr.send();
 
         // This will be called after the response is received
@@ -489,7 +542,7 @@ function loadCurrentData(databaseName){
         * 
         */
         let xhrConfirmed = new XMLHttpRequest();
-        xhrConfirmed.open('GET', 'https://raw.githubusercontent.com/kukosek/czech-covid-db/master/records_confirmed.csv');
+        xhrConfirmed.open('GET', czechCovidDbURLs.confirmed);
         xhrConfirmed.send();
         // This will be called after the response is received
         xhrConfirmed.onload = function() {
@@ -511,7 +564,7 @@ function loadCurrentData(databaseName){
         };
 
         let xhrRecovered = new XMLHttpRequest();
-        xhrRecovered.open('GET', 'https://raw.githubusercontent.com/kukosek/czech-covid-db/master/records_recovered.csv');
+        xhrRecovered.open('GET', czechCovidDbURLs.recovered);
         xhrRecovered.send();
         // This will be called after the response is received
         xhrRecovered.onload = function() {
@@ -533,7 +586,7 @@ function loadCurrentData(databaseName){
         };
 
         let xhrDeaths = new XMLHttpRequest();
-        xhrDeaths.open('GET', 'https://raw.githubusercontent.com/kukosek/czech-covid-db/master/records_deaths.csv');
+        xhrDeaths.open('GET', czechCovidDbURLs.deaths);
         xhrDeaths.send();
         // This will be called after the response is received
         xhrDeaths.onload = function() {
@@ -559,7 +612,7 @@ function loadCurrentData(databaseName){
        * 
        */
        let xhrConfirmed = new XMLHttpRequest();
-       xhrConfirmed.open('GET', 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv');
+       xhrConfirmed.open('GET', csseURLs.confirmed);
        xhrConfirmed.send();
 
        // This will be called after the response is received
@@ -574,7 +627,7 @@ function loadCurrentData(databaseName){
                     
                     let optionToAdd = document.createElement("option");
                     optionToAdd.value = "world";
-                    optionToAdd.innerHTML = "Svět";
+                    optionToAdd.innerHTML = strings.world;
                     document.getElementById("stateSelect").appendChild(optionToAdd);
                     for(i=1; i<csseArr["confirmed"].length; i++){
                         let currContryName = csseArr["confirmed"][i][1];
@@ -604,7 +657,7 @@ function loadCurrentData(databaseName){
        };
        let xhrRecovered = new XMLHttpRequest();
 
-       xhrRecovered.open('GET', 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Recovered.csv');
+       xhrRecovered.open('GET', csseURLs.recovered);
        xhrRecovered.send();
 
        // This will be called after the response is received
@@ -628,7 +681,7 @@ function loadCurrentData(databaseName){
        };
        
        let xhrDeaths = new XMLHttpRequest();
-       xhrDeaths.open('GET', 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_global.csv');
+       xhrDeaths.open('GET', csseURLs.deaths);
        xhrDeaths.send();
 
        // This will be called after the response is received
@@ -709,7 +762,7 @@ var predictionConfigShowed=false;
 function predictionConfigSH(calculate){
     if (predictionConfigShowed == false) {
         predictionConfigShowed = true;
-        document.getElementById("settingsApplyButton").src="apply.svg";
+        document.getElementById("settingsApplyButton").src="/images/apply.svg";
         let fghjkl = document.getElementsByClassName("showedInPredictionConfig");
         for (i=0; i<fghjkl.length; i++){
             fghjkl[i].style.display = "initial";
@@ -720,7 +773,7 @@ function predictionConfigSH(calculate){
         document.getElementById('config-input').addEventListener('change', loadPredictionConfigFile, false);
     }else{
         predictionConfigShowed = false;
-        document.getElementById("settingsApplyButton").src="settings.svg";
+        document.getElementById("settingsApplyButton").src="/images/settings.svg";
         let fghjkl = document.getElementsByClassName("showedInPredictionConfig");
         for (i=0; i<fghjkl.length; i++){
             fghjkl[i].style.display = "none";
@@ -761,11 +814,11 @@ function loadPredictionConfigFile(evt){
                 let loadedDict = JSON.parse(reader.result);
                 predictionConfig = JSON.parse(reader.result);
             }catch(err){
-                alert("Chyba při čtení souboru:\n"+err.message);
+                alert(strings.errorReadingFile+err.message);
             }
         }
     } else {
-        alert('The File APIs are not fully supported in this browser.');
+        alert(strings.fileApiNotSupported);
     }
     loadPredictionConfigIntoHTML()
 }
@@ -843,18 +896,18 @@ function predictionConfigValAtEndChange(promptT){
     }else{
         if (promptT){
             predictionConfig["continuous_endVar"] = true;
-            let specifiedEndVars = prompt("Zadejte ve formátu: hodnota1(*kolik dní); hodnota2(*kolik dní),...\n hodnota -1 znamená poslední použítá hodnota.", predictionConfig["continuous_endVarValues"]);
+            let specifiedEndVars = prompt(strings.endVarsPrompt, predictionConfig["continuous_endVarValues"]);
             try {
                 let output =parseEndVarValues(specifiedEndVars);
                 if (output.length>0 && !output.includes(NaN)){
                     predictionConfig["continuous_endVarValues"] = specifiedEndVars;
                 }else{
-                    alert("Něco nevyšlo, možná jste zadali špatný formát. Zkuste to znovu");
+                    alert(strings.endVarsBadFormat+" "+strings.tryItAgaing);
                     predictionConfigValAtEndChange();
                 }
             }catch(err){
                 if (err.message != "varValues is null"){
-                    alert("Něco nevyšlo, možná jste zadali špatný formát. "+err.message);
+                    alert(strings.endVarsBadFormat+err.message);
                 }
             }
         }
@@ -907,7 +960,7 @@ function getDataCalculatePredictionAndPlot(){
         data: {
             datasets: [{
                 data: predDataset,
-                label: "Počet lidí, kteří jsou nebo byli infikováni",
+                label: strings.predictionLabel,
                 borderColor: "#964906",
                 fill: false
             }]
@@ -929,7 +982,7 @@ function getDataCalculatePredictionAndPlot(){
                 yAxes: [{
                     scaleLabel: {
                         display: false,
-                        labelString: 'Počet lidí'
+                        labelString: strings.predictionTooltipLabel
                     }
                 }]
             }
@@ -1046,7 +1099,7 @@ function calculateSpreadGrowthFactorAndPlot(height){//TODO dont call this twice 
             data: {
                 datasets: [{ 
                     data: datasets["spreadGrowthFactor"],
-                    label: "Faktor šíření",
+                    label: strings.growthFactorChartLabel,
                     borderColor: "#5e00c9",
                     fill: false
                 }]
@@ -1111,7 +1164,7 @@ function calculatePredictions(){
                 }
             }
             if (minDateConfirmedValue == null){
-                alert("Error - co delas ty blazne??");
+                alert(strings.idiotError);
             }else{
                 indexOfStartSpreadGrowthFactor = 0;
                 lastResult = minDateConfirmedValue;
@@ -1245,7 +1298,7 @@ function shareCurrentView() {
     };
     paramsEncoded = new URLSearchParams(obj).toString();
     let url = location.protocol + '//' + location.host + location.pathname+"?"+paramsEncoded;
-    prompt("Následující adresu si zkopírujte a někomu pošlete:",url);
+    prompt(strings.copyAndShareURL,url);
 }
 
 var urlSelectedCountry=null;

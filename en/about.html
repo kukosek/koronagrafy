@@ -1,0 +1,154 @@
+<html>
+    <head>
+        <title>COVID-19 Graphs and predictions</title>
+		<link rel="stylesheet" type="text/css" href="/styles.css">
+		<link href="https://fonts.googleapis.com/css2?family=PT+Mono&display=swap" rel="stylesheet">
+		<meta charset="utf8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+        <script type="text/javascript" src="/about_script.js"></script>
+        
+        <!-- Global site tag (gtag.js) - Google Analytics -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=UA-161601540-1"></script>
+        <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'UA-161601540-1');
+        </script>
+
+    </head>
+    <body style="margin: 10px 18px 0 18px;">
+        <div class="wrapperNavBar">
+            <a href="index.html">
+                <div id="navBarLogoDiv">
+                    <li class="navBarItem left" id="navBarLogo">
+                        <img class="navBarLogoPart" width="35px" src="/images/virus.svg"></img>
+                        <h1 class="navBarLogoPart">koronagrafy</h1>
+                    </li>
+                </div>
+            </a>
+            <div id ="navBarInfoDiv">
+                <ul id="navBar">
+                    <li class="navBarItem left">COVID-19 Pandemic</li>
+                    <li class="navBarItem right" id="navBarGithubIcon">about</li>
+                    <li class="navBarItem" id="navBarGithubIcon">
+                        <a href="https://github.com/kukosek/koronagrafy"><img width="20px" src="/images/Octicons-mark-github.svg"></img></a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        
+        <h1>How it works</h1>
+            <h2>Data</h2>
+                The client-side downloads data from <a href="https://github.com/kukosek/english-covid-db"> czech-covid-db github</a>. This repository is updated by <a href="https://github.com/kukosek/english-covid-db-wikipediaparser"> czech-covid-db-wikipediaparser </a>, which checks the wikipedia article <a href="https://cs.wikipedia.org/wiki/Pandemie_COVID-19_v_%C4%8Cesku">Pandemie COVID-19 v Česku</a> every minute to see if the numbers are changed. If it detects some information is changed, it stores it as a record in a .csv table, which it then sends to github.
+
+                <br><b>Why wikipedia?</b>
+                    I wanted to download data from the <a href="https://onemocneni-aktualne.mzcr.cz/covid-19"> official website of the Ministry of Health </a>, but unfortunately I found that it used a pretty complicated API from Google that needs variables full of access keys to get any data at all. If I had to reverse engineer it, it would take too much time. So I chosed the path with wikipedia and it turned out that it was not such a bad choice, because the current data sometimes gets faster to wikipedia than to the website of the Czech Ministry of Health.
+                <p>
+                    I would like to point out that due to these circumstances, please <b> do not accept the data shown here as trusted </b>. At any time, it may happen that someone enters a false value to the Wikipedia article, and it is displays here. Take the record times only for reference, this is the time when someone changed the information to Wikipedia.
+                </p>
+                <p>
+                    The website of the Czech Ministry of Health on COVID-19 says that they are preparing an open dataset. If they really release it, I will try to use their official data.
+                </p>
+                <p>
+                    <b>Edit 22.3.</b>: We now support the <a href="https://github.com/CSSEGISandData/COVID-19">world-wide dataset</a> from Johns Hopkins University.
+                </p>
+            <h2>Growth factor</h2>
+                <p>
+                    Our growth factor differs from the commonly used <a href="https://en.wikipedia.org/wiki/Basic_reproduction_number"> R<sub>0</sub> factor </a>. While the the R<sub>0</sub> factor used by epidemiologists indicates how many people does an infected person inficate <b>in the infection period</b>, the growth factor we use indicates how many people does an infected person infect in <b>  one day</b>.
+                </p>
+                <i>
+                f(x) = Number of confirmed cases in day "x"<br>
+                t = The number of day we want to calculate the growth factor for<br>
+                T = Infection period (phase, when an infected person infects other people and he still isn't quarantined)<br>
+                </i>
+                <h4 style="line-height: 0;">Between days</h4>
+                <div class="functionDescription">
+                    <i>D = Infection period (days)</i><br>
+                    <img class="longMathExpressionImg" src="/images/predpis_faktor_mezi.png"></img><br>
+                    <p>
+                    If <i>t-T+(0,1,2,3,...)</i> is smaller than 0, then <i>f(t-T+(0,1,2,3,...))</i> is replaced by 0.
+                    </p>
+                </div>
+                <h4 style="line-height: 0;">From wholes</h4>
+                <div class="functionDescription">
+                    <img class="smallMathExpressionImg" src="/images/predpis_faktor_zcelku.png"></img><br>
+                    <p>
+                        Growth factor from wholes doesn't exclude people, who aren't arleady quarantined and isn't suitable for prediction.
+                </div>
+            <h2>Prediction</h2>
+                <p>
+                    The default prediction parameters are based on our own current estimates (we do that only for czech republic prediction). We are not epidemiologists, so I recommend trying to set your own parameters. Then you can save the configuration and bet with your friend who will hit the result better.
+                </p>
+                <p>
+                    The prediction calculation doesn't start in today, but in day 0.
+                </p>
+                <h4>Prediction with continuos growth factor according to growth factor chart</h4>
+                    <div class="functionDescription">
+                        The growth factor for each calculation is updated to the value from the growth factor graph. The configuration of the growth factor graph is also reflected in the forecast.
+                        <br>
+                    <p>
+                    <b>Settings</b>
+                    <ul>
+                        <li><b>Value after end of growth factor data</b> - option to set what values will be feeded into the function after using the last value from the growth factor chart</li>
+                        <li><b>Limit data</b> - allows you to specify the last date when values from the growth factor chart should be used. To select this date, simply click a point in the growth factor chart or data chart.</li>
+                    </ul>
+                    <p>
+                        If you would like the prediction graph curve to accurately mimic the existing data curve, you must
+                        <ul>
+                            <li>set the "Between Days" function with a one-day interval value in the growth factor chart settings
+                            </li>
+                            <li>Turn off the option "limit data" in prediction settings</li>
+                        </ul>
+                    </p>
+                    </div>
+                <h3>Function, mathematically</h3>
+                <h4 style="line-height: 0;">Function parameters</h4>
+                <div class="functionDescription">
+                    <i>
+                    <br>
+                    M<sub>r</sub> = Number of people a person encounters in a day<br>
+                    M<sub>g</sub> = Population size<br>
+                    p<sub>i</sub> = The chance of getting infected after an encounter with an infected person<br>
+                    f(x) = Number of confirmed cases in day "x"<br>
+                    T = Infection period (phase, when an infected person infects other people and he still isn't quarantined)<br>
+                    </i>
+                </div>
+                <h4>Henry's first epidemic function (Logistic)</h4>
+                <div class="functionDescription">
+                    <img class="mathExpressionImg" src="/images/predpis_Henryova-prvni.png"></img><br>
+                    It is essentially a recursive prescription of an exponential sequence that does not grow to infinity, but only to a certain maximum, thereby slowing its growth towards the end again by eliminating the possibility of infecting people who are already or have been previously infected. At the same time, it expects that infected people are contagious only for a certain period of time. It does not take mortality into account, the possibility of re-infection after recovering and the biggest problem of this function is that it does not exclude the possibility of multiple infections of the same person in one day.
+                </div>
+                <h4>Henry's second epidemic function (Probabilistic)</h4>
+                <div class="functionDescription">
+                    <img class="mathExpressionImg" src="/images/predpis_Henryova-druha.png"></img><br>
+                    Due to many problems of the first function, which are difficult to tune, a slightly different approach is chosen in this case. The function calculates the likelihood of a person becoming infected on a given day, which then increases with the average number of people that he meets per day. This probability is then multiplied by the number of healthy people and the result is how many people were infected that day.
+                    <p>
+                        <br><b>Probability of getting infected</b><br>
+                        <img class="mathExpressionImg" src="/images/pravdepodobnost_Henryova-druha.png"></img><br>
+                        This is used to calculate the chance you got infected today.
+                    </p>
+                </div>
+                <b>To our surprise, both functions eventually return almost the same results.</b>
+        <h1>Development timeline</h1>
+            <ul>
+                <li><b>12.3. 2020</b> - Started developing the wikipedia parser</li>
+                <li><b>14.3. 2020</b> - Started developing the frontend, first chart</li>
+                <li><b>15.3. 2020</b> - Henry got an idea how to predict, in the evening we have the first prediction chart render.</li>
+                <li><b>17.3. 2020</b> - Growth factor chart</li>
+                <li><b>18.3. 2020</b> - Finding out that the growth factor function does not people who are already in quarantine into account, development of a new growth factor function</li>
+                <li><b>19.3. 2020</b> - Henry's second function (Probabilistic)</li>
+                <li><b>20.3. 2020</b> - New parameters in prediction settings, cosmetic details
+                </li>
+                <li><b>21.3. 2020</b> - Release, sending friends and relatives
+                </li>
+                <li><b>22.3. 2020</b> - World-wide data fron the JHO CSSE dataset</li>
+                <li><b>futute</b> - Growth factor prediction??</li>
+            </ul>
+        <h1>License</h1>
+            <div class="codebox" id="licenseArea">
+                Načítaní license...
+            </div>
+    </body>
+</html>

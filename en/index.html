@@ -1,0 +1,234 @@
+<html>
+	<head>
+		<title>Grafy COVID-19</title>
+		<link rel="stylesheet" type="text/css" href="/styles.css">
+		<link href="https://fonts.googleapis.com/css2?family=PT+Mono&display=swap" rel="stylesheet">
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.1.0/papaparse.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js"></script>
+        <script src="https://unpkg.com/nprogress@0.2.0/nprogress.js"></script>
+        <link rel='stylesheet' href='https://unpkg.com/nprogress@0.2.0/nprogress.css'/>
+		<script type="text/javascript" src="/index_script.js"></script>
+		<meta charset="utf8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta property="og:image" content="http://koronagrafy.techbrick.cz/thumbnail.png"/>
+        <meta property="og:image:secure_url" content="https://i.imgur.com/9RZrrKv.png"/>
+        <meta property="og:type" content="website"/>
+        <meta property="og:url" content="http://koronagrafy.techbrick.cz/index.html"/>
+        <meta property="og:title" content="koronagrafy - Grafy a predikce COVID-19"/>
+        <meta property="og:description" content="Matematicky odhadujeme budoucí vývin epidemie COVID-19 v České republice."/>
+        <meta property="fb:app_id" content="774574353067294"/>
+        <!-- Global site tag (gtag.js) - Google Analytics -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=UA-161601540-1"></script>
+        <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'UA-161601540-1');
+        </script>
+	</head>
+	<body>
+        <div class="content">
+            <div class="wrapperNavBar">
+                <div id="navBarLogoDiv">
+                    <li class="navBarItem left" id="navBarLogo">
+                        <img class="navBarLogoPart" width="35px" src="/images/virus.svg"></img>
+                        <h1 class="navBarLogoPart">koronagrafy</h1>
+                    </li>
+                </div>
+                <div id ="navBarInfoDiv">
+                    <ul id="navBar">
+                        <li class="navBarItem left">COVID-19 Pandemic
+                            <select id="databasePick" onchange="databaseChange()">
+                                <option value="czech-covid-db">czech-covid-db</option>
+                                <option value="CSSE COVID-19 Dataset">CSSE COVID-19</option>
+                            </select>
+                            <select id="stateSelect" onchange="countryNameChange()">
+
+                            </select>
+                        </li>
+                        <li class="navBarItem right" id="navBarGithubIcon"><a href="about.html">about</a></li>
+                        <li class="navBarItem" id="navBarGithubIcon">
+                            <a href="https://github.com/kukosek/koronagrafy"><img width="20px" src="/images/Octicons-mark-github.svg"></img></a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="wrapperBasicStats">
+                <div class="box basicStats confirmedLight" id="confirmed">
+                    <img class="oneColorIconLight" width="30px" src="/images/sick.svg"></img>
+                    <div id="confirmedText">
+                        <div class="statNumber">
+                            loading
+                        </div>
+                        <div class="statDate">
+                            ...
+                        </div>
+                    </div>
+                </div>
+                <div class="box basicStats curedLight" id="cured">
+                    <img class="oneColorIconLight" width="30px" src="/images/plus.svg"></img>
+                    <div id="recoveredText">
+                        <div class ="statNumber">
+                            loading
+                        </div>
+                        <div class="statDate">
+                            ...
+                        </div>
+                    </div>
+                </div>
+                <div class="box basicStats deathsLight" id="deaths">
+                    <img class="oneColorIconLight" width="30px" src="/images/funeral.svg"></img>
+                    <div id="deathsText">
+                        <div class ="statNumber">
+                            loading
+                        </div>
+                        <div class="statDate">
+                            ...
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="wrapperCharts">
+                <div class="chartsBox">
+                    <div class="chartControls">
+                        <h2>Data</h2>
+                        <label class="radio-inline">
+                            <input id="dataChart_allData" onclick="loadDataChart()" type="radio" name="optradio" checked>All
+                        </label>
+                        <label class="radio-inline">
+                            <input id="dataChart_dailyData" onclick="loadDataChart()" type="radio" name="optradio">Daily
+                        </label>
+                    </div>
+                    <div id="dataChartDiv">
+                        
+                    </div>
+                </div>
+                <div class="chartsBox">
+                    <div class="chartControls">
+                        <h2>Growth factor <img style="cursor: pointer;" onclick="growthFactorConfigSH()" width="15px" src="/images/settings.svg"></img></h2>
+                    </div>
+                    <div id="growthFactorChartConfig">
+                        <form>
+                            <label class="radio-inline">
+                                <input id="chartConfig_between" onclick="growthFactorConfigChange()" type="radio" name="optradio">Between days
+                            </label>
+                            <label class="radio-inline">
+                                <input id="dataChart_whole" onclick="growthFactorConfigChange()" type="radio" name="optradio">From wholes
+                            </label><br>
+                            <label id="label_daysToCalculateGrowthFactorOver" for="daysToCalculateGrowthFactorOver">Growth period:<br>
+                                <input type="number" id="daysToCalculateGrowthFactorOver" name="daysToCalculateGrowthFactorOver" onchange="growthFactorConfigChange()" onfocus="this.select();" min="1">dnů<br>
+                            </label>
+                        </form>
+                    </div>
+                    <div id="growthFactorChartDiv">
+                        
+                    </div>
+                    <div id="growthFactorChartInfo">
+                        Here we can observe whether quarantine restrictions slow down the speed of coronavirus spreading.
+                    </div>
+                </div>
+                <div class="chartsBox">
+                    <div class="chartControls">
+                        <div>
+                            <h2>Prediction
+                                <img id="settingsApplyButton" style="cursor: pointer;" onclick="predictionConfigSH(true)" width="15px" src="/images/settings.svg"></img>
+                                <img class="showedInPredictionConfig" title="Download configuration" style="cursor: pointer;" onclick="savePredictionConfigFile()" width="15px" src="/images/download.svg"></img>
+                                <label class="showedInPredictionConfig" for="config-input">
+                                    <img title="Load configuration" style="cursor: pointer;" width="15px" src="/images/upload.svg"></img>
+                                </label>
+                                <input style="display: none;" id="config-input" type="file" accept=".json"/>
+                                <img class="showedInPredictionConfig" title="Default configuration" style="cursor: pointer;" onclick="resetPredictionConfigToDefault()" width="15px" src="/images/reload.svg"></img>
+                            </h2>
+                        </div>
+                        
+                    </div>
+                    <div id="predictionConfig">
+                        <form> 
+                            <label for="predictionFunctionName">Function
+                                <select onchange="predictionConfigFunctionNameChange()" id="predictionFunctionName">
+                                    <option value="henry1">Henry's 1.</option>
+                                    <option value="henryProbabilistic">Henry's probabilistic</option>
+                                </select>
+                            </label><br>
+                            <label for="infectionPeriod">Infection period:</label>
+                            <input type="number" class="dynamicInput" onInput="dynamicInputAdjust(); infectionPeriodGrowthFactorChange();" id="infectionPeriod" name="infectionPeriod" onfocus="this.select();" min="0">&nbspdays<br> 
+                            
+                            <label for="mTimesPway"><b>Growth factor</b>
+                                <select id="mTimesPway" onchange="predictionConfigMtimesPwayChange()">
+                                    <option value="continuousFromExistingData">Continuous from existing data</option>
+                                    <option value="fixedFromCurrentValue" disabled>Fixed from current data</option>
+                                    <option value="customFixed">Fixed custom value</option>
+                                </select>
+                            </label><br>
+                            <div id="continuousFromExistingDataConfig">
+                                Value after end of growth factor data:<br>
+                                <label id="label_continuous_endLast" class="radio-inline">
+                                    <input id="continuous_endLast" onclick="predictionConfigValAtEndChange(true)" type="radio" name="optradio" checked>Last value
+                                </label>
+                                <label class="radio-inline">
+                                    <input id="continuous_endCustom" onclick="predictionConfigValAtEndChange(true)" type="radio" name="optradio">
+                                        <input class="dynamicInput" onInput="dynamicInputAdjust()" type="number" id="valueAfterDataFromGrowthChart" name="valueAfterDataFromGrowthChart" onfocus="this.select();" min="0" max="100" step="any">
+                                </label>
+                                <label class="radio-inline">
+                                    <input id="continuous_endCustomVars" onclick="predictionConfigValAtEndChange(true)" type="radio" name="optradio">Set variables<br>
+                                </label>
+                                <label for="growthFactorDateLimit">
+                                    Limit data
+                                    <label class="radio-inline">
+                                        <input id="continuous_limitData" onclick="predictionConfigDateLimitCbChange()" type="checkbox">
+                                        <input type="date" id="growthFactorDateLimit" disabled onclick=""> 
+                                    </label>
+                                    
+                                    
+                                </label>
+                            </div>
+                            <div id="customFixedValueConfig">
+                                <label id="label_averageMeetPerDay" for="averageMeetPerDay">Average person encounters per day:
+                                    <input type="number" class="dynamicInput" onInput="dynamicInputAdjust()" id="averageMeetPerDay" name="averageMeetPerDay" onfocus="this.select();" min="0">,
+                                </label>
+                                <label id="label_infectionProbability" for="infectionProbability">probability of getting infected after encountering an infected
+                                    <input class="dynamicInput" onInput="dynamicInputAdjust()" type="number" id="infectionProbability" name="infectionProbability" onfocus="this.select();" min="0" max="100" step="any">&nbsp%<br> 
+                                </label> 
+                            </div>
+                            <label for="populationSize"><br><b>Population size:</b></label><br> 
+                            <input class="dynamicInput" onInput="dynamicInputAdjust()" type="number" id="populationSize" name="populationSize" onfocus="this.select();" min="0">people<br> 
+                            <input type="checkbox" onchange="plotPredictionToDataChartCbChange()" id="plotPredictionToDataChart" name="plotPredictionToDataChart"><label for="plotPredictionToDataChart">Plot into datachart</label>
+                            <label id="label_plotPredictionToDataChartAddDays" for="plotPredictionToDataChart"> add +</label>
+                            <input class="dynamicInput" onInput="dynamicInputAdjust()" type="number" id="plotPredictionToDataChartAddDays" name="plotPredictionToDataChartAddDays" onfocus="this.select();" min="0">days
+                            
+                        </form>
+                        
+                    </div>
+                    <div id="predictionChartDiv">
+                        
+                    </div>
+                </div>
+                <div class="chartsBox">
+                    <div class="chartControls">
+                        <h2>Did I got infected today?</h2>
+                    </div>
+                    <div>
+                        <label for="myMeetPerDay">
+                            Today I encountered with
+                            <input class="dynamicInput" onInput="dynamicInputAdjust(); myTodayInfectedProbability();" type="number" id="myMeetPerDay" name="myMeetPerDay" onfocus="this.select();" min="0">people
+                        </label>
+                    </div>
+                    <p>
+                    The chance you got infected today is
+                    <div id="probabilityOfBeingInfectedToday">
+                        
+                    </div>
+                    </p>
+                </div>
+            </div>
+            <div class="footer">
+                <a id="shareCurrentView" href="#" onclick="shareCurrentView();return false;">Share current view</a>   |   <i>Icons by <a href="https://www.flaticon.com/authors/freepik" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" title="Flaticon"> www.flaticon.com</a></i>  |    e-mail: <a href="mailto:koronagrafy@seznam.cz">koronagrafy@seznam.cz</a>    |    <b><a href="/cs/index.html">Česká verze</a></b>
+            </div>
+		</div>
+        
+	</body>
+</html>
