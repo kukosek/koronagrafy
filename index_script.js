@@ -54,6 +54,7 @@ var csStrings = {world: "Svět",
              dataChartDeathsLabel: "Úmrtí",
              dataChartPredictionLabel: "Predikce",
              idiotError: "Error - co delas ty blazne??",
+             datasetError: "Omlouváme se, ale asi se vyskytla chyba pravděpodobně způsobená změněnými formáty v datasetu. Toto se často stává u datasetu CSSE, někdy udělají opravdu nekonzistentní změny. Prosím dejte nám vědět na drese koronagrafy@seznam.cz. Pokusíme se to spravit."
             }
 var enStrings = {world: "World",
              czechia: "Czechia",
@@ -73,6 +74,7 @@ var enStrings = {world: "World",
              dataChartDeathsLabel: "Deaths",
              dataChartPredictionLabel: "Prediction",
              idiotError: "Error - you doing weird things",
+             datasetError: "Sorry, but an error occured. It was probably because of changed formats in a dataset. This often happens with the JHO CSSE dataset, they sometimes do really inconsistent changes - it is a mess! Please email us about that at koronagrafy@seznam.cz. We will try to fix it."
             }
 
 var predictionConfigCzechDefaults = {functionName: "henry1",
@@ -326,10 +328,9 @@ function csseParse(datasetName){
     let datasetNameMaxInDay = datasetName+"MaxInDay";
     datasets[datasetNameMaxInDay]=[];
     for (i=4; i<columnNames.length; i++){
-        dateOfColumn = moment(columnNames[i], "M/D/YYYY").toISOString();
+        dateOfColumn = moment(columnNames[i], "M/D/YY").toISOString();
         datasets[datasetNameMaxInDay].push({x: dateOfColumn, y: 0});
     }
-    
     let stateName;
     if (urlSelectedCountry==null){
         stateName = document.getElementById("stateSelect").value;
@@ -1154,6 +1155,9 @@ function calculatePredictions(){
             }
         }
         if(indexOfStartSpreadGrowthFactor == -1){
+            if (len(datasets["spreadGrowthFactor"] == 0){
+                alert(strings.datasetError);
+            }
             let minDateSpreadGrowthKnows = new Date(datasets["spreadGrowthFactor"][0].x);
             let minDateConfirmedValue = null;
             for(var i=0; i<datasets["confirmedMaxInDay"].length; i++) {
