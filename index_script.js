@@ -326,7 +326,7 @@ function csseParse(datasetName){
     let datasetNameMaxInDay = datasetName+"MaxInDay";
     datasets[datasetNameMaxInDay]=[];
     for (i=4; i<columnNames.length; i++){
-        dateOfColumn = moment(columnNames[i], "M/D/YY").toISOString();
+        dateOfColumn = moment(columnNames[i], "M/D/YYYY").toISOString();
         datasets[datasetNameMaxInDay].push({x: dateOfColumn, y: 0});
     }
     
