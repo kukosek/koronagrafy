@@ -3,13 +3,12 @@
         <title>Grafy COVID-19</title>
         <script>
             function redir(){
-                let currUrl = window.location.toString().replace("/index.html", "/");
                 var userLang = navigator.language || navigator.userLanguage;
                 
                 if(userLang == "cs" || userLang == "cs-CZ"){
-                    window.location.href = currUrl+"cs/index.html";
+                    window.location.href = location.protocol + '//' + location.host+"/cs/index.html";
                 }else{
-                    window.location.href =currUrl+"en/index.html";
+                    window.location.href = location.protocol + '//' + location.host+"/en/index.html";
                 }
             }
         </script>
