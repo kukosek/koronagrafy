@@ -33,9 +33,11 @@ var czechCovidDbURLs = {currentNumbers: 'https://raw.githubusercontent.com/kukos
                         deaths: 'https://raw.githubusercontent.com/kukosek/czech-covid-db/master/records_deaths.csv',
 }
 var csseURLs = {confirmed: 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv',
-            recovered: 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Recovered.csv',
+            recovered: 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_recovered_global.csv',
             deaths: 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_global.csv'
 }
+var csseDateFormat = {confirmed: "M/D/YY", recovered: "M/D/YYYY", deaths: "M/D/YY"};
+var csvFormat = {"CSSE COVID-19 Dataset": {delimeter: ","}, "czech-covid-db": {delimeter: ","}};
 var csStrings = {world: "Svět",
              czechia: "Česko",
              jhoRecoveredUnavailable: "JHO CSSE nyní nemá funkční dataset zotavených.",
@@ -54,7 +56,7 @@ var csStrings = {world: "Svět",
              dataChartDeathsLabel: "Úmrtí",
              dataChartPredictionLabel: "Predikce",
              idiotError: "Error - co delas ty blazne??",
-             datasetError: "Omlouváme se, ale asi se vyskytla chyba pravděpodobně způsobená změněnými formáty v datasetu. Toto se často stává u datasetu CSSE, někdy udělají opravdu nekonzistentní změny. Prosím dejte nám vědět na drese koronagrafy@seznam.cz. Pokusíme se to spravit."
+             datasetError: "Omlouváme se, ale asi se vyskytla chyba pravděpodobně způsobená změněnými formáty v datasetu. Toto se často stává u datasetu JHO CSSE, někdy udělají opravdu nekonzistentní změny. Prosím dejte nám vědět na adrese koronagrafy@seznam.cz. Pokusíme se to spravit."
             }
 var enStrings = {world: "World",
              czechia: "Czechia",
@@ -328,7 +330,7 @@ function csseParse(datasetName){
     let datasetNameMaxInDay = datasetName+"MaxInDay";
     datasets[datasetNameMaxInDay]=[];
     for (i=4; i<columnNames.length; i++){
-        dateOfColumn = moment(columnNames[i], "M/D/YY").toISOString();
+        dateOfColumn = moment(columnNames[i], csseDateFormat[datasetName]).toISOString();
         datasets[datasetNameMaxInDay].push({x: dateOfColumn, y: 0});
     }
     let stateName;
@@ -343,10 +345,12 @@ function csseParse(datasetName){
         let currStateName = dataFromCsse[i][1];
         if (stateName == currStateName || stateName == "world"){
             for (j=0; j<datasets[datasetNameMaxInDay].length; j++){
-                if (dataFromCsse[i][j+4] != ""){
-                    datasets[datasetNameMaxInDay][j].y += parseInt(dataFromCsse[i][j+4]);
+                let item = dataFromCsse[i][j+4];
+                if (item != undefined && item != ""){
+                    datasets[datasetNameMaxInDay][j].y += parseInt(item.replace(/\D+/g, ""));
                 }
             }
+            //console.log(datasets[datasetNameMaxInDay][30]);
         }
     }
     //clean start zeros and same values
@@ -358,7 +362,6 @@ function csseParse(datasetName){
             break;
         }
     }
-    
     if (valuesStart == null){
         datasets[datasetNameMaxInDay] = [datasets[datasetNameMaxInDay][datasets[datasetNameMaxInDay].length-1]];
     }else{
@@ -379,7 +382,7 @@ function csseParse(datasetName){
 
     //basic stats cases box
     document.getElementById(datasetName+"Text").getElementsByClassName("statNumber")[0].innerHTML = data[datasetName]["number"];
-    if(datasetName == "recovered"){
+    if(data[datasetName].number == NaN){
         document.getElementsByClassName("box")[1].style.fontSize = "11px";
         document.getElementById(datasetName+"Text").getElementsByClassName("statDate")[0].innerHTML = strings.jhoRecoveredUnavailable;
         document.getElementById(datasetName+"Text").getElementsByClassName("statDate")[0].style.fontSize = "10px";
@@ -548,13 +551,13 @@ function loadCurrentData(databaseName){
         // This will be called after the response is received
         xhrConfirmed.onload = function() {
             if (xhrConfirmed.status == 200 || xhrConfirmed.status == 304) { // analyze HTTP status of the response
-                let results = Papa.parse(xhrConfirmed.response);
+                let results = Papa.parse(xhrConfirmed.response, csvFormat[databaseName]);
                 if (results["errors"].length == 0){
                     czechCovidDbArr["confirmed"] = results.data;
                     czechCovidDbParse("confirmed");
                     if(progressBarShowed) {NProgress.inc();}
                 }else{
-                    alert("Error parsing chart dataset");
+                    alert("Error parsing chart dataset\n"+results.errors[0].message);
                 }
             } else { // show the result
                 alert(`Error ${xhrConfirmed.status}: ${xhrConfirmed.statusText}`); // e.g. 404: Not Found
@@ -570,13 +573,13 @@ function loadCurrentData(databaseName){
         // This will be called after the response is received
         xhrRecovered.onload = function() {
             if (xhrRecovered.status == 200 || xhrRecovered.status == 304) { // analyze HTTP status of the response
-                let results = Papa.parse(xhrRecovered.response);
+                let results = Papa.parse(xhrRecovered.response, csvFormat[databaseName]);
                 if (results["errors"].length == 0){
                     czechCovidDbArr["recovered"] = results.data;
                     czechCovidDbParse("recovered");
                     if(progressBarShowed) {NProgress.inc();}
                 }else{
-                    alert("Error parsing chart dataset");
+                    alert("Error parsing chart dataset\n"+results.errors[0].message);
                 }
             } else { // show the result
                 alert(`Error ${xhrRecovered.status}: ${xhrRecovered.statusText}`); // e.g. 404: Not Found
@@ -592,13 +595,13 @@ function loadCurrentData(databaseName){
         // This will be called after the response is received
         xhrDeaths.onload = function() {
             if (xhrDeaths.status == 200 || xhrDeaths.status == 304) { // analyze HTTP status of the response
-                let results = Papa.parse(xhrDeaths.response);
+                let results = Papa.parse(xhrDeaths.response, csvFormat[databaseName]);
                 if (results["errors"].length == 0){
                     czechCovidDbArr["deaths"] = results.data;
                     czechCovidDbParse("deaths");
                     if(progressBarShowed) {NProgress.inc();}
                 }else{
-                    alert("Error parsing chart dataset");
+                    alert("Error parsing chart dataset\n"+results.errors[0].message);
                 }
             } else { // show the result
                 alert(`Error ${xhrDeaths.status}: ${xhrDeaths.statusText}`); // e.g. 404: Not Found
@@ -615,12 +618,11 @@ function loadCurrentData(databaseName){
        let xhrConfirmed = new XMLHttpRequest();
        xhrConfirmed.open('GET', csseURLs.confirmed);
        xhrConfirmed.send();
-
        // This will be called after the response is received
        xhrConfirmed.onload = function() {
            document.getElementById("databasePick").value = databaseName;
            if (xhrConfirmed.status == 200 || xhrConfirmed.status == 304) { // analyze HTTP status of the response
-               let results = Papa.parse(xhrConfirmed.response);
+               let results = Papa.parse(xhrConfirmed.response, csvFormat[databaseName]);
                if (results["errors"].length == 0){
                     csseArr["confirmed"] = results.data;
                     document.getElementById("stateSelect").innerHTML="";
@@ -646,7 +648,7 @@ function loadCurrentData(databaseName){
                     }
                     csseParse("confirmed");
                }else{
-                   alert("Error parsing chart dataset");
+                   alert("Error parsing confirmed chart dataset\n"+results.errors[0].message);
                }
            } else { // show the result
                alert(`Error ${xhrConfirmed.status}: ${xhrConfirmed.statusText}`); // e.g. 404: Not Found
@@ -657,7 +659,6 @@ function loadCurrentData(databaseName){
            alert("Request to github JHO CSSE - confirmed failed");
        };
        let xhrRecovered = new XMLHttpRequest();
-
        xhrRecovered.open('GET', csseURLs.recovered);
        xhrRecovered.send();
 
@@ -665,12 +666,12 @@ function loadCurrentData(databaseName){
        xhrRecovered.onload = function() {
            document.getElementById("databasePick").value = databaseName;
            if (xhrRecovered.status == 200 || xhrRecovered.status == 304) { // analyze HTTP status of the response
-               let results = Papa.parse(xhrRecovered.response);
+               let results = Papa.parse(xhrRecovered.response, csvFormat[databaseName]);
                if (results["errors"].length == 0){
                     csseArr["recovered"] = results.data;
                     csseParse("recovered");
                }else{
-                   alert("Error parsing chart dataset");
+                   alert("Error parsing recovered chart dataset\n"+results.errors[0].message);
                }
            } else { // show the result
                alert(`Error ${xhrRecovered.status}: ${xhrRecovered.statusText}`); // e.g. 404: Not Found
@@ -689,12 +690,12 @@ function loadCurrentData(databaseName){
        xhrDeaths.onload = function() {
            document.getElementById("databasePick").value = databaseName;
            if (xhrDeaths.status == 200 || xhrDeaths.status == 304) { // analyze HTTP status of the response
-               let results = Papa.parse(xhrDeaths.response);
+               let results = Papa.parse(xhrDeaths.response, csvFormat[databaseName]);
                if (results["errors"].length == 0){
                     csseArr["deaths"] = results.data;
                     csseParse("deaths");
                }else{
-                   alert("Error parsing chart dataset");
+                   alert("Error parsing deaths chart dataset\n"+results.errors[0].message);
                }
            } else { // show the result
                alert(`Error ${xhrDeaths.status}: ${xhrDeaths.statusText}`); // e.g. 404: Not Found
@@ -1155,7 +1156,7 @@ function calculatePredictions(){
             }
         }
         if(indexOfStartSpreadGrowthFactor == -1){
-            if (len(datasets["spreadGrowthFactor"] == 0){
+            if (datasets["spreadGrowthFactor"].length == 0){
                 alert(strings.datasetError);
             }
             let minDateSpreadGrowthKnows = new Date(datasets["spreadGrowthFactor"][0].x);
