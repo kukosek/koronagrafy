@@ -36,13 +36,6 @@ var csseURLs = {confirmed: 'https://raw.githubusercontent.com/CSSEGISandData/COV
             recovered: 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_recovered_global.csv',
             deaths: 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_global.csv'
 }
-var uzisURLs = {currentNumbers: 'https://raw.githubusercontent.com/kukosek/czech-covid-db/master/current_numbers.json',
-                confirmed: 'https://cors-anywhere.herokuapp.com/https://onemocneni-aktualne.mzcr.cz/api/v1/covid-19/nakaza.csv',
-                persons: 'https://cors-anywhere.herokuapp.com/https://onemocneni-aktualne.mzcr.cz/api/v1/covid-19/osoby.json',
-                tests: 'https://cors-anywhere.herokuapp.com/https://onemocneni-aktualne.mzcr.cz/api/v1/covid-19/testy.csv'
-            }
-
-var uzisDateFormat = {confirmed: "YYYY-MM-DD", persons: "YYYY-MM-DD", tests: "YYYY-MM-DD"};
 var csseDateFormat = {confirmed: "M/D/YY", recovered: "M/D/YYYY", deaths: "M/D/YY"};
 var csvFormat = {"CSSE COVID-19 Dataset": {delimeter: ","}, "czech-covid-db": {delimeter: ","}};
 var csStrings = {world: "Svět",
@@ -165,7 +158,7 @@ var myMeetPerDayConf = 20;
 
 var dataChartHtml = "<canvas class=\"chartjs\" id=\"dataChart\"></canvas>";
 var dataChart;
-var datasets = {confirmed:[], confirmedMaxInDay:[], confirmedPerDay:[], spreadGrowthFactor:[]};
+var datasets = {confirmed:[], confirmedMaxInDay:[], spreadGrowthFactor:[]};
 var dataChartFirstLoad = true;
 function loadDataChart(optionalDataset){
     let dataChartDataset;
@@ -262,8 +255,6 @@ function loadDataChart(optionalDataset){
         dataChart.update();
     }
 }
-var uzisArrParsed = {confirmed: false, persons: false, tests: false};
-var uzisArr = {confirmed: [], persons: [], tests: []};
 var csseArrParsed = {confirmed: false, recovered: false, deaths: false};
 var csseArr = {confirmed: [], recovered: [], deaths: []};
 var czechCovidDbArr = {confirmed: [], recovered: [], deaths: []};
@@ -317,27 +308,6 @@ function databaseChange() {
             if (progressBarShowed){NProgress.inc();}
             czechCovidDbParse("deaths");
         }
-    }else if (databaseName == "ÚZIS ČR"){
-        if (!progressBarShowed){
-            NProgress.start();
-            progressBarShowed = true;
-        }
-        uzisArrParsed = {confirmed: false, persons: false, tests: false};
-        predictionConfig = predictionConfigCzechDefaults;
-        growthFactorCalcConfig = growthFactorCalcConfigCzechDefaults;
-        if (uzisArr.confirmed.length==0){
-            loadCurrentData(databaseName);
-        }else{
-            uzisParse("confirmed");
-            if (progressBarShowed){NProgress.inc();}
-            uzisParse("persons");
-            if (progressBarShowed){NProgress.inc();}
-            uzisParse("tests");
-            /*uzisParse("recovered");
-            if (progressBarShowed){NProgress.inc();}
-            uzisParse("deaths");*/
-            if (progressBarShowed){NProgress.done();}
-        }
     }
 }
 
@@ -351,80 +321,6 @@ function countryNameChange(){
         csseParse("confirmed");
         csseParse("recovered");
         csseParse("deaths");
-    }
-}
-
-function uzisParse(datasetName){
-    let datasetNameMaxInDay = datasetName+"MaxInDay";
-    let datasetNamePerDay = datasetName+"PerDay";
-    let stateName;
-    if (urlSelectedCountry==null){
-        stateName = document.getElementById("stateSelect").value;
-    }else{
-        stateName = urlSelectedCountry;
-        document.getElementById("stateSelect").value = stateName;
-        urlSelectedCountry = null;
-    }
-    if ((datasetName == "confirmed")){
-        if (stateName == "czechia"){
-            let dataFromUzis = uzisArr[datasetName].slice(1);
-            datasets[datasetNameMaxInDay]=[];
-            let valuesStarted = false;
-            for (i=0; i<dataFromUzis.length-1; i++){
-                if (!valuesStarted && dataFromUzis[i][1] !=0){
-                    valuesStarted = true;
-                }
-                if (valuesStarted){
-                    dateOfRow = moment(dataFromUzis[i][0], uzisDateFormat[datasetName]).toISOString();
-
-                    datasets[datasetNameMaxInDay].push({x: dateOfRow, y: parseInt(dataFromUzis[i][2])});
-                    datasets[datasetNamePerDay].push({x: dateOfRow, y: parseInt(dataFromUzis[i][1])});
-                }
-            }
-        }else{
-            return undefined;
-        }
-        datasets[datasetName] = datasets[datasetNameMaxInDay];
-    }else if (datasetName == "persons"){
-        return undefined;
-    }else{
-        return undefined;
-    }
-    //datasets[datasetName]= datasets[datasetNameMaxInDay];
-    
-    if(datasetName == "confirmed"){
-        datasets["recovered"] = [];
-        datasets["recoveredMaxInDay"] = [];
-        datasets["deaths"] = [];
-        datasets["deathsMaxInDay"] = [];
-        predictionConfig.startDate = new Date(datasets[datasetNameMaxInDay][0].x);
-        predictionConfig.startValue = datasets[datasetNameMaxInDay][0].y;
-        predictionConfig.infectionProbability = calculateInfectionDefaultProbability(false, datasets[datasetNameMaxInDay][datasets[datasetNameMaxInDay].length-1].y, predictionConfig["averageMeetPerDay"]);
-        if (populations.hasOwnProperty(stateName)){
-            predictionConfig.populationSize = populations[stateName];
-        }
-        //calculate spread growth factors from confirmed dataset
-        calculateSpreadGrowthFactorAndPlot("77%");
-        myTodayInfectedProbability();
-        
-        if (predictionConfig.plotPredictionToDataChart){
-            getDataCalculatePredictionAndPlot();
-            if (progressBarShowed){NProgress.inc();};
-        }else{
-            loadDataChart(null);
-            if (progressBarShowed){NProgress.inc();};
-            getDataCalculatePredictionAndPlot();
-        }
-    }
-
-    
-
-    //calculate config variable for prediction
-    uzisArrParsed[datasetName] = true;
-    if (uzisArrParsed.confirmed == true && uzisArrParsed.persons == true && uzisArrParsed.tests == true) {
-        NProgress.done();
-    }else{
-        if (progressBarShowed){NProgress.inc();};
     }
 }
 
@@ -809,111 +705,6 @@ function loadCurrentData(databaseName){
        xhrRecovered.onerror = function() {
            alert("Request to github JHO CSSE - deaths failed");
        };
-    }else if (databaseName == "ÚZIS ČR"){
-        /* Fetch current data from MZCR onemocneni aktualne
-        * 
-        */
-        
-
-        let xhr = new XMLHttpRequest();
-        xhr.open('GET', czechCovidDbURLs.currentNumbers);
-        xhr.send();
-
-        // This will be called after the response is received
-        xhr.onload = function() {
-            if (xhr.status == 200) { // analyze HTTP status of the response
-                document.getElementById("databasePick").value = databaseName;
-                data = JSON.parse(xhr.response); // responseText is the server
-                //confirmed cases box
-                document.getElementById("confirmedText").getElementsByClassName("statNumber")[0].innerHTML = data["confirmed"]["number"];
-                document.getElementById("confirmedText").getElementsByClassName("statDate")[0].innerHTML = convertDate(data["confirmed"]["date"]);
-                
-                //cured box
-                document.getElementById("recoveredText").getElementsByClassName("statNumber")[0].innerHTML = data["recovered"]["number"];
-                document.getElementById("recoveredText").getElementsByClassName("statDate")[0].innerHTML = convertDate(data["recovered"]["date"]);
-                
-                //deaths box
-                document.getElementById("deathsText").getElementsByClassName("statNumber")[0].innerHTML = data["deaths"]["number"];
-                document.getElementById("deathsText").getElementsByClassName("statDate")[0].innerHTML = convertDate(data["deaths"]["date"]);
-                
-                
-                //load default value into did i got the virus today box inputBox
-                document.getElementById("myMeetPerDay").value = myMeetPerDayConf;
-                dynamicInputAdjust();
-            } else { // show the result
-                alert(`Error ${xhr.status}: ${xhr.statusText}`); // e.g. 404: Not Found
-            }
-        };
-
-        xhr.onerror = function() {
-            alert("Request failed");
-        };
-        
-        
-        uzisArrParsed = {confirmed: false, recovered: false, deaths: false};
-        /* Fetch current datasets to charts from kukosek's github
-        * 
-        */
-        let xhrConfirmed = new XMLHttpRequest();
-        xhrConfirmed.open('GET', uzisURLs.confirmed);
-        xhrConfirmed.send();
-        // This will be called after the response is received
-        xhrConfirmed.onload = function() {
-            if (xhrConfirmed.status == 200 || xhrConfirmed.status == 304) { // analyze HTTP status of the response
-                let results = Papa.parse(xhrConfirmed.response, csvFormat[databaseName]);
-                if (results["errors"].length == 0){
-                    uzisArr["confirmed"] = results.data;
-                    uzisParse("confirmed");
-                    if(progressBarShowed) {NProgress.inc();}
-                }else{
-                    alert("Error parsing chart dataset\n"+results.errors[0].message);
-                }
-            } else { // show the result
-                alert(`Error ${xhrConfirmed.status}: ${xhrConfirmed.statusText}`); // e.g. 404: Not Found
-            }
-        };
-        xhrConfirmed.onerror = function() {
-            alert("Request failed");
-        };
-
-        let xhrPersons = new XMLHttpRequest();
-        xhrPersons.open('GET', uzisURLs.persons);
-        xhrPersons.send();
-        // This will be called after the response is received
-        xhrPersons.onload = function() {
-            if (xhrPersons.status == 200 || xhrPersons.status == 304) { // analyze HTTP status of the response
-                uzisArr["persons"] = JSON.parse(xhrPersons.response);
-                //uzisParse("persons");
-                if(progressBarShowed) {NProgress.inc();}
-            } else { // show the result
-                alert(`Error ${xhrPersons.status}: ${xhrPersons.statusText}`); // e.g. 404: Not Found
-            }
-        };
-        xhrPersons.onerror = function() {
-            alert("Request failed");
-        };
-
-        let xhrTests = new XMLHttpRequest();
-        xhrTests.open('GET', uzisURLs.tests);
-        xhrTests.send();
-        // This will be called after the response is received
-        xhrTests.onload = function() {
-            if (xhrTests.status == 200 || xhrTests.status == 304) { // analyze HTTP status of the response
-                let results = Papa.parse(xhrTests.response, csvFormat[databaseName]);
-                if (results["errors"].length == 0){
-                    uzisArr["tests"] = results.data;
-                    //uzisParse("tests");
-                    if(progressBarShowed) {NProgress.inc();}
-                }else{
-                    alert("Error parsing chart dataset\n"+results.errors[0].message);
-                }
-            } else { // show the result
-                alert(`Error ${xhrRests.status}: ${xhrRests.statusText}`); // e.g. 404: Not Found
-            }
-        };
-        xhrTests.onerror = function() {
-            alert("Request failed");
-        };
     }
 };
 
@@ -1462,7 +1253,7 @@ function calculatePredictions(){
         }
         let result;
         if(predictionConfig["functionName"] == "henry1"){
-            result = lastResult + (MtimesP*(1-(lastResult/populationSize))*(lastResult-resultBeforeInfectionPeriod));
+            result = lastResult + MtimesP*(1-(lastResult/populationSize))*(lastResult-resultBeforeInfectionPeriod);
         }else if (predictionConfig["functionName"] == "henryProbabilistic"){
             let probabilisticProbability = predictionConfig["infectionProbability"]*0.01; //When you run out of variable names
             let meetInThisDay = MtimesP / probabilisticProbability;
