@@ -1,9 +1,27 @@
 function convertDate(dateString){
-    let mmnt = moment(dateString);
-    if (mmnt.hours() == 0 && mmnt.minutes() == 0){
-        return mmnt.format("D.M. YYYY");
+    if (dateString == null){
+        return strings.noData;
     }else{
-        return mmnt.format("D.M. YYYY H:mm");
+        let mmnt = moment(dateString);
+        let today = moment();
+        let yesterday = moment().subtract(1, "days");
+        if (mmnt.isSame(today, "day")){
+            if (mmnt.hours() == 0 && mmnt.minutes() == 0){
+                return strings.today
+            }else{
+                return strings.today+" "+mmnt.format("H:mm");
+            }
+        }else if (mmnt.isSame(yesterday, "day")){
+            if (mmnt.hours() == 0 && mmnt.minutes() == 0){
+                return strings.yesterday
+            }else{
+                return strings.yesterday+" "+mmnt.format("H:mm");
+            }
+        }else if (mmnt.hours() == 0 && mmnt.minutes() == 0){
+            return mmnt.format("D.M. YYYY");
+        }else{
+            return mmnt.format("D.M. YYYY H:mm");
+        }
     }
 }
 
@@ -27,10 +45,10 @@ function calculateInfectionDefaultProbability(daysSinceOutbreakStart, currentCon
 }
 
 NProgress.configure({ showSpinner: false });
-var czechCovidDbURLs = {currentNumbers: 'https://raw.githubusercontent.com/kukosek/czech-covid-db/master/current_numbers.json',
-                        confirmed: 'https://raw.githubusercontent.com/kukosek/czech-covid-db/master/records_confirmed.csv',
-                        recovered: 'https://raw.githubusercontent.com/kukosek/czech-covid-db/master/records_recovered.csv',
-                        deaths: 'https://raw.githubusercontent.com/kukosek/czech-covid-db/master/records_deaths.csv',
+var czechCovidDbURLs = {currentNumbers: 'https://raw.githubusercontent.com/kukosek/czech-covid-db/master/uzis/current_numbers_uzis.json',
+                        confirmed: 'https://raw.githubusercontent.com/kukosek/czech-covid-db/master/uzis/records_confirmed_uzis.csv',
+                        recovered: 'https://raw.githubusercontent.com/kukosek/czech-covid-db/master/uzis/records_recovered_uzis.csv',
+                        deaths: 'https://raw.githubusercontent.com/kukosek/czech-covid-db/master/uzis/records_deaths_uzis.csv',
 }
 var csseURLs = {confirmed: 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv',
             recovered: 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_recovered_global.csv',
@@ -56,7 +74,11 @@ var csStrings = {world: "Svět",
              dataChartDeathsLabel: "Úmrtí",
              dataChartPredictionLabel: "Predikce",
              idiotError: "Error - co delas ty blazne??",
-             datasetError: "Omlouváme se, ale asi se vyskytla chyba pravděpodobně způsobená změněnými formáty v datasetu. Toto se často stává u datasetu JHO CSSE, někdy udělají opravdu nekonzistentní změny. Prosím dejte nám vědět na adrese koronagrafy@seznam.cz. Pokusíme se to spravit."
+             datasetError: "Omlouváme se, ale asi se vyskytla chyba pravděpodobně způsobená změněnými formáty v datasetu. Toto se často stává u datasetu JHO CSSE, někdy udělají opravdu nekonzistentní změny. Prosím dejte nám vědět na adrese koronagrafy@seznam.cz. Pokusíme se to spravit.",
+             noData: "Nemám data",
+             today: "Dnes",
+             yesterday: "Včera",
+             importedCases: "Importovaných případů"
             }
 var enStrings = {world: "World",
              czechia: "Czechia",
@@ -76,7 +98,11 @@ var enStrings = {world: "World",
              dataChartDeathsLabel: "Deaths",
              dataChartPredictionLabel: "Prediction",
              idiotError: "Error - you doing weird things",
-             datasetError: "Sorry, but an error occured. It was probably because of changed formats in a dataset. This often happens with the JHO CSSE dataset, they sometimes do really inconsistent changes - it is a mess! Please email us about that at koronagrafy@seznam.cz. We will try to fix it."
+             datasetError: "Sorry, but an error occured. It was probably because of changed formats in a dataset. This often happens with the JHO CSSE dataset, they sometimes do really inconsistent changes - it is a mess! Please email us about that at koronagrafy@seznam.cz. We will try to fix it.",
+             noData: "Data not available",
+             today: "Today",
+             yesterday: "Yesterday",
+             importedCases: "Imported cases"
             }
 
 var predictionConfigCzechDefaults = {functionName: "henry1",
@@ -120,6 +146,9 @@ var populations = {world: 7800000000, Germany: 83149300, Italy: 60243406,
                     "Korea, South": 51780579, France: 67069000,
                     China: 1401841400, Netherlands: 17446481
                 }
+
+var czechRegionsPopulations = {};
+
 var data = {"confirmed":{"number":"", "date":""},
 "recovered":{"number":"", "date":""},
 "deaths":     {"number":"", "date":""}};
@@ -146,12 +175,13 @@ function parseEndVarValues(varValues){
 if (window.location.toString().includes("cs")){
     var databaseName = "czech-covid-db";
     var strings = csStrings;
-    var predictionConfig = predictionConfigCzechDefaults;
+    var predictionConfig = JSON.parse(JSON.stringify(predictionConfigCzechDefaults));
+    predictionConfig.startDate = new Date(predictionConfig.startDate);
     var growthFactorCalcConfig = growthFactorCalcConfigCzechDefaults;
 }else{
     var databaseName = "CSSE COVID-19 Dataset";
     var strings = enStrings;
-    var predictionConfig = predictionConfigWorldDefaults;
+    var predictionConfig = JSON.parse(JSON.stringify(predictionConfigWorldDefaults));
     var growthFactorCalcConfig = growthFactorCalcConfigWorldDefaults;
 }
 var myMeetPerDayConf = 20;
@@ -255,8 +285,11 @@ function loadDataChart(optionalDataset){
         dataChart.update();
     }
 }
+var csseArrParseWaiting = {recovered: false, deaths: false};
 var csseArrParsed = {confirmed: false, recovered: false, deaths: false};
 var csseArr = {confirmed: [], recovered: [], deaths: []};
+var czechCovidDbData;
+var czechCovidDbArrParseWaiting = {recovered: false, deaths: false};
 var czechCovidDbArr = {confirmed: [], recovered: [], deaths: []};
 var czechCovidDbArrParsed = {confirmed: false, recovered: false, deaths: false};
 var csseCountriesList = [];
@@ -268,7 +301,7 @@ function databaseChange() {
             progressBarShowed = true;
         }
         csseArrParsed = {confirmed: false, recovered: false, deaths: false};
-        predictionConfig = predictionConfigWorldDefaults;
+        predictionConfig = JSON.parse(JSON.stringify(predictionConfigWorldDefaults));
         growthFactorCalcConfig = growthFactorCalcConfigWorldDefaults;
         if (csseArr.confirmed.length == 0) {
             loadCurrentData(databaseName)
@@ -278,6 +311,7 @@ function databaseChange() {
             optionToAdd.value = "world";
             optionToAdd.innerHTML = strings.world;
             document.getElementById("stateSelect").appendChild(optionToAdd);
+            detailedStatsSH();
             for(i=1; i<csseCountriesList.length; i++){
                 let currContryName = csseCountriesList[i];
                 optionToAdd = document.createElement("option");
@@ -296,12 +330,16 @@ function databaseChange() {
             NProgress.start();
             progressBarShowed = true;
         }
+        
         czechCovidDbArrParsed = {confirmed: false, recovered: false, deaths: false};
-        predictionConfig = predictionConfigCzechDefaults;
+        predictionConfig = JSON.parse(JSON.stringify(predictionConfigCzechDefaults));
+        predictionConfig.startDate = new Date(predictionConfig.startDate);
         growthFactorCalcConfig = growthFactorCalcConfigCzechDefaults;
         if (czechCovidDbArr.confirmed.length==0){
             loadCurrentData(databaseName);
         }else{
+            czechCountrySelect(czechCovidDbArr.confirmed[0]);
+            data = JSON.parse(JSON.stringify(czechCovidDbData));
             czechCovidDbParse("confirmed");
             if (progressBarShowed){NProgress.inc();}
             czechCovidDbParse("recovered");
@@ -321,9 +359,31 @@ function countryNameChange(){
         csseParse("confirmed");
         csseParse("recovered");
         csseParse("deaths");
+    }else if (document.getElementById("databasePick").value == "czech-covid-db"){
+        detailedStatsSH()
+        czechCovidDbParse("confirmed");
+        czechCovidDbParse("recovered");
+        czechCovidDbParse("deaths");
     }
 }
-
+function czechCountrySelect(columnNamesCon){
+    let optionToAdd = document.createElement("option");
+    optionToAdd.value = "czechia";
+    optionToAdd.innerHTML = strings.czechia;
+    document.getElementById("stateSelect").innerHTML="";
+    document.getElementById("stateSelect").appendChild(optionToAdd);
+    detailedStatsSH();
+    for (i=columnNamesCon.length - 14; i<columnNamesCon.length; i++){
+        optionToAdd = document.createElement("option");
+        optionToAdd.value = columnNamesCon[i];
+        optionToAdd.innerHTML = columnNamesCon[i];
+        document.getElementById("stateSelect").appendChild(optionToAdd);
+    }
+    if (urlSelectedCountry != null){
+        document.getElementById("stateSelect").value = urlSelectedCountry;
+    }
+    detailedStatsSH();
+}
 function csseParse(datasetName){
     let columnNames = csseArr[datasetName][0];
     let dataFromCsse = csseArr[datasetName].slice(1);
@@ -350,7 +410,6 @@ function csseParse(datasetName){
                     datasets[datasetNameMaxInDay][j].y += parseInt(item.replace(/\D+/g, ""));
                 }
             }
-            //console.log(datasets[datasetNameMaxInDay][30]);
         }
     }
     //clean start zeros and same values
@@ -375,6 +434,8 @@ function csseParse(datasetName){
         predictionConfig.infectionProbability = calculateInfectionDefaultProbability(false, datasets[datasetNameMaxInDay][datasets[datasetNameMaxInDay].length-1].y, predictionConfig["averageMeetPerDay"]);
         if (populations.hasOwnProperty(stateName)){
             predictionConfig.populationSize = populations[stateName];
+        }else{
+            predictionConfig.populationSize = Math.floor(parseInt(populations.world)/198);
         }
     }
     data[datasetName].number = datasets[datasetNameMaxInDay][datasets[datasetNameMaxInDay].length-1].y;
@@ -422,13 +483,28 @@ function czechCovidDbParse(datasetName){
     let datasetsInColumns = czechCovidDbArr[datasetName].slice(1);
     let datasetNameMaxInDay = datasetName+"MaxInDay";
 
-    let optionToAdd = document.createElement("option");
-    optionToAdd.value = "czechia";
-    optionToAdd.innerHTML = strings.czechia;
-    document.getElementById("stateSelect").innerHTML="";
-    document.getElementById("stateSelect").appendChild(optionToAdd);
-
-    
+    let selValue
+    let targetIndex;
+    if (urlSelectedCountry==null){
+        selValue = document.getElementById("stateSelect").value;
+        if (selValue && (!columnNames.includes(selValue) && selValue != "czechia")){
+            targetIndex = null;
+        }else if (!selValue || selValue == "czechia"){
+            targetIndex = 2;
+        }else{
+            targetIndex = columnNames.indexOf(selValue);
+        }
+    }else{
+        selValue = urlSelectedCountry; 
+        console.log(selValue)
+        if (urlSelectedCountry == "czechia"){
+            targetIndex = 2;
+        }else{
+            targetIndex = columnNames.indexOf(urlSelectedCountry);
+        }
+        document.getElementById("stateSelect").value = urlSelectedCountry;
+        urlSelectedCountry = null;
+    }
     datasetsInRows = datasetsInColumns[0].map(function(col, i) {
         return datasetsInColumns.map(function(row) {
             return row[i];
@@ -437,34 +513,42 @@ function czechCovidDbParse(datasetName){
     datasets[datasetName] = [];
     datasets[datasetNameMaxInDay] = [];
     
-    let firstDate = new Date(datasetsInRows[1][0]);
-    let i = 0;
-    var lastValueConfirmed = -1;
-    datasetsInRows[1].forEach(function(entry) {
-        let currValueConfirmed = datasetsInRows[2][i];
-        if (currValueConfirmed != 0) {
-            if (currValueConfirmed != lastValueConfirmed){
-                var dataObject = {x: entry, y: currValueConfirmed};
-                datasets[datasetName].push(dataObject);
-            }
-            if (i+1<datasetsInRows[1].length){
-                let dateOfEntry = new Date(entry);
-                let nextDate = new Date(datasetsInRows[1][i+1]);
-                if (nextDate.getDate() != dateOfEntry.getDate()){
-                    dateOfEntry.setHours(0,0,0,0);
-                    datasets[datasetNameMaxInDay].push({x: dateOfEntry.toISOString(), y: currValueConfirmed});
+    if (targetIndex != null){
+        let firstDate = new Date(datasetsInRows[1][0]);
+        let i = 0;
+        var lastValueConfirmed = -1;
+        datasetsInRows[1].forEach(function(entry) {
+            let currValueConfirmed = datasetsInRows[targetIndex][i];
+            if (currValueConfirmed != 0) {
+                if (currValueConfirmed != lastValueConfirmed){
+                    var dataObject = {x: entry, y: currValueConfirmed};
+                    datasets[datasetName].push(dataObject);
                 }
-            }else{
-                //datasets["confirmedMaxInDay"].push({x: entry, y: currValueConfirmed});
+                if (i+1<datasetsInRows[1].length){
+                    let dateOfEntry = new Date(entry);
+                    let nextDate = new Date(datasetsInRows[1][i+1]);
+                    if (nextDate.getDate() != dateOfEntry.getDate()){
+                        dateOfEntry.setHours(0,0,0,0);
+                        datasets[datasetNameMaxInDay].push({x: dateOfEntry.toISOString(), y: currValueConfirmed});
+                    }
+                }else{
+                    //datasets["confirmedMaxInDay"].push({x: entry, y: currValueConfirmed});
+                }
             }
+            i++;
+            lastValueConfirmed = currValueConfirmed;
+        });
+        if (targetIndex != 2){
+            data[datasetName].number = datasets[datasetNameMaxInDay][datasets[datasetNameMaxInDay].length-1].y;
+            data[datasetName].date = datasets[datasetNameMaxInDay][datasets[datasetNameMaxInDay].length-1].x;
+        }else if (czechCovidDbData !== undefined){
+            data[datasetName].number = czechCovidDbData[datasetName].number
+            data[datasetName].date = czechCovidDbData[datasetName].date
         }
-        i++;
-        lastValueConfirmed = currValueConfirmed;
-    });
-
-    data[datasetName].number = datasets[datasetNameMaxInDay][datasets[datasetNameMaxInDay].length-1].y;
-    data[datasetName].date = datasets[datasetNameMaxInDay][datasets[datasetNameMaxInDay].length-1].x;
-
+    }else{
+        data[datasetName].number = "???";
+        data[datasetName].date = null;
+    }
     //basic stats cases box
     document.getElementById(datasetName+"Text").getElementsByClassName("statNumber")[0].innerHTML = data[datasetName]["number"];
     document.getElementsByClassName("box")[1].style.fontSize = "150%";
@@ -477,6 +561,14 @@ function czechCovidDbParse(datasetName){
         //calculate config variable for prediction
         predictionConfigCzechDefaults["infectionProbability"] = calculateInfectionDefaultProbability(false, datasets.confirmedMaxInDay[datasets.confirmedMaxInDay.length-1].y, predictionConfigCzechDefaults["averageMeetPerDay"]);
         predictionConfig.infectionProbability = predictionConfigCzechDefaults.infectionProbability;
+
+        if (selValue == "czechia"){
+            predictionConfig.populationSize = predictionConfigCzechDefaults.populationSize
+        }else if (czechRegionsPopulations.hasOwnProperty(selValue)){
+            predictionConfig.populationSize = czechRegionsPopulations[selValue];
+        }else{
+            predictionConfig.populationSize = parseInt(predictionConfigCzechDefaults.populationSize)/14;
+        }
 
         //calculate spread growth factors from confirmed dataset
         calculateSpreadGrowthFactorAndPlot("77%");
@@ -500,7 +592,6 @@ var progressBarShowed = false;
 function loadCurrentData(databaseName){
     progressBarShowed = true;
     if (databaseName == "czech-covid-db"){
-        urlSelectedCountry=null;
         /* Fetch current data from kukosek's github
         * 
         */
@@ -514,19 +605,39 @@ function loadCurrentData(databaseName){
         xhr.onload = function() {
             if (xhr.status == 200) { // analyze HTTP status of the response
                 document.getElementById("databasePick").value = databaseName;
-                data = JSON.parse(xhr.response); // responseText is the server
-                //confirmed cases box
-                document.getElementById("confirmedText").getElementsByClassName("statNumber")[0].innerHTML = data["confirmed"]["number"];
-                document.getElementById("confirmedText").getElementsByClassName("statDate")[0].innerHTML = convertDate(data["confirmed"]["date"]);
+                czechCovidDbData = JSON.parse(xhr.response); // responseText is the server
+                data = JSON.parse(JSON.stringify(czechCovidDbData));
                 
-                //cured box
-                document.getElementById("recoveredText").getElementsByClassName("statNumber")[0].innerHTML = data["recovered"]["number"];
-                document.getElementById("recoveredText").getElementsByClassName("statDate")[0].innerHTML = convertDate(data["recovered"]["date"]);
+                let basicStatsParse = false;
+                if (document.getElementById("stateSelect") == undefined){
+                    basicStatsParse = true;
+                }else{
+                    let selectedCountry = document.getElementById("stateSelect").value;
+                    if (selectedCountry == "czechia" || selectedCountry == "world" || selectedCountry == ""){
+                        basicStatsParse=true;
+                    }
+                }
+                if (urlSelectedCountry == null && basicStatsParse){
+                    //tests box
+                    document.getElementById("testedText").getElementsByClassName("statNumber")[0].innerHTML = data["tested"]["number"];
+                    document.getElementById("testedText").getElementsByClassName("statDate")[0].innerHTML = convertDate(data["tested"]["date"])
+
+                    //confirmed cases box
+                    document.getElementById("confirmedText").getElementsByClassName("statNumber")[0].innerHTML = data["confirmed"]["number"];
+                    document.getElementById("confirmedText").getElementsByClassName("statDate")[0].innerHTML = convertDate(data["confirmed"]["date"]);
+                    
+                    //cured box
+                    document.getElementById("recoveredText").getElementsByClassName("statNumber")[0].innerHTML = data["recovered"]["number"];
+                    document.getElementById("recoveredText").getElementsByClassName("statDate")[0].innerHTML = convertDate(data["recovered"]["date"]);
+                    
+                    //deaths box
+                    document.getElementById("deathsText").getElementsByClassName("statNumber")[0].innerHTML = data["deaths"]["number"];
+                    document.getElementById("deathsText").getElementsByClassName("statDate")[0].innerHTML = convertDate(data["deaths"]["date"]);
                 
-                //deaths box
-                document.getElementById("deathsText").getElementsByClassName("statNumber")[0].innerHTML = data["deaths"]["number"];
-                document.getElementById("deathsText").getElementsByClassName("statDate")[0].innerHTML = convertDate(data["deaths"]["date"]);
-                
+                    //average age box
+                    document.getElementById("importedCasesText").getElementsByClassName("statNumber")[0].innerHTML = data["confirmedImported"]["number"];
+                    document.getElementById("importedCasesText").getElementsByClassName("statDate")[0].innerHTML = strings.importedCases;
+                }
                 
                 //load default value into did i got the virus today box inputBox
                 document.getElementById("myMeetPerDay").value = myMeetPerDayConf;
@@ -554,7 +665,16 @@ function loadCurrentData(databaseName){
                 let results = Papa.parse(xhrConfirmed.response, csvFormat[databaseName]);
                 if (results["errors"].length == 0){
                     czechCovidDbArr["confirmed"] = results.data;
+                    czechCountrySelect(czechCovidDbArr["confirmed"][0]);
                     czechCovidDbParse("confirmed");
+                    if (czechCovidDbArrParseWaiting.recovered){
+                        czechCovidDbParse("recovered");
+                        czechCovidDbArrParseWaiting.recovered = true;
+                    }
+                    if (czechCovidDbArrParseWaiting.deaths) {
+                        czechCovidDbParse("deaths");
+                        czechCovidDbArrParseWaiting.deaths = false;
+                    }
                     if(progressBarShowed) {NProgress.inc();}
                 }else{
                     alert("Error parsing chart dataset\n"+results.errors[0].message);
@@ -576,7 +696,11 @@ function loadCurrentData(databaseName){
                 let results = Papa.parse(xhrRecovered.response, csvFormat[databaseName]);
                 if (results["errors"].length == 0){
                     czechCovidDbArr["recovered"] = results.data;
-                    czechCovidDbParse("recovered");
+                    if (czechCovidDbArrParsed.confirmed) {
+                        czechCovidDbParse("recovered");
+                    }else{
+                        czechCovidDbArrParseWaiting.recovered = true;
+                    }
                     if(progressBarShowed) {NProgress.inc();}
                 }else{
                     alert("Error parsing chart dataset\n"+results.errors[0].message);
@@ -598,7 +722,11 @@ function loadCurrentData(databaseName){
                 let results = Papa.parse(xhrDeaths.response, csvFormat[databaseName]);
                 if (results["errors"].length == 0){
                     czechCovidDbArr["deaths"] = results.data;
-                    czechCovidDbParse("deaths");
+                    if (czechCovidDbArrParsed.confirmed) {
+                        czechCovidDbParse("deaths");
+                    }else{
+                        czechCovidDbArrParseWaiting.deaths = true;
+                    }
                     if(progressBarShowed) {NProgress.inc();}
                 }else{
                     alert("Error parsing chart dataset\n"+results.errors[0].message);
@@ -624,7 +752,7 @@ function loadCurrentData(databaseName){
            if (xhrConfirmed.status == 200 || xhrConfirmed.status == 304) { // analyze HTTP status of the response
                let results = Papa.parse(xhrConfirmed.response, csvFormat[databaseName]);
                if (results["errors"].length == 0){
-                    csseArr["confirmed"] = results.data;
+                    csseArr["confirmed"] = JSON.parse(JSON.stringify(results.data));
                     document.getElementById("stateSelect").innerHTML="";
 
                     
@@ -632,6 +760,7 @@ function loadCurrentData(databaseName){
                     optionToAdd.value = "world";
                     optionToAdd.innerHTML = strings.world;
                     document.getElementById("stateSelect").appendChild(optionToAdd);
+                    detailedStatsSH();
                     for(i=1; i<csseArr["confirmed"].length; i++){
                         let currContryName = csseArr["confirmed"][i][1];
                         if (!csseCountriesList.includes(currContryName)){
@@ -647,6 +776,14 @@ function loadCurrentData(databaseName){
                         document.getElementById("stateSelect").appendChild(optionToAdd);
                     }
                     csseParse("confirmed");
+                    if (csseArrParseWaiting.recovered){
+                        csseParse("recovered");
+                        csseArrParseWaiting.recovered = false;
+                    }
+                    if (csseArrParseWaiting.deaths){
+                        csseParse("deaths");
+                        csseArrParseWaiting.deaths = false;
+                    }
                }else{
                    alert("Error parsing confirmed chart dataset\n"+results.errors[0].message);
                }
@@ -668,8 +805,12 @@ function loadCurrentData(databaseName){
            if (xhrRecovered.status == 200 || xhrRecovered.status == 304) { // analyze HTTP status of the response
                let results = Papa.parse(xhrRecovered.response, csvFormat[databaseName]);
                if (results["errors"].length == 0){
-                    csseArr["recovered"] = results.data;
-                    csseParse("recovered");
+                    csseArr["recovered"] = JSON.parse(JSON.stringify(results.data));
+                    if (csseArrParsed.confirmed){
+                        csseParse("recovered");
+                    }else{
+                        csseArrParseWaiting.recovered = true;
+                    }
                }else{
                    alert("Error parsing recovered chart dataset\n"+results.errors[0].message);
                }
@@ -692,8 +833,12 @@ function loadCurrentData(databaseName){
            if (xhrDeaths.status == 200 || xhrDeaths.status == 304) { // analyze HTTP status of the response
                let results = Papa.parse(xhrDeaths.response, csvFormat[databaseName]);
                if (results["errors"].length == 0){
-                    csseArr["deaths"] = results.data;
-                    csseParse("deaths");
+                    csseArr["deaths"] = JSON.parse(JSON.stringify(results.data));
+                    if (csseArrParsed.confirmed){
+                        csseParse("deaths");
+                    }else{
+                        csseArrParseWaiting.deaths = true;
+                    }
                }else{
                    alert("Error parsing deaths chart dataset\n"+results.errors[0].message);
                }
@@ -711,6 +856,18 @@ function loadCurrentData(databaseName){
 
 var predictionChartHtml = "<canvas class=\"chartjs\" id=\"predictionChart\"></canvas>";
 
+function detailedStatsSH(){
+    let elems = document.getElementsByClassName("detailedData");
+    if (databaseName == "czech-covid-db" && document.getElementById("stateSelect").value == "czechia"){
+        for (i=0; i< elems.length; i++){
+            elems[i].style.display = "flex";
+        }
+    }else{
+        for (i=0; i< elems.length; i++){
+            elems[i].style.display = "none";
+        }
+    }
+}
 
 function loadPredictionConfigIntoHTML(){
     document.getElementById("predictionChartDiv").innerHTML = "";
@@ -827,7 +984,8 @@ function loadPredictionConfigFile(evt){
 
 function resetPredictionConfigToDefault(){
     if (confirm('Opravdu chcete obnovit výchozí hodnoty konfigurace?')) {
-        predictionConfig = predictionConfigCzechDefaults;
+        predictionConfig = JSON.parse(JSON.stringify(predictionConfigCzechDefaults));
+        predictionConfig.startDate = new Date(predictionConfig.startDate);
         loadPredictionConfigIntoHTML();
     }
 }
