@@ -96,10 +96,17 @@
     font-size: 100%;
     flex: 50%;
     max-width: 100%;
-    height: 350px;
-    
     padding: 20px 20px 75px 20px;
 }
+
+.big{
+    height: 350px;
+}
+
+.small{
+    height: 160px;
+}
+
 #testsChart{
     height: 95%;
 }
@@ -109,6 +116,10 @@
 }
 #predictionChart {
     height: 345px;
+}
+
+.infoIcon {
+    margin:10px; opacity: 0.70;
 }
 
 /*this is pretty shity solution to a creepy bug but i dont know how to solve it better*/

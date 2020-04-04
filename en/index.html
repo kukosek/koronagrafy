@@ -115,7 +115,21 @@
             </div>
             
             <div class="wrapperCharts">
-                <div class="chartsBox">
+                <div class="chartsBox big detailedData">
+                    <div class="chartControls">
+                        <h2>Testování&nbsp</h2>
+                        <label class="radio-inline">
+                            <input id="testingChart_perDay" onclick="loadTestsChart()" type="checkbox" checked>Za den
+                        </label>
+                        <label class="radio-inline">
+                            <input id="testingChart_ratio" onclick="loadTestsChart()" type="checkbox" checked>Poměr k počtu nakažených
+                        </label>
+                    </div>
+                    <div id="testingChartDiv">
+                        
+                    </div>
+                </div>
+                <div class="chartsBox big">
                     <div class="chartControls">
                         <h2>Data</h2>
                         <label class="radio-inline">
@@ -129,7 +143,7 @@
                         
                     </div>
                 </div>
-                <div class="chartsBox">
+                <div class="chartsBox big">
                     <div class="chartControls">
                         <h2>Growth factor <img style="cursor: pointer;" onclick="growthFactorConfigSH()" width="15px" src="/images/settings.svg"></img></h2>
                     </div>
@@ -153,7 +167,7 @@
                         Here we can observe whether quarantine restrictions slow down the speed of coronavirus spreading.
                     </div>
                 </div>
-                <div class="chartsBox">
+                <div class="chartsBox big">
                     <div class="chartControls">
                         <div>
                             <h2>Prediction
@@ -229,9 +243,10 @@
                         
                     </div>
                 </div>
-                <div class="chartsBox">
+                <div class="chartsBox small">
                     <div class="chartControls">
                         <h2>Did I got infected today?</h2>
+                        <img class="infoIcon" title="Toto je pouze statistická hodnota. Nemá moc smysl aplikovat tuto šanci na sebe samotné, šance je kalkulována z globálních/státních čísel a šance, že se zrovna vy dnes nakazíte, závisí na mnoha dalších faktorech. Prosím, neberte tuto šanci jako důvod k ignorování vládních nařízení." width="18px" src="/images/info.svg"></img>
                     </div>
                     <div>
                         <label for="myMeetPerDay">
@@ -240,11 +255,11 @@
                         </label>
                     </div>
                     <p>
-                    If the number of currently infected people equals the current number of confirmed cases, the chance you got infected today would be
-                    <div id="probabilityOfBeingInfectedToday">
-                        
-                    </div>
-                    This is only a statistical value, it doesn't make much sense to apply this chance to yourself as it is calculated from the global numbers. Please don't make this a reason to ignore goverment advice.
+                    If the number of currently infected people matched the current number of confirmed cases, the chance you got infected today would be
+                    <span id="probabilityOfBeingInfectedToday" title="">
+                    
+                    </span>
+                    
                     </p>
                 </div>
             </div>

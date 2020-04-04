@@ -116,7 +116,7 @@
             </div>
             
             <div class="wrapperCharts">
-                <div class="chartsBox detailedData">
+                <div class="chartsBox big detailedData">
                     <div class="chartControls">
                         <h2>Testování&nbsp</h2>
                         <label class="radio-inline">
@@ -130,7 +130,7 @@
                         
                     </div>
                 </div>
-                <div class="chartsBox">
+                <div class="chartsBox big">
                     <div class="chartControls">
                         <h2>Data</h2>
                         <label class="radio-inline">
@@ -144,7 +144,7 @@
                         
                     </div>
                 </div>
-                <div class="chartsBox">
+                <div class="chartsBox big">
                     <div class="chartControls">
                         <h2>Růstový faktor šíření <img style="cursor: pointer;" onclick="growthFactorConfigSH()" width="15px" src="/images/settings.svg"></img></h2>
                     </div>
@@ -168,7 +168,7 @@
                         Zde teoreticky můžeme pozorovat, zda vládní opatření zpomalují šíření koronaviru.
                     </div>
                 </div>
-                <div class="chartsBox">
+                <div class="chartsBox big">
                     <div class="chartControls">
                         <div>
                             <h2>Predikce
@@ -244,9 +244,10 @@
                         
                     </div>
                 </div>
-                <div class="chartsBox">
+                <div class="chartsBox small">
                     <div class="chartControls">
                         <h2>Nakazil jsem se dnes?</h2>
+                        <img class="infoIcon" title="Toto je pouze statistická hodnota. Nemá moc smysl aplikovat tuto šanci na sebe samotné, šance je kalkulována z globálních/státních čísel a šance, že se zrovna vy dnes nakazíte, závisí na mnoha dalších faktorech. Prosím, neberte tuto šanci jako důvod k ignorování vládních nařízení." width="18px" src="/images/info.svg"></img>
                     </div>
                     <div>
                         <label for="myMeetPerDay">
@@ -256,10 +257,9 @@
                     </div>
                     <p>
                     V případě že by dnešní počet potvrzené případů udával reálný počet nakažených, šance, že jste se dnes nakazil/a, je
-                    <div id="probabilityOfBeingInfectedToday">
-                        
-                    </div>
-                    Toto je pouze statistická hodnota. Nemá moc smysl aplikovat tuto šanci na sebe samotné, šance je kalkulována z globálních/státních čísel a šance, že se zrovna vy dnes nakazíte, závisí na mnoha dalších faktorech. Prosím, neberte tuto šanci jako důvod k ignorování vládních nařízení.
+                    <span id="probabilityOfBeingInfectedToday">
+                    </span>
+                    
                     </p>
                 </div>
             </div>

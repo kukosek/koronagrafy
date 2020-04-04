@@ -1031,9 +1031,18 @@ function detailedStatsSH(){
                 elems[i].style.display = "initial";
             }
         }
+        elemsSmall = document.getElementsByClassName("small");
+        for (i=0; i<elemsSmall.length; i++){
+            elemsSmall[i].style.height= "160px";
+        }
     }else{
         for (i=0; i< elems.length; i++){
             elems[i].style.display = "none";
+        }
+        bigHeight = getComputedStyle(document.querySelector('.big')).height;
+        elemsSmall = document.getElementsByClassName("small");
+        for (i=0; i<elemsSmall.length; i++){
+            elemsSmall[i].style.height= bigHeight;
         }
     }
 }
