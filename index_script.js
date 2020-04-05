@@ -399,7 +399,7 @@ function countryNameChange(){
             //average age box
             document.getElementById("importedCasesText").getElementsByClassName("statNumber")[0].innerHTML = data["confirmedImported"]["number"];
             document.getElementById("importedCasesText").getElementsByClassName("statDate")[0].innerHTML = strings.importedCases;
-            
+
             document.getElementById("okresyBox").style.display = "none";            loadTestsChart();
         }
     }
@@ -994,7 +994,8 @@ function loadCurrentData(databaseName){
         xhrDN.send();
         xhrDN.onload = function() {
             if (xhrDN.status == 200) { // analyze HTTP status of the response
-                data.districtsNumbers = JSON.parse(JSON.parse(xhrDN.response).contents.replace('/', ''));
+                czechCovidDbData.districtsNumbers = JSON.parse(JSON.parse(xhrDN.response).contents.replace('/', ''));
+                data.districtsNumbers = JSON.parse(JSON.stringify(czechCovidDbData.districtsNumbers));
                 let selectedCountry = document.getElementById("stateSelect").value;
                 if ((selectedCountry != "" && selectedCountry != "czechia") || (urlSelectedCountry != "czechia" && urlSelectedCountry != null)){
                     loadDistrictsTable();
@@ -1159,17 +1160,28 @@ function detailedStatsSH(){
 
 function scaleSmallBox(w){
     if (databaseName == "czech-covid-db") {
-    elemsSmall = document.getElementsByClassName("small");
-    if (w.matches){
-        bigHeight = getComputedStyle(document.querySelector('.big')).height;
-        for (i=0; i<elemsSmall.length; i++){
-            elemsSmall[i].style.height= bigHeight;
+        elemsSmall = document.getElementsByClassName("small");
+        if (w.matches){
+            bigHeight = getComputedStyle(document.querySelector('.big')).height;
+            for (i=0; i<elemsSmall.length; i++){
+                elemsSmall[i].style.height= bigHeight;
+            }
+            document.getElementById("infectionProbabilityBox").style.gridColumn = "";
+        }else{
+            for (i=0; i<elemsSmall.length; i++){
+                elemsSmall[i].style.height= "160px";
+            }
+            selectedstate = document.getElementById("stateSelect").value;
+            if (selectedstate != "" && selectedstate != "czechia"){
+                document.getElementById("infectionProbabilityBox").style["grid-column"] = "1/5";
+            }else{
+                document.getElementById("infectionProbabilityBox").style["grid-column"] = "";
+            }
+            
         }
     }else{
-        for (i=0; i<elemsSmall.length; i++){
-            elemsSmall[i].style.height= "160px";
-        }
-    }
+        document.getElementById("infectionProbabilityBox").style["grid-column"] = "";
+        
     }
 }
 
