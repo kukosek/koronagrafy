@@ -107,6 +107,42 @@
     height: 160px;
 }
 
+#okresyBox {
+    display: none;
+}
+
+#districts {
+    border-collapse: collapse;
+    table-layout: fixed;
+    width: 100%;
+}
+
+#districts thead tr {
+    display: block;
+    
+}
+
+#districts tbody{
+    display:block;
+    width: 100%;
+    overflow: auto;
+    height: 300px;
+}
+
+#districts td, #districts th {
+    border-bottom: 1px solid #444;
+    padding: 8px;
+    width: 70%;
+}
+
+#districts tbody tr:hover {background-image: linear-gradient(45deg, #d4e1ff 0%, #efcafa 60%);}
+#districts th {
+    padding-top: 12px;
+    padding-bottom: 12px;
+    text-align: left;
+    color: #444;
+}
+
 #testsChart{
     height: 95%;
 }

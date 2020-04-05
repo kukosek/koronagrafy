@@ -50,6 +50,7 @@ var czechCovidDbURLs = {currentNumbers: 'https://raw.githubusercontent.com/kukos
                         confirmed: 'https://raw.githubusercontent.com/kukosek/czech-covid-db/master/uzis/records_confirmed_uzis.csv',
                         recovered: 'https://raw.githubusercontent.com/kukosek/czech-covid-db/master/uzis/records_recovered_uzis.csv',
                         deaths: 'https://raw.githubusercontent.com/kukosek/czech-covid-db/master/uzis/records_deaths_uzis.csv',
+                        districtsNumbers: 'https://api.allorigins.win/get?url=https://mapy.cz/covid/data/districts.json'
 }
 var csseURLs = {confirmed: 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv',
             recovered: 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_recovered_global.csv',
@@ -153,6 +154,20 @@ var populations = {world: 7800000000, Germany: 83149300, Italy: 60243406,
                 }
 
 var czechRegionsPopulations = {};
+var czechRegionCodes = { 'Hlavní město Praha': 'CZ010',
+'Středočeský kraj': 'CZ020',
+'Jihočeský kraj': 'CZ031',
+'Plzeňský kraj': 'CZ032',
+'Karlovarský kraj': 'CZ041',
+'Ústecký kraj': 'CZ042',
+'Liberecký kraj': 'CZ051',
+'Královéhradecký kraj': 'CZ052',
+'Pardubický kraj': 'CZ053',
+'Kraj Vysočina': 'CZ063',
+'Jihomoravský kraj': 'CZ064',
+'Olomoucký kraj': 'CZ071',
+'Zlínský kraj': 'CZ072',
+'Moravskoslezský kraj': 'CZ080' };
 
 var data = {"confirmed":{"number":"", "date":""},
 "recovered":{"number":"", "date":""},
@@ -302,6 +317,7 @@ var csseCountriesList = [];
 function databaseChange() {
     databaseName = document.getElementById("databasePick").value;
     if (databaseName == "CSSE COVID-19 Dataset"){
+        document.getElementById("okresyBox").style.display = "none";
         if (!progressBarShowed){
             NProgress.start();
             progressBarShowed = true;
@@ -352,6 +368,11 @@ function databaseChange() {
             if (progressBarShowed){NProgress.inc();}
             czechCovidDbParse("deaths");
         }
+        if (document.getElementById("stateSelect").value != "czechia"){
+            document.getElementById("okresyBox").style.display = "initial";
+        }else{
+            document.getElementById("okresyBox").style.display = "none";
+        }
     }
 }
 
@@ -367,9 +388,20 @@ function countryNameChange(){
         csseParse("deaths");
     }else if (document.getElementById("databasePick").value == "czech-covid-db"){
         detailedStatsSH()
+        scaleSmallBox(x);
         czechCovidDbParse("confirmed");
         czechCovidDbParse("recovered");
         czechCovidDbParse("deaths");
+        if (document.getElementById("stateSelect").value != "czechia"){
+            document.getElementById("okresyBox").style.display = "initial";
+            loadDistrictsTable();
+        }else{
+            //average age box
+            document.getElementById("importedCasesText").getElementsByClassName("statNumber")[0].innerHTML = data["confirmedImported"]["number"];
+            document.getElementById("importedCasesText").getElementsByClassName("statDate")[0].innerHTML = strings.importedCases;
+            
+            document.getElementById("okresyBox").style.display = "none";            loadTestsChart();
+        }
     }
 }
 function czechCountrySelect(columnNamesCon){
@@ -502,7 +534,6 @@ function czechCovidDbParse(datasetName){
         }
     }else{
         selValue = urlSelectedCountry; 
-        console.log(selValue)
         if (urlSelectedCountry == "czechia"){
             targetIndex = 2;
         }else{
@@ -633,97 +664,146 @@ function czechCovidDbTestsParse(){
         lastValue = currValue;
         lastValueConfirmed = currentValueConfirmed;
     }
-    loadTestsChart();
+
+    let selSt = document.getElementById("stateSelect").value;
+    if (databaseName == "czech-covid-db"){
+        if (selSt == "czechia" || (selSt == "" && urlSelectedCountry ==null)){
+            loadTestsChart();
+        }
+    }
 }
 
 var testsChart;
 var testsChartHtml = "<canvas class=\"chartjs\" id=\"testsChart\"></canvas>";
 function loadTestsChart(){
-    let perDayChecked = document.getElementById("testingChart_perDay").checked;
-    let ratioChecked = document.getElementById("testingChart_ratio").checked;
-    let testsDataset;
-    let testsLabel;
-    let yAxisPercent = {
-        ticks: {
-            min: 0,
-            callback: function (value) {
-                return (value * 100).toFixed(0) + '%'; // convert it to percentage
-            }
-        }
-    }
-    let yAxis = {};
-    let ttipsPercent = {
-        callbacks: {
-            label: function (tooltipItem, data) {
-            let tooltipValue = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index].y;
-            return (tooltipValue*100).toString()+"%";
-            }
-        }
-    }
-    let ttips = {};
-    let color = "#5e00c9";
-    if (perDayChecked && ratioChecked){
-        testsDataset = datasets.tests.perDayRatio;
-        testsLabel = strings.testsPerDayRatio;
-        yAxis = yAxisPercent;
-        ttips = ttipsPercent;
-        color = "#f84f4a";
-    }else if (!perDayChecked && ratioChecked){
-        testsDataset = datasets.tests.allRatio;
-        testsLabel = strings.testsAllRatio;
-        yAxis = yAxisPercent;
-        ttips = ttipsPercent;
-        color = "#f84f4a";
-    }else if(perDayChecked && !ratioChecked){
-        testsDataset = datasets.tests.perDay;
-        testsLabel = strings.testsPerDay;
+    if (datasets.tests == undefined){
+        czechCovidDbTestsParse()
     }else{
-        testsDataset = datasets.tests.all;
-        testsLabel = strings.testsAll;
-    }
-    if (testsChart == undefined){
-        document.getElementById("testingChartDiv").innerHTML = "";
-        document.getElementById("testingChartDiv").innerHTML = testsChartHtml;
-        //document.getElementById("testsChart").style.height = "125px";
-        var ctx = document.getElementById("testsChart");
-        
-        testsChart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                datasets: [{ 
-                    data: testsDataset,
-                    label: testsLabel,
-                    borderColor: "#f84f4a",
-                    fill: false
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    xAxes: [{
-                        type: 'time',
-                        time: {
-                            tooltipFormat: 'dddd D. M.',
-                            unit: 'day',
-                            displayFormats: {
-                                'day': 'D. M.'
-                            }
-                        }
-                    }],
-                    yAxes: [yAxis]
+        //tests box
+        document.getElementById("testedText").getElementsByClassName("statNumber")[0].innerHTML = data["tested"]["number"];
+        document.getElementById("testedText").getElementsByClassName("statDate")[0].innerHTML = convertDate(data["tested"]["date"])
+
+        let perDayChecked = document.getElementById("testingChart_perDay").checked;
+        let ratioChecked = document.getElementById("testingChart_ratio").checked;
+        let testsDataset;
+        let testsLabel;
+        let yAxisPercent = {
+            ticks: {
+                min: 0,
+                callback: function (value) {
+                    return (value * 100).toFixed(0) + '%'; // convert it to percentage
+                }
+            }
+        }
+        let yAxis = {};
+        let ttipsPercent = {
+            callbacks: {
+                label: function (tooltipItem, data) {
+                let tooltipValue = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index].y;
+                return (tooltipValue*100).toString()+"%";
+                }
+            }
+        }
+        let ttips = {};
+        let color = "#5e00c9";
+        if (perDayChecked && ratioChecked){
+            testsDataset = datasets.tests.perDayRatio;
+            testsLabel = strings.testsPerDayRatio;
+            yAxis = yAxisPercent;
+            ttips = ttipsPercent;
+            color = "#f84f4a";
+        }else if (!perDayChecked && ratioChecked){
+            testsDataset = datasets.tests.allRatio;
+            testsLabel = strings.testsAllRatio;
+            yAxis = yAxisPercent;
+            ttips = ttipsPercent;
+            color = "#f84f4a";
+        }else if(perDayChecked && !ratioChecked){
+            testsDataset = datasets.tests.perDay;
+            testsLabel = strings.testsPerDay;
+        }else{
+            testsDataset = datasets.tests.all;
+            testsLabel = strings.testsAll;
+        }
+        if (testsChart == undefined){
+            document.getElementById("testingChartDiv").innerHTML = "";
+            document.getElementById("testingChartDiv").innerHTML = testsChartHtml;
+            //document.getElementById("testsChart").style.height = "125px";
+            var ctx = document.getElementById("testsChart");
+            
+            testsChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    datasets: [{ 
+                        data: testsDataset,
+                        label: testsLabel,
+                        borderColor: "#f84f4a",
+                        fill: false
+                    }]
                 },
-                tooltips: ttips
-            }
-        });
-    }else{
-        testsChart.data.datasets[0].data = testsDataset;
-        testsChart.data.datasets[0].label = testsLabel;
-        testsChart.data.datasets[0].borderColor = color;
-        testsChart.options.scales.yAxes[0] = yAxis;
-        testsChart.options.tooltips = ttips;
-        testsChart.update();
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        xAxes: [{
+                            type: 'time',
+                            time: {
+                                tooltipFormat: 'dddd D. M.',
+                                unit: 'day',
+                                displayFormats: {
+                                    'day': 'D. M.'
+                                }
+                            }
+                        }],
+                        yAxes: [yAxis]
+                    },
+                    tooltips: ttips
+                }
+            });
+        }else{
+            testsChart.data.datasets[0].data = testsDataset;
+            testsChart.data.datasets[0].label = testsLabel;
+            testsChart.data.datasets[0].borderColor = color;
+            testsChart.options.scales.yAxes[0] = yAxis;
+            testsChart.options.tooltips = ttips;
+            testsChart.update();
+        }
     }
+}
+
+function loadDistrictsTable(){
+    let table = document.getElementById("districts").getElementsByTagName("tbody")[0];
+    table.innerHTML = "";
+    let deathsSum = 0;
+    let regionId = czechRegionCodes[document.getElementById("stateSelect").value];
+    let suitDistricts = [];
+    for (i=0; i<data.districtsNumbers.districts.length; i++){
+        let district = data.districtsNumbers.districts[i];
+        if (district.id.substring(0,5) == regionId){
+            deathsSum += district.deaths;
+            suitDistricts.push(district);
+        }
+    }
+    suitDistricts.sort(function(first, second) {
+        return second.total_cases - first.total_cases;
+    });
+    for (i=0; i<suitDistricts.length; i++){
+        let district = suitDistricts[i];
+        let row = table.insertRow(-1);
+        let nameCell = row.insertCell(0);
+        nameCell.appendChild(document.createTextNode(district.name));
+
+        let confirmedCell = row.insertCell(1);
+        confirmedCell.appendChild(document.createTextNode(district.total_cases));
+
+        let deathsCell = row.insertCell(2);
+        deathsCell.appendChild(document.createTextNode(district.deaths));
+    }
+    
+
+    data.deaths.number = deathsSum;
+    document.getElementById("deathsText")
+    document.getElementById("deathsText").getElementsByClassName("statNumber")[0].innerHTML = data["deaths"]["number"];
 }
 
 var progressBarShowed = false;
@@ -744,22 +824,24 @@ function loadCurrentData(databaseName){
             if (xhr.status == 200) { // analyze HTTP status of the response
                 document.getElementById("databasePick").value = databaseName;
                 czechCovidDbData = JSON.parse(xhr.response); // responseText is the server
-                data = JSON.parse(JSON.stringify(czechCovidDbData));
-                
+                data = {...data, ...JSON.parse(JSON.stringify(czechCovidDbData))};
+
+                let selectedCountry = document.getElementById("stateSelect").value;
+
                 let basicStatsParse = false;
                 if (document.getElementById("stateSelect") == undefined){
                     basicStatsParse = true;
                 }else{
-                    let selectedCountry = document.getElementById("stateSelect").value;
+                    
                     if (selectedCountry == "czechia" || selectedCountry == "world" || selectedCountry == ""){
                         basicStatsParse=true;
                     }
                 }
-                if (urlSelectedCountry == null && basicStatsParse){
-                    //tests box
-                    document.getElementById("testedText").getElementsByClassName("statNumber")[0].innerHTML = data["tested"]["number"];
-                    document.getElementById("testedText").getElementsByClassName("statDate")[0].innerHTML = convertDate(data["tested"]["date"])
+                if (selectedCountry == "czechia" && czechCovidDbArrParseWaiting.tests && czechCovidDbArrParsed.confirmed){
+                    czechCovidDbTestsParse();
+                }
 
+                if (urlSelectedCountry == null && basicStatsParse){
                     //confirmed cases box
                     document.getElementById("confirmedText").getElementsByClassName("statNumber")[0].innerHTML = data["confirmed"]["number"];
                     document.getElementById("confirmedText").getElementsByClassName("statDate")[0].innerHTML = convertDate(data["confirmed"]["date"]);
@@ -798,7 +880,8 @@ function loadCurrentData(databaseName){
                 let results = Papa.parse(xhrTests.response, csvFormat[databaseName]);
                 if (results["errors"].length == 0){
                     czechCovidDbArr.tests = results.data;
-                    if (czechCovidDbArrParsed.confirmed){
+                    let selectedCountry = document.getElementById("stateSelect").value;
+                    if (selectedCountry == "czechia" && czechCovidDbArrParsed.confirmed && data.tested != undefined){
                         czechCovidDbTestsParse();
                     }else{
                         czechCovidDbArrParseWaiting.tests = true;
@@ -829,7 +912,8 @@ function loadCurrentData(databaseName){
                     czechCovidDbArr["confirmed"] = results.data;
                     czechCountrySelect(czechCovidDbArr["confirmed"][0]);
                     czechCovidDbParse("confirmed");
-                    if (czechCovidDbArrParseWaiting.tests){
+                    let selectedCountry = document.getElementById("stateSelect").value;
+                    if (selectedCountry == "czechia" && czechCovidDbArrParseWaiting.tests && data.tested != undefined){
                         czechCovidDbTestsParse();
                     }
                     if (czechCovidDbArrParseWaiting.recovered){
@@ -901,6 +985,25 @@ function loadCurrentData(databaseName){
             }
         };
         xhrDeaths.onerror = function() {
+            alert("Request failed");
+        };
+
+        let xhrDN = new XMLHttpRequest();
+        xhrDN.open('GET', czechCovidDbURLs.districtsNumbers);
+        xhrDN.setRequestHeader("x-requested-with", "XMLHttpRequest");
+        xhrDN.send();
+        xhrDN.onload = function() {
+            if (xhrDN.status == 200) { // analyze HTTP status of the response
+                data.districtsNumbers = JSON.parse(JSON.parse(xhrDN.response).contents.replace('/', ''));
+                let selectedCountry = document.getElementById("stateSelect").value;
+                if ((selectedCountry != "" && selectedCountry != "czechia") || (urlSelectedCountry != "czechia" && urlSelectedCountry != null)){
+                    loadDistrictsTable();
+                }
+            } else { // show the result
+                alert(`Error ${xhrDN.status}: ${xhrDN.statusText}`); // e.g. 404: Not Found
+            }
+        };
+        xhrDN.onerror = function() {
             alert("Request failed");
         };
     }else if(databaseName == "CSSE COVID-19 Dataset"){
@@ -1022,6 +1125,7 @@ function loadCurrentData(databaseName){
 var predictionChartHtml = "<canvas class=\"chartjs\" id=\"predictionChart\"></canvas>";
 
 function detailedStatsSH(){
+    let width = (window.innerWidth > 0) ? window.innerWidth : screen.width;
     let elems = document.getElementsByClassName("detailedData");
     if (databaseName == "czech-covid-db" && document.getElementById("stateSelect").value == "czechia"){
         for (i=0; i< elems.length; i++){
@@ -1032,8 +1136,11 @@ function detailedStatsSH(){
             }
         }
         elemsSmall = document.getElementsByClassName("small");
-        for (i=0; i<elemsSmall.length; i++){
-            elemsSmall[i].style.height= "160px";
+        
+        if (width > 1655 && width < 2075){
+            for (i=0; i<elemsSmall.length; i++){
+                elemsSmall[i].style.height= "160px";
+            }
         }
     }else{
         for (i=0; i< elems.length; i++){
@@ -1041,11 +1148,34 @@ function detailedStatsSH(){
         }
         bigHeight = getComputedStyle(document.querySelector('.big')).height;
         elemsSmall = document.getElementsByClassName("small");
+        if (width > 1655 && width < 2075){
+            for (i=0; i<elemsSmall.length; i++){
+                elemsSmall[i].style.height= bigHeight;
+            }
+        }
+        
+    }
+}
+
+function scaleSmallBox(w){
+    if (databaseName == "czech-covid-db") {
+    elemsSmall = document.getElementsByClassName("small");
+    if (w.matches){
+        bigHeight = getComputedStyle(document.querySelector('.big')).height;
         for (i=0; i<elemsSmall.length; i++){
             elemsSmall[i].style.height= bigHeight;
         }
+    }else{
+        for (i=0; i<elemsSmall.length; i++){
+            elemsSmall[i].style.height= "160px";
+        }
+    }
     }
 }
+
+var x = window.matchMedia("(max-width:1655px), (min-width:2075px)");
+
+x.addListener(scaleSmallBox);
 
 function loadPredictionConfigIntoHTML(){
     document.getElementById("predictionChartDiv").innerHTML = "";
@@ -1624,6 +1754,11 @@ function myTodayInfectedProbability() {
 }
 
 window.addEventListener('load', (event) => {
+    let selectedC = document.getElementById("stateSelect").value;
+    if (( databaseName == "czech-covid-db" && selectedC != "" &&  selectedC != "czechia") || (urlSelectedCountry != null && databaseName == "czech-covid-db" && urlSelectedCountry != "czechia")){
+        document.getElementById("okresyBox").style.display = "initial";
+    }
+    scaleSmallBox(x);
     document.addEventListener('keyup', (e) => {
         if (e.code === "Enter"){
             predictionConfigSH(true);
