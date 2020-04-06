@@ -74,8 +74,11 @@ var csStrings = {world: "Svět",
              predictionTooltipLabel: 'Počet lidí',
              growthFactorChartLabel: "Faktor šíření",
              dataChartConfirmedLabel: "Potvrzené případy",
+             dataChartPerDayConfirmedLabel: "Nárůst potvrzených případů",
              dataChartRecoveredLabel: "Zotavení",
+             dataChartPerDayRecoveredLabel: "Nárůst počtu zotavených",
              dataChartDeathsLabel: "Úmrtí",
+             dataChartPerDayDeathsLabel: "Nárůst úmrtí",
              dataChartPredictionLabel: "Predikce",
              idiotError: "Error - co delas ty blazne??",
              datasetError: "Omlouváme se, ale asi se vyskytla chyba pravděpodobně způsobená změněnými formáty v datasetu. Toto se často stává u datasetu JHO CSSE, někdy udělají opravdu nekonzistentní změny. Prosím dejte nám vědět na adrese koronagrafy@seznam.cz. Pokusíme se to spravit.",
@@ -86,7 +89,18 @@ var csStrings = {world: "Svět",
              testsAll: "Počet provedených testů",
              testsPerDay: "Nárůst počtu provedených testů",
              testsAllRatio: "Procento pozitivních testů",
-             testsPerDayRatio: "Procento pozitivních testů za den"
+             testsPerDayRatio: "Procento pozitivních testů za den",
+             countryNames: {
+                AT: "Rakousko",
+                IT: "Itálie",
+                DE: "Německo",
+                GB: "Velká Británie",
+                FR: "Francie",
+                ES: "Španělsko",
+                US: "USA",
+                CH: "Švýcarsko",
+                TH: "Thajsko"
+             }
             };
 var enStrings = {world: "World",
              czechia: "Czechia",
@@ -102,8 +116,11 @@ var enStrings = {world: "World",
              predictionTooltipLabel: 'Number of people',
              growthFactorChartLabel: "Growth factor",
              dataChartConfirmedLabel: "Confirmed cases",
+             dataChartPerDayConfirmedLabel: "Confirmed cases increase",
              dataChartRecoveredLabel: "Recovered",
+             dataChartPerDayRecoveredLabel: "Recovered increase",
              dataChartDeathsLabel: "Deaths",
+             dataChartPerDayDeathsLabel: "Deaths increase",
              dataChartPredictionLabel: "Prediction",
              idiotError: "Error - you doing weird things",
              datasetError: "Sorry, but an error occured. It was probably because of changed formats in a dataset. This often happens with the JHO CSSE dataset, they sometimes do really inconsistent changes - it is a mess! Please email us about that at koronagrafy@seznam.cz. We will try to fix it.",
@@ -114,7 +131,18 @@ var enStrings = {world: "World",
              testsAll: "Number of tests",
              testsPerDay: "Nárůst počtu provedených testů",
              testsAllRatio: "Procento pozitivních testů",
-             testsPerDayRatio: "Procento pozitivních testů za den"
+             testsPerDayRatio: "Procento pozitivních testů za den",
+             countryNames: {
+                AT: "Austria",
+                IT: "Italy",
+                DE: "Germany",
+                GB: "Great Britain",
+                FR: "France",
+                ES: "Spain",
+                US: "USA",
+                CH: "Switzerland",
+                TH: "Thailand"
+             }
             };
 
 var predictionConfigCzechDefaults = {functionName: "henry1",
@@ -217,42 +245,71 @@ var dataChartHtml = "<canvas class=\"chartjs\" id=\"dataChart\"></canvas>";
 var dataChart;
 var datasets = {confirmed:[], confirmedMaxInDay:[], spreadGrowthFactor:[]};
 var dataChartFirstLoad = true;
-function loadDataChart(optionalDataset){
+function loadDataChart(){
+    let optionalDataset = null;
+    if(predictionConfig["plotPredictionToDataChart"]){
+        let endOf = parseInt(daysSinceOutbreakSt)+parseInt(predictionConfig["plotPredictionToDataChartAddDays"]);
+        optionalDataset = JSON.parse(JSON.stringify(datasets.prediction.slice(0,endOf)));
+    }
+
     let dataChartDataset;
-    let datasetNameMaxString;
-    if(document.getElementById("dataChart_dailyData").checked || optionalDataset != null){
-        document.getElementById("dataChart_dailyData").checked = true;
-        datasetNameMaxString ="MaxInDay";
-    }else{
-        datasetNameMaxString ="";
-    }
+    let datasetNameMaxString  = "MaxInDay";
     let feeddatasets;
-    let ttformat;
+    let ttformat = 'dddd D. M.';
 
-    if(optionalDataset != null){
-        for(var i=0; i<datasets["confirmed"+datasetNameMaxString].length; i++){
-            blablaDate = new Date(datasets["confirmed"+datasetNameMaxString][i].x);
-            blablaDate.setHours(0,0,0,0);
-            datasets["confirmed"+datasetNameMaxString][i].x = blablaDate.toISOString();
+    let confirmedDataset = JSON.parse(JSON.stringify(datasets["confirmed"+datasetNameMaxString]));
+    let confirmedLabel;
+    let recoveredDataset = JSON.parse(JSON.stringify(datasets["recovered"+datasetNameMaxString]));
+    let recoveredLabel;
+    let deathsDataset = JSON.parse(JSON.stringify(datasets["deaths"+datasetNameMaxString]));
+    let deathsLabel;
+
+    if (document.getElementById("dataChart_perDay").checked){
+        let lastValue = 0;
+        confirmedLabel = strings.dataChartPerDayConfirmedLabel;
+        recoveredLabel = strings.dataChartPerDayRecoveredLabel;
+        deathsLabel = strings.dataChartPerDayDeathsLabel;
+        for (i=0; i<optionalDataset.length; i++){
+            let currValue = optionalDataset[i].y;
+            optionalDataset[i].y = currValue - lastValue;
+            lastValue = currValue;
         }
-        ttformat = 'D. M.';
+        lastValue = 0;
+        for (i=0; i<confirmedDataset.length; i++){
+            let currValue = confirmedDataset[i].y;
+            confirmedDataset[i].y = currValue - lastValue;
+            lastValue = currValue;
+        }
+        lastValue = 0;
+        for (i=0; i<recoveredDataset.length; i++){
+            let currValue = recoveredDataset[i].y;
+            recoveredDataset[i].y = currValue - lastValue;
+            lastValue = currValue;
+        }
+        lastValue = 0;
+        for (i=0; i<deathsDataset.length; i++){
+            let currValue = deathsDataset[i].y;
+            deathsDataset[i].y = currValue - lastValue;
+            lastValue = currValue;
+        }
     }else{
-        ttformat = 'D. M. H:mm';
+        confirmedLabel = strings.dataChartConfirmedLabel;
+        recoveredLabel = strings.dataChartRecoveredLabel;
+        deathsLabel = strings.dataChartDeathsLabel;
     }
-
     feeddatasets = [{ 
-        data: datasets["confirmed"+datasetNameMaxString],
-        label: strings.dataChartConfirmedLabel,
+        data: confirmedDataset,
+        label: confirmedLabel,
         borderColor: "#f84f4a",
         fill: 1
             },{
-        data: datasets["recovered"+datasetNameMaxString],
-        label: strings.dataChartRecoveredLabel,
+        data: recoveredDataset,
+        label: recoveredLabel,
         borderColor: "#1261ff",
         fill: false
             },{
-        data: datasets["deaths"+datasetNameMaxString],
-        label: strings.dataChartDeathsLabel,
+        data: deathsDataset,
+        label: deathsLabel,
         borderColor: "#383838",
         fill: false
         }
@@ -513,7 +570,7 @@ function csseParse(datasetName){
             getDataCalculatePredictionAndPlot();
             if (progressBarShowed){NProgress.inc();};
         }else{
-            loadDataChart(null);
+            loadDataChart();
             if (progressBarShowed){NProgress.inc();};
             getDataCalculatePredictionAndPlot();
         }
@@ -629,7 +686,7 @@ function czechCovidDbParse(datasetName){
         if (predictionConfig.plotPredictionToDataChart){
             getDataCalculatePredictionAndPlot();
         }else{
-            loadDataChart(null);        
+            loadDataChart();        
             getDataCalculatePredictionAndPlot();
         }
         NProgress.done();
@@ -1555,10 +1612,8 @@ function getDataCalculatePredictionAndPlot(){
             }
         }
     });
-    if(predictionConfig["plotPredictionToDataChart"]){
-        let endOf = parseInt(daysSinceOutbreakSt)+parseInt(predictionConfig["plotPredictionToDataChartAddDays"]);
-        loadDataChart(predDataset.slice(0,endOf));
-    }
+    datasets.prediction = predDataset;
+    loadDataChart();
 }
 
 function growthFactorConfigChange(){
@@ -1667,6 +1722,14 @@ function loadImportsChart(){
 
     let numberOfStates = parseInt(statesToShow.value);
     let statesNames = czechCovidDbArr.imports[0].slice(3, 3+numberOfStates);
+    if (numberOfStates < 8){
+        for (i=0; i<statesNames.length; i++){
+            currName = statesNames[i];
+            if (strings.countryNames.hasOwnProperty(currName)){
+                statesNames[i] = strings.countryNames[currName];
+            }
+        }
+    }
     statesToShow.max = czechCovidDbArr.imports[0].slice(3).length-48;
     let targetIndex = parseInt(slider.value)-1;
     let stateValues = czechCovidDbArr.imports[targetIndex].slice(3, 3+numberOfStates);
