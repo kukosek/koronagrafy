@@ -50,12 +50,14 @@ var czechCovidDbURLs = {currentNumbers: 'https://raw.githubusercontent.com/kukos
                         confirmed: 'https://raw.githubusercontent.com/kukosek/czech-covid-db/master/uzis/records_confirmed_uzis.csv',
                         recovered: 'https://raw.githubusercontent.com/kukosek/czech-covid-db/master/uzis/records_recovered_uzis.csv',
                         deaths: 'https://raw.githubusercontent.com/kukosek/czech-covid-db/master/uzis/records_deaths_uzis.csv',
-                        districtsNumbers: 'https://api.allorigins.win/get?url=https://mapy.cz/covid/data/districts.json'
-}
+                        districtsNumbers: 'https://api.allorigins.win/get?url=https://mapy.cz/covid/data/districts.json',
+                        imports: 'https://raw.githubusercontent.com/kukosek/czech-covid-db/master/uzis/records_imports_uzis.csv',
+                        ageGroups: 'https://raw.githubusercontent.com/kukosek/czech-covid-db/master/uzis/records_confirmed-agegroups_uzis.csv'
+};
 var csseURLs = {confirmed: 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv',
             recovered: 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_recovered_global.csv',
             deaths: 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_global.csv'
-}
+};
 var csseDateFormat = {confirmed: "M/D/YY", recovered: "M/D/YYYY", deaths: "M/D/YY"};
 var csvFormat = {"CSSE COVID-19 Dataset": {delimeter: ","}, "czech-covid-db": {delimeter: ","}};
 var csStrings = {world: "Svět",
@@ -85,7 +87,7 @@ var csStrings = {world: "Svět",
              testsPerDay: "Nárůst počtu provedených testů",
              testsAllRatio: "Procento pozitivních testů",
              testsPerDayRatio: "Procento pozitivních testů za den"
-            }
+            };
 var enStrings = {world: "World",
              czechia: "Czechia",
              jhoRecoveredUnavailable: "JHO CSSE haven't got the recovered dataset working.",
@@ -108,8 +110,12 @@ var enStrings = {world: "World",
              noData: "Data not available",
              today: "Today",
              yesterday: "Yesterday",
-             importedCases: "Imported cases"
-            }
+             importedCases: "Imported cases",
+             testsAll: "Number of tests",
+             testsPerDay: "Nárůst počtu provedených testů",
+             testsAllRatio: "Procento pozitivních testů",
+             testsPerDayRatio: "Procento pozitivních testů za den"
+            };
 
 var predictionConfigCzechDefaults = {functionName: "henry1",
                                 startValue: 4,
@@ -126,7 +132,7 @@ var predictionConfigCzechDefaults = {functionName: "henry1",
                                 continuous_endVarValues: "0.25*10; 0.2*10; 0.12",
                                 plotPredictionToDataChart: true,
                                 plotPredictionToDataChartAddDays: 4
-}
+};
 
 var predictionConfigWorldDefaults = {functionName: "henry1",
                                 startValue: 4,
@@ -143,7 +149,7 @@ var predictionConfigWorldDefaults = {functionName: "henry1",
                                 continuous_endVarValues: "0.27*12; 0.2*10; 0.12",
                                 plotPredictionToDataChart: true,
                                 plotPredictionToDataChartAddDays: 4
-}
+};
 var growthFactorCalcConfigCzechDefaults = {days: 1, perDay: true};
 var growthFactorCalcConfigWorldDefaults = {days: 1, perDay: true};
 
@@ -151,7 +157,7 @@ var populations = {world: 7800000000, Germany: 83149300, Italy: 60243406,
                     Spain: 47100396, Iran: 83295597,
                     "Korea, South": 51780579, France: 67069000,
                     China: 1401841400, Netherlands: 17446481
-                }
+                };
 
 var czechRegionsPopulations = {};
 var czechRegionCodes = { 'Hlavní město Praha': 'CZ010',
@@ -310,7 +316,7 @@ var csseArrParseWaiting = {recovered: false, deaths: false};
 var csseArrParsed = {confirmed: false, recovered: false, deaths: false};
 var csseArr = {confirmed: [], recovered: [], deaths: []};
 var czechCovidDbData;
-var czechCovidDbArrParseWaiting = {tests: false, recovered: false, deaths: false};
+var czechCovidDbArrParseWaiting = {tests: false, recovered: false, deaths: false, imports: false, districtsNumbers: false, ageGroups: false};
 var czechCovidDbArr = {tests: {}, confirmed: [], recovered: [], deaths: []};
 var czechCovidDbArrParsed = {confirmed: false, recovered: false, deaths: false};
 var csseCountriesList = [];
@@ -347,6 +353,7 @@ function databaseChange() {
             NProgress.inc();
             csseParse("deaths");
         }
+        scaleSmallBox();
     }else if (databaseName == "czech-covid-db"){
         if (!progressBarShowed){
             NProgress.start();
@@ -541,6 +548,11 @@ function czechCovidDbParse(datasetName){
         }
         document.getElementById("stateSelect").value = urlSelectedCountry;
         urlSelectedCountry = null;
+    }
+    if (selValue != "czechia"){
+        document.getElementById("okresyBox").style.display = "initial";
+    }else{
+        document.getElementById("okresyBox").style.display = "none";
     }
     datasetsInRows = datasetsInColumns[0].map(function(col, i) {
         return datasetsInColumns.map(function(row) {
@@ -924,6 +936,21 @@ function loadCurrentData(databaseName){
                         czechCovidDbParse("deaths");
                         czechCovidDbArrParseWaiting.deaths = false;
                     }
+                    if (czechCovidDbArrParseWaiting.districtsNumbers){
+                        let selectedCountry = document.getElementById("stateSelect").value;
+                        if ((selectedCountry != "" && selectedCountry != "czechia") || (urlSelectedCountry != "czechia" && urlSelectedCountry != null)){
+                            loadDistrictsTable();
+                        }
+                        czechCovidDbArrParseWaiting.districtsNumbers = false;
+                    }
+                    if (czechCovidDbArrParseWaiting.imports){
+                        loadImportsChart();
+                        czechCovidDbArrParseWaiting.imports = false;
+                    }
+                    if (czechCovidDbArrParseWaiting.ageGroups){
+                        loadAgegroupsChart();
+                        czechCovidDbArrParseWaiting.ageGroups = false;
+                    }
                     if(progressBarShowed) {NProgress.inc();}
                 }else{
                     alert("Error parsing chart dataset\n"+results.errors[0].message);
@@ -996,15 +1023,75 @@ function loadCurrentData(databaseName){
             if (xhrDN.status == 200) { // analyze HTTP status of the response
                 czechCovidDbData.districtsNumbers = JSON.parse(JSON.parse(xhrDN.response).contents.replace('/', ''));
                 data.districtsNumbers = JSON.parse(JSON.stringify(czechCovidDbData.districtsNumbers));
-                let selectedCountry = document.getElementById("stateSelect").value;
-                if ((selectedCountry != "" && selectedCountry != "czechia") || (urlSelectedCountry != "czechia" && urlSelectedCountry != null)){
-                    loadDistrictsTable();
+                if (czechCovidDbArrParsed.confirmed){
+                    let selectedCountry = document.getElementById("stateSelect").value;
+                    if ((selectedCountry != "" && selectedCountry != "czechia") || (urlSelectedCountry != "czechia" && urlSelectedCountry != null)){
+                        loadDistrictsTable();
+                    }
+                }else{
+                    czechCovidDbArrParseWaiting.districtsNumbers = true;
                 }
             } else { // show the result
                 alert(`Error ${xhrDN.status}: ${xhrDN.statusText}`); // e.g. 404: Not Found
             }
         };
         xhrDN.onerror = function() {
+            alert("Request failed");
+        };
+
+        let xhrImports = new XMLHttpRequest();
+        xhrImports.open('GET', czechCovidDbURLs.imports);
+        xhrImports.send();
+        xhrImports.onload = function() {
+            if (xhrImports.status == 200) { // analyze HTTP status of the response
+                let results = Papa.parse(xhrImports.response, csvFormat[databaseName]);
+                if (results["errors"].length == 0){
+                    czechCovidDbArr["imports"] = results.data;
+                    if (czechCovidDbArrParsed.confirmed){
+                        let selectedCountry = document.getElementById("stateSelect").value;
+                        if (urlSelectedCountry == "czechia" || selectedCountry == "czechia"){
+                            loadImportsChart();
+                        }
+                    }else{
+                        czechCovidDbArrParseWaiting.imports = true;
+                    }
+                    if(progressBarShowed) {NProgress.inc();}
+                }else{
+                    alert("Error parsing chart dataset\n"+results.errors[0].message);
+                }
+            } else { // show the result
+                alert(`Error ${xhrImports.status}: ${xhrImports.statusText}`); // e.g. 404: Not Found
+            }
+        };
+        xhrImports.onerror = function() {
+            alert("Request failed");
+        };
+
+        let xhrAgegroups = new XMLHttpRequest();
+        xhrAgegroups.open('GET', czechCovidDbURLs.ageGroups);
+        xhrAgegroups.send();
+        xhrAgegroups.onload = function() {
+            if (xhrAgegroups.status == 200) { // analyze HTTP status of the response
+                let results = Papa.parse(xhrAgegroups.response, csvFormat[databaseName]);
+                if (results["errors"].length == 0){
+                    czechCovidDbArr["ageGroups"] = results.data;
+                    if (czechCovidDbArrParsed.confirmed){
+                        let selectedCountry = document.getElementById("stateSelect").value;
+                        if (urlSelectedCountry == "czechia" || selectedCountry == "czechia"){
+                            loadAgegroupsChart();
+                        }
+                    }else{
+                        czechCovidDbArrParseWaiting.ageGroups = true;
+                    }
+                    if(progressBarShowed) {NProgress.inc();}
+                }else{
+                    alert("Error parsing chart dataset\n"+results.errors[0].message);
+                }
+            } else { // show the result
+                alert(`Error ${xhrAgegroups.status}: ${xhrAgegroups.statusText}`); // e.g. 404: Not Found
+            }
+        };
+        xhrAgegroups.onerror = function() {
             alert("Request failed");
         };
     }else if(databaseName == "CSSE COVID-19 Dataset"){
@@ -1561,6 +1648,132 @@ function calculateSpreadGrowthFactor(dataset){
             }
         }
     } //TODO if not perday
+}
+importsChartHtml = "<canvas class=\"chartjs\" id=\"importschart\"></canvas>";
+var importschart;
+function loadImportsChart(){
+    let firstRecordDate = moment(czechCovidDbArr.imports[1][1]);
+    let latestRecordDate = moment(czechCovidDbArr.imports[czechCovidDbArr.imports.length-1][1]);
+    let dateDiff = latestRecordDate.diff(firstRecordDate, 'days');
+    let slider = document.getElementById("importsSlider");
+    let statesToShow = document.getElementById("numberOfStatesToShow");
+    if (slider.max != dateDiff){
+        slider.max = dateDiff;
+        slider.value = dateDiff;
+    }
+    selectedDate = moment(firstRecordDate);
+    selectedDate.add(parseInt(slider.value), "days");
+    document.getElementById("importsDate").value = selectedDate.toISOString().substr(0, 10);
+
+    let numberOfStates = parseInt(statesToShow.value);
+    let statesNames = czechCovidDbArr.imports[0].slice(3, 3+numberOfStates);
+    statesToShow.max = czechCovidDbArr.imports[0].slice(3).length-48;
+    let targetIndex = parseInt(slider.value)-1;
+    let stateValues = czechCovidDbArr.imports[targetIndex].slice(3, 3+numberOfStates);
+    for (i=0; i<stateValues.length; i++){
+        stateValues[i] = parseInt(stateValues[i]);
+    }
+    let chartData =  {
+        labels: statesNames,
+        datasets: [{
+            backgroundColor: [
+                'rgba(255, 99, 132, 0.4)',
+                'rgba(54, 162, 235, 0.4)',
+                'rgba(255, 206, 86, 0.4)',
+                'rgba(75, 192, 192, 0.4)',
+                'rgba(153, 102, 255, 0.4)',
+                'rgba(255, 159, 64, 0.4)',
+                'rgba(255, 99, 132, 0.4)',
+                'rgba(54, 162, 235, 0.4)',
+                'rgba(255, 206, 86, 0.4)',
+                'rgba(75, 192, 192, 0.4)',
+                'rgba(153, 102, 255, 0.4)',
+                'rgba(255, 159, 64, 0.4)'
+              ],
+            borderColor: "#f84f4a",
+            borderWidth: 2,
+            data: stateValues
+        }]
+    };
+
+    if (importschart == undefined){
+        document.getElementById("importsChartDiv").innerHTML = "";
+        document.getElementById("importsChartDiv").innerHTML = importsChartHtml;
+        var ctx = document.getElementById("importschart");
+        importschart = new Chart(ctx, {
+            type: 'bar',
+            data: chartData,
+            options: {
+                legend: {
+                    display: false
+                },
+                responsive: true,
+                maintainAspectRatio: false,
+            }
+        });
+    }else{
+        importschart.data = chartData;
+        importschart.update(0);
+    }
+}
+
+ageGroupsHtml = "<canvas class=\"chartjs\" id=\"agegroupschart\"></canvas>";
+var agegroupschart;
+function loadAgegroupsChart(){
+    let firstRecordDate = moment(czechCovidDbArr.ageGroups[1][1]);
+    let latestRecordDate = moment(czechCovidDbArr.ageGroups[czechCovidDbArr.ageGroups.length-1][1]);
+    let dateDiff = latestRecordDate.diff(firstRecordDate, 'days');
+    let slider = document.getElementById("agegroupsSlider");
+    if (slider.max != dateDiff){
+        slider.max = dateDiff;
+        slider.value = dateDiff;
+    }
+    selectedDate = moment(firstRecordDate);
+    selectedDate.add(parseInt(slider.value), "days");
+    document.getElementById("agegroupsDate").value = selectedDate.toISOString().substr(0, 10);
+
+    let statesNames = czechCovidDbArr.ageGroups[0].slice(3);
+    let targetIndex = parseInt(slider.value);
+    let stateValues = czechCovidDbArr.ageGroups[targetIndex].slice(3);
+    for (i=0; i<stateValues.length; i++){
+        stateValues[i] = parseInt(stateValues[i]);
+    }
+    let chartData =  {
+        labels: statesNames,
+        datasets: [{
+            backgroundColor: [
+                'rgba(255, 99, 132, 0.4)',
+                'rgba(54, 162, 235, 0.4)',
+                'rgba(255, 206, 86, 0.4)',
+                'rgba(75, 192, 192, 0.4)',
+                'rgba(153, 102, 255, 0.4)',
+                'rgba(255, 159, 64, 0.4)',
+              ],
+            borderColor: "#f84f4a",
+            borderWidth: 2,
+            data: stateValues
+        }]
+    };
+
+    if (agegroupschart == undefined){
+        document.getElementById("agegroupsChartDiv").innerHTML = "";
+        document.getElementById("agegroupsChartDiv").innerHTML = ageGroupsHtml;
+        let ctx = document.getElementById("agegroupschart");
+        agegroupschart = new Chart(ctx, {
+            type: 'bar',
+            data: chartData,
+            options: {
+                legend: {
+                    display: false
+                },
+                responsive: true,
+                maintainAspectRatio: false,
+            }
+        });
+    }else{
+        agegroupschart.data = chartData;
+        agegroupschart.update(0);
+    }
 }
 
 var lastHeight = 0;

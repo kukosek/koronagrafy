@@ -117,12 +117,12 @@
             <div class="wrapperCharts">
                 <div class="chartsBox big detailedData">
                     <div class="chartControls">
-                        <h2>Testování&nbsp</h2>
+                        <h2>Testing&nbsp</h2>
                         <label class="radio-inline">
-                            <input id="testingChart_perDay" onclick="loadTestsChart()" type="checkbox" checked>Za den
+                            <input id="testingChart_perDay" onclick="loadTestsChart()" type="checkbox" checked>Per day
                         </label>
                         <label class="radio-inline">
-                            <input id="testingChart_ratio" onclick="loadTestsChart()" type="checkbox" checked>Poměr k počtu nakažených
+                            <input id="testingChart_ratio" onclick="loadTestsChart()" type="checkbox" checked>Positive ratio
                         </label>
                     </div>
                     <div id="testingChartDiv">
@@ -243,10 +243,62 @@
                         
                     </div>
                 </div>
-                <div class="chartsBox small">
+                <div id="okresyBox" class="chartsBox big">
+                    <div style="justify-content: space-between;" class="chartControls">
+                        <h2>Districts</h2>
+                        <div>Data source: <a href="https://mapy.cz/covid/data/districts.json">mapy.cz</a></div>
+                    </div>
+                    <table id="districts">
+                        <thead>
+                            <tr>
+                                <th>District</th>
+                                <th>Infected</th>
+                                <th>Deaths</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <th>Loading...</th>
+                                <th></th>
+                                <th></th>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="chartsBox small detailedData">
+                    <div class="chartControls">
+                        <h2>Import of infected people &#8203;</h2>
+                        <label id="numberOfStatesToShow_label">
+                            Show first
+                            <input class="dynamicInput" onInput="dynamicInputAdjust();loadImportsChart();" type="number" id="numberOfStatesToShow" name="numberOfStatesToShow" onfocus="this.select();" min=1 value=6>countries
+                        </label>
+                    </div>
+                    <div id="importsChartDiv">
+
+                    </div>
+                    <div id="importsDateSelector">
+                        <label>Date:</label>
+                        <input type="range" class="slider" id="importsSlider" oninput="loadImportsChart()" min="1" max="50">
+                        <input type="date" id="importsDate">
+                    </div>
+                </div>
+                <div class="chartsBox small detailedData">
+                    <div class="chartControls">
+                        Infected &#8203;<wbr><h2>age groups</h2>
+                    </div>
+                    <div id="agegroupsChartDiv">
+                        
+                    </div>
+                    <div id="agegroupsDateSelector">
+                        <label>Date:</label>
+                        <input type="range" id="agegroupsSlider" oninput="loadAgegroupsChart()" min="1" max="50">
+                        <input type="date" id="agegroupsDate">
+                    </div>
+                </div>
+                <div id="infectionProbabilityBox" class="chartsBox small">
                     <div class="chartControls">
                         <h2>Did I got infected today?</h2>
-                        <img class="infoIcon" title="Toto je pouze statistická hodnota. Nemá moc smysl aplikovat tuto šanci na sebe samotné, šance je kalkulována z globálních/státních čísel a šance, že se zrovna vy dnes nakazíte, závisí na mnoha dalších faktorech. Prosím, neberte tuto šanci jako důvod k ignorování vládních nařízení." width="18px" src="/images/info.svg"></img>
+                        <img class="infoIcon" title="This is only a statistical value, it doesn't make much sense to apply this chance to yourself as it is calculated from the global numbers. Please don't make this a reason to ignore goverment advice." width="18px" src="/images/info.svg"></img>
                     </div>
                     <div>
                         <label for="myMeetPerDay">

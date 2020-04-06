@@ -103,6 +103,70 @@
     padding: 20px 20px 75px 20px;
 }
 
+
+/*Chrome*/
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+    input[type='range'] {
+      overflow: hidden;
+      -webkit-appearance: none;
+      background-color: transparent;
+    }
+    
+    input[type='range']::-webkit-slider-runnable-track {
+      height: 10px;
+      -webkit-appearance: none;
+      color: #13bba4;
+      margin-top: -1px;
+    }
+    
+    input[type='range']::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      height: 10px;
+      cursor: ew-resize;
+      background: #434343;
+      box-shadow: -80px 0 0 80px #5e00c9;
+    }
+
+}
+/** FF*/
+input[type="range"]::-moz-range-progress {
+  background-color: #5e00c9; 
+}
+input[type="range"]::-moz-range-track {  
+  background-color: #9a905d;
+}
+/* IE*/
+input[type="range"]::-ms-fill-lower {
+  background-color: #5e00c9; 
+}
+input[type="range"]::-ms-fill-upper {  
+  background-color: #9a905d;
+}
+  
+  
+#importsChart {
+    height: 100%;
+}
+#agegroupschart{
+    height: 100%;
+}
+
+#importsChartDiv{
+    height: 120px;
+}
+#agegroupsChartDiv{
+    height: 120px;
+}
+
+@media screen and (max-width:1655px) {
+    #importsChartDiv{
+        height: 265px;
+    }
+    #agegroupsChartDiv{
+        height: 265px;
+    }
+}
+
 .big{
     height: 350px;
 }
@@ -160,6 +224,10 @@
 
 .infoIcon {
     margin:10px; opacity: 0.70;
+}
+
+#myMeetPerDay {
+    width: 60px;
 }
 
 /*this is pretty shity solution to a creepy bug but i dont know how to solve it better*/
@@ -250,6 +318,9 @@
 }
 
 #daysToCalculateGrowthFactorOver{
+    width: 50px;
+}
+#numberOfStatesToShow{
     width: 50px;
 }
 #infectionGrowthFactorChart{

@@ -268,14 +268,33 @@
                 </div>
                 <div class="chartsBox small detailedData">
                     <div class="chartControls">
-                        <h2>Import nakažených</h2>
+                        <h2>Import nakažených &#8203;</h2>
+                        <label id="numberOfStatesToShow_label">
+                            Zobrazovat prvních
+                            <input class="dynamicInput" onInput="dynamicInputAdjust();loadImportsChart();" type="number" id="numberOfStatesToShow" name="numberOfStatesToShow" onfocus="this.select();" min=1 value=6>států
+                        </label>
+                    </div>
+                    <div id="importsChartDiv">
+
+                    </div>
+                    <div id="importsDateSelector">
+                        <label>Datum:</label>
+                        <input type="range" class="slider" id="importsSlider" oninput="loadImportsChart()" min="1" max="50">
+                        <input type="date" id="importsDate">
                     </div>
                 </div>
                 <div class="chartsBox small detailedData">
                     <div class="chartControls">
                         Nakažení podle &#8203;<wbr><h2>věkové skupiny</h2>
                     </div>
-                    
+                    <div id="agegroupsChartDiv">
+                        
+                    </div>
+                    <div id="agegroupsDateSelector">
+                        <label>Datum:</label>
+                        <input type="range" id="agegroupsSlider" oninput="loadAgegroupsChart()" min="1" max="50">
+                        <input type="date" id="agegroupsDate">
+                    </div>
                 </div>
                 <div id="infectionProbabilityBox" class="chartsBox small">
                     <div class="chartControls">
