@@ -783,7 +783,7 @@ function loadTestsChart(){
             }
         }
         let ttips = {};
-        let color = "#5e00c9";
+        let color = "#b200c9";
         if (perDayChecked && ratioChecked){
             testsDataset = datasets.tests.perDayRatio;
             testsLabel = strings.testsPerDayRatio;
