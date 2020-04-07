@@ -1750,20 +1750,28 @@ function calculateSpreadGrowthFactor(dataset){
 }
 importsChartHtml = "<canvas class=\"chartjs\" id=\"importschart\"></canvas>";
 var importschart;
-function loadImportsChart(){
+function loadImportsChart(changed){
+    console.log(changed);
     let firstRecordDate = moment(czechCovidDbArr.imports[1][1]);
     let latestRecordDate = moment(czechCovidDbArr.imports[czechCovidDbArr.imports.length-1][1]);
     let dateDiff = latestRecordDate.diff(firstRecordDate, 'days');
     let slider = document.getElementById("importsSlider");
+    let dateThing = document.getElementById("importsDate");
     let statesToShow = document.getElementById("numberOfStatesToShow");
     if (slider.max != dateDiff){
         slider.max = dateDiff;
         slider.value = dateDiff;
     }
-    selectedDate = moment(firstRecordDate);
-    selectedDate.add(parseInt(slider.value), "days");
-    document.getElementById("importsDate").value = selectedDate.toISOString().substr(0, 10);
-
+    let selectedDate;
+    if (changed != 1){
+        selectedDate = moment(firstRecordDate);
+        selectedDate.add(parseInt(slider.value), "days");
+        dateThing.value = selectedDate.toISOString().substr(0, 10);
+    }else{
+        selectedDate = moment(dateThing.value);
+        dateDiff = selectedDate.diff(firstRecordDate, 'days');
+        slider.value = dateDiff;
+    }
     let numberOfStates = parseInt(statesToShow.value);
     let statesNames = czechCovidDbArr.imports[0].slice(3, 3+numberOfStates);
     if (numberOfStates < 8){
@@ -1826,19 +1834,26 @@ function loadImportsChart(){
 
 ageGroupsHtml = "<canvas class=\"chartjs\" id=\"agegroupschart\"></canvas>";
 var agegroupschart;
-function loadAgegroupsChart(){
+function loadAgegroupsChart(changed){
     let firstRecordDate = moment(czechCovidDbArr.ageGroups[1][1]);
     let latestRecordDate = moment(czechCovidDbArr.ageGroups[czechCovidDbArr.ageGroups.length-1][1]);
     let dateDiff = latestRecordDate.diff(firstRecordDate, 'days');
     let slider = document.getElementById("agegroupsSlider");
+    let dateThing = document.getElementById("agegroupsDate");
     if (slider.max != dateDiff){
         slider.max = dateDiff;
         slider.value = dateDiff;
     }
-    selectedDate = moment(firstRecordDate);
-    selectedDate.add(parseInt(slider.value), "days");
-    document.getElementById("agegroupsDate").value = selectedDate.toISOString().substr(0, 10);
-
+    let selectedDate;
+    if (changed != 1){
+        selectedDate = moment(firstRecordDate);
+        selectedDate.add(parseInt(slider.value), "days");
+        dateThing.value = selectedDate.toISOString().substr(0, 10);
+    }else{
+        selectedDate = moment(dateThing.value);
+        dateDiff = selectedDate.diff(firstRecordDate, 'days');
+        slider.value = dateDiff;
+    }
     let statesNames = czechCovidDbArr.ageGroups[0].slice(3);
     let targetIndex = parseInt(slider.value);
     let stateValues = czechCovidDbArr.ageGroups[targetIndex].slice(3);
