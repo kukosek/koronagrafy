@@ -41,15 +41,10 @@
         
         <h1>Jak to funguje</h1>
             <h2>Data</h2>
-                Stránka na klientské straně stáhne data z <a href="https://github.com/kukosek/czech-covid-db">githubu czech-covid-db</a>. Tento repozitář je aktualizovaný programem <a href="https://github.com/kukosek/czech-covid-db-wikipediaparser">czech-covid-db-wikipediaparser</a>, který každou minutu kontroluje článek na wikipedii <a href="https://cs.wikipedia.org/wiki/Pandemie_COVID-19_v_%C4%8Cesku">Pandemie COVID-19 v Česku</a>, zda se nezměnily informace. Pokud zjistí, že se informace změnili, uloží je jako záznam do tabulky .csv, kterou pak pošle na github.
-                <br><b>Proč zrovna wikipedie?</b>
-                    Chtěl jsem stahovat data z <a href="https://onemocneni-aktualne.mzcr.cz/covid-19">officiální stránky ministerstva zdravotnictví</a>, bohužel jsem ale zjistil, že používá dost komplikované API od googlu, které potřebuje proměnné plné přístupových klíčů na to aby jste vůbec získali nějaké data. Pokud bych to měl reverse-engineerovat, zabralo by to zbytečně moc času. Tak jsem zvolil cestu s wikipedií a ukázalo se, že to nebyla zas tak špatná volba, protože aktuální údaje se někdy dostanou rychleji na wikipedii než na stránky MZČR.
-                <p>
-                    Hlavně bych chtěl zdůraznit, že vzhledem k těmto okolnostem prosím <b>neberte data zde zobrazená jako důvěryhodné</b>. Kdykoli se může stát, že někdo do wikipedie zadá falešnou hodnotu a ta se zobrazí i zde. Časy u záznamů berte jenom orientačně, jde o čas, kdy někdo změnil informaci na wikipedii. A možná ani to ne, protože se stává, že na wikipedii změní formát nějaké informace, což způsobí chybu v mém skriptu. Já si toho po nějaké době všimnu a skript změně přizpůsobím.
-                </p>
-                <p>
-                    Na webu MZČR o COVID-19 se píše, že připravují otevřenou datovou sadu. Jestli tak opravdu učiní, budu se snažit, aby koronagrafy využívali jejich officiální data.
-                </p>
+                Stránka na klientské straně stáhne data z <a href="https://github.com/kukosek/czech-covid-db">githubu czech-covid-db</a>. Tento repozitář je aktualizovaný programem <a href="https://github.com/kukosek/czech-covid-db-multiparser">czech-covid-db-multiparser</a>, který každou minutu kontroluje článek na wikipedii <a href="https://cs.wikipedia.org/wiki/Pandemie_COVID-19_v_%C4%8Cesku">Pandemie COVID-19 v Česku</a> a <a href="https://onemocneni-aktualne.mzcr.cz/covid-19">stránku MZČR (od ÚZISu)</a>, zda se nezměnily nějaké informace. Pokud zjistí, že se informace změnili, uloží je jako záznam do tabulek .csv, kterou pak pošle na github.
+                <br><b>Officiální dataset</b><br>
+                    Od 7.4. koronagrafy používají pouze data z officiálního datasetu. Dataset z wikipedie se sice na czech-covid-db stále aktualizuje, ale už není nijak používaný.
+                
                 <p>
                     <b>Edit 22.3.</b>: Nyní podporujeme <a href="https://github.com/CSSEGISandData/COVID-19">celosvětový dataset</a> od Univerzity Johnse Hopkinse.
                 </p>
@@ -143,6 +138,10 @@
                 <li><b>20.3. 2020</b> - Nové parametry v nastavení predikce, kosmetické drobnosti, příprava na rozeslání</li>
                 <li><b>21.3. 2020</b> - Zveřejnění, rozeslání všem možným kamarádům a příbuzným</li>
                 <li><b>22.3. 2020</b> - Celosvětové data z datasetu JHO CSSE</li>
+                <li><b>30.3. 2020</b> - Začátek vývoje parseru z ofiko stránek</li>
+                <li><b>01.4. 2020</b> - Nový parser hotový, czech-covid-db tak má mnoho nových použitelných dat</li> 
+                <li><b>07.4. 2020</b> - Velký update: koronagrafy používají officiální dataset, nový blok importů, věkových skupin, testování, možnost přepnout na jiné kraje</li>
+                <li><b>budoucnost</b> - Nová stránka porovnávání (pro data a růstový faktor - porovnávání českých krajů či států)</li>
                 <li><b>budoucnost</b> - Odhad růstového faktoru??</li>
             </ul>
         <h1>License</h1>
