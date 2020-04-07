@@ -648,8 +648,6 @@ function czechCovidDbParse(datasetName){
                         dateOfEntry.setHours(0,0,0,0);
                         datasets[datasetNameMaxInDay].push({x: dateOfEntry.toISOString(), y: currValueConfirmed});
                     }
-                }else{
-                    //datasets["confirmedMaxInDay"].push({x: entry, y: currValueConfirmed});
                 }
             }
             i++;
@@ -808,7 +806,6 @@ function loadTestsChart(){
         if (testsChart == undefined){
             document.getElementById("testingChartDiv").innerHTML = "";
             document.getElementById("testingChartDiv").innerHTML = testsChartHtml;
-            //document.getElementById("testsChart").style.height = "125px";
             var ctx = document.getElementById("testsChart");
             
             testsChart = new Chart(ctx, {
@@ -817,7 +814,7 @@ function loadTestsChart(){
                     datasets: [{ 
                         data: testsDataset,
                         label: testsLabel,
-                        borderColor: "#f84f4a",
+                        borderColor: color,
                         fill: false
                     }]
                 },
@@ -899,7 +896,6 @@ function loadCurrentData(databaseName){
         xhr.open('GET', czechCovidDbURLs.currentNumbers);
         xhr.send();
 
-        // This will be called after the response is received
         xhr.onload = function() {
             if (xhr.status == 200) { // analyze HTTP status of the response
                 document.getElementById("databasePick").value = databaseName;
@@ -954,7 +950,6 @@ function loadCurrentData(databaseName){
         let xhrTests = new XMLHttpRequest();
         xhrTests.open('GET', czechCovidDbURLs.tests);
         xhrTests.send();
-        // This will be called after the response is received
         xhrTests.onload = function() {
             if (xhrTests.status == 200 || xhrTests.status == 304) { // analyze HTTP status of the response
                 let results = Papa.parse(xhrTests.response, csvFormat[databaseName]);
@@ -984,7 +979,6 @@ function loadCurrentData(databaseName){
         let xhrConfirmed = new XMLHttpRequest();
         xhrConfirmed.open('GET', czechCovidDbURLs.confirmed);
         xhrConfirmed.send();
-        // This will be called after the response is received
         xhrConfirmed.onload = function() {
             if (xhrConfirmed.status == 200 || xhrConfirmed.status == 304) { // analyze HTTP status of the response
                 let results = Papa.parse(xhrConfirmed.response, csvFormat[databaseName]);
@@ -1034,7 +1028,6 @@ function loadCurrentData(databaseName){
         let xhrRecovered = new XMLHttpRequest();
         xhrRecovered.open('GET', czechCovidDbURLs.recovered);
         xhrRecovered.send();
-        // This will be called after the response is received
         xhrRecovered.onload = function() {
             if (xhrRecovered.status == 200 || xhrRecovered.status == 304) { // analyze HTTP status of the response
                 let results = Papa.parse(xhrRecovered.response, csvFormat[databaseName]);
@@ -1060,7 +1053,6 @@ function loadCurrentData(databaseName){
         let xhrDeaths = new XMLHttpRequest();
         xhrDeaths.open('GET', czechCovidDbURLs.deaths);
         xhrDeaths.send();
-        // This will be called after the response is received
         xhrDeaths.onload = function() {
             if (xhrDeaths.status == 200 || xhrDeaths.status == 304) { // analyze HTTP status of the response
                 let results = Papa.parse(xhrDeaths.response, csvFormat[databaseName]);
@@ -1170,7 +1162,6 @@ function loadCurrentData(databaseName){
        let xhrConfirmed = new XMLHttpRequest();
        xhrConfirmed.open('GET', csseURLs.confirmed);
        xhrConfirmed.send();
-       // This will be called after the response is received
        xhrConfirmed.onload = function() {
            document.getElementById("databasePick").value = databaseName;
            if (xhrConfirmed.status == 200 || xhrConfirmed.status == 304) { // analyze HTTP status of the response
@@ -1223,7 +1214,6 @@ function loadCurrentData(databaseName){
        xhrRecovered.open('GET', csseURLs.recovered);
        xhrRecovered.send();
 
-       // This will be called after the response is received
        xhrRecovered.onload = function() {
            document.getElementById("databasePick").value = databaseName;
            if (xhrRecovered.status == 200 || xhrRecovered.status == 304) { // analyze HTTP status of the response
@@ -1251,7 +1241,6 @@ function loadCurrentData(databaseName){
        xhrDeaths.open('GET', csseURLs.deaths);
        xhrDeaths.send();
 
-       // This will be called after the response is received
        xhrDeaths.onload = function() {
            document.getElementById("databasePick").value = databaseName;
            if (xhrDeaths.status == 200 || xhrDeaths.status == 304) { // analyze HTTP status of the response
@@ -1354,7 +1343,6 @@ function scaleSmallBox3(w){
     let selectedstate = document.getElementById("stateSelect").value;
     let czechia = selectedstate == "czechia" || urlSelectedCountry == "czechia";
     if (w.matches && databaseName == "czech-covid-db"){
-        console.log("match")
         document.getElementById("infectionProbabilityBox").style["grid-column"] = "1/3";
     }else if (!czechia && selectedstate != "czechia"){
         document.getElementById("infectionProbabilityBox").style.gridColumn = "";
@@ -1744,17 +1732,16 @@ function calculateSpreadGrowthFactor(dataset){
                 }
                 
                 
-                let date = new Date(dataset[i].x) //V2
+                let date = new Date(dataset[i].x);
                 date.setHours(12,0,0,0);
                 datasets["spreadGrowthFactor"].push({x: date.toISOString(), y: result});
             }
         }
-    } //TODO if not perday
+    }
 }
 importsChartHtml = "<canvas class=\"chartjs\" id=\"importschart\"></canvas>";
 var importschart;
 function loadImportsChart(changed){
-    console.log(changed);
     let firstRecordDate = moment(czechCovidDbArr.imports[1][1]);
     let latestRecordDate = moment(czechCovidDbArr.imports[czechCovidDbArr.imports.length-1][1]);
     let dateDiff = latestRecordDate.diff(firstRecordDate, 'days');
@@ -1904,7 +1891,7 @@ function loadAgegroupsChart(changed){
 var lastHeight = 0;
 var infectionGrowthFactorChart;
 growthFactorChartHtml = "<canvas class=\"chartjs\" id=\"infectionGrowthFactorChart\"></canvas>";
-function calculateSpreadGrowthFactorAndPlot(height){//TODO dont call this twice like idiot
+function calculateSpreadGrowthFactorAndPlot(height){
     calculateSpreadGrowthFactor(datasets["confirmedMaxInDay"]);
     if (infectionGrowthFactorChart == undefined || height.localeCompare(lastHeight) != 0){
         document.getElementById("growthFactorChartDiv").innerHTML = "";
@@ -2071,7 +2058,7 @@ function calculatePredictions(){
         if(predictionConfig["functionName"] == "henry1"){
             result = lastResult + MtimesP*(1-(lastResult/populationSize))*(lastResult-resultBeforeInfectionPeriod);
         }else if (predictionConfig["functionName"] == "henryProbabilistic"){
-            let probabilisticProbability = predictionConfig["infectionProbability"]*0.01; //When you run out of variable names
+            let probabilisticProbability = predictionConfig["infectionProbability"]*0.01;
             let meetInThisDay = MtimesP / probabilisticProbability;
             result = populationSize*(1 - (1-lastResult/populationSize)*Math.pow((1- probabilisticProbability*(lastResult-resultBeforeInfectionPeriod)/populationSize),meetInThisDay));
         }
