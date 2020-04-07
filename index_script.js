@@ -150,7 +150,7 @@ var predictionConfigCzechDefaults = {functionName: "henry1",
                                 startDate: new Date(2020, 02, 02),
                                 infectionPeriod: 6,
                                 growthFactor: "continuousFromExistingData",
-                                growthFactorDataUntilDate: -2, //This will be good when we would want to know how our predictions from day X matched current data
+                                growthFactorDataUntilDate: -2,
                                 averageMeetPerDay: 30,
                                 infectionProbability: 30,
                                 continuous_endCustom: false,
@@ -167,13 +167,13 @@ var predictionConfigWorldDefaults = {functionName: "henry1",
                                 startDate: new Date(2020, 02, 02),
                                 infectionPeriod: 6,
                                 growthFactor: "continuousFromExistingData",
-                                growthFactorDataUntilDate: -1, //This will be good when we would want to know how our predictions from day X matched current data
+                                growthFactorDataUntilDate: -1,
                                 averageMeetPerDay: 30,
                                 infectionProbability: 30,
                                 continuous_endCustom: false,
                                 continuos_endCustom_val: 0.5,
                                 populationSize:10649800,
-                                continuous_endVar: true,
+                                continuous_endVar: false,
                                 continuous_endVarValues: "0.27*12; 0.2*10; 0.12",
                                 plotPredictionToDataChart: true,
                                 plotPredictionToDataChartAddDays: 4
@@ -184,7 +184,7 @@ var growthFactorCalcConfigWorldDefaults = {days: 1, perDay: true};
 var populations = {world: 7800000000, Germany: 83149300, Italy: 60243406,
                     Spain: 47100396, Iran: 83295597,
                     "Korea, South": 51780579, France: 67069000,
-                    China: 1401841400, Netherlands: 17446481
+                    China: 1401841400, Netherlands: 17446481, US: 327200000
                 };
 
 var czechRegionsPopulations = {};
