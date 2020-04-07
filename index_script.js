@@ -471,6 +471,8 @@ function countryNameChange(){
             document.getElementById("importedCasesText").getElementsByClassName("statDate")[0].innerHTML = strings.importedCases;
 
             document.getElementById("okresyBox").style.display = "none";            loadTestsChart();
+            loadImportsChart();
+            loadAgegroupsChart();
         }
     }
 }
@@ -1321,7 +1323,7 @@ function scaleSmallBox(w){
             for (i=0; i<elemsSmall.length; i++){
                 elemsSmall[i].style.height= "160px";
             }
-            selectedstate = document.getElementById("stateSelect").value;
+            let selectedstate = document.getElementById("stateSelect").value;
             if ((urlSelectedCountry != null && urlSelectedCountry!="czechia") || selectedstate != "" && selectedstate != "czechia"){
                 document.getElementById("infectionProbabilityBox").style["grid-column"] = "1/5";
             }else{
@@ -1336,21 +1338,33 @@ function scaleSmallBox(w){
 }
 
 function scaleSmallBox2(w){
-    if (w.matches && databaseName == "czech-covid-db"){
+    let selectedstate = document.getElementById("stateSelect").value;
+    let czechia = selectedstate == "czechia" || urlSelectedCountry == "czechia";
+    if (w.matches && databaseName == "czech-covid-db" && czechia){
         document.getElementById("infectionProbabilityBox").style["grid-column"] = "1/4";
+    }else if (!czechia && selectedstate != "czechia"){
+        document.getElementById("infectionProbabilityBox").style.gridColumn = "";
     }
 }
 
 function scaleSmallBox3(w){
+    let selectedstate = document.getElementById("stateSelect").value;
+    let czechia = selectedstate == "czechia" || urlSelectedCountry == "czechia";
     if (w.matches && databaseName == "czech-covid-db"){
         console.log("match")
         document.getElementById("infectionProbabilityBox").style["grid-column"] = "1/3";
+    }else if (!czechia && selectedstate != "czechia"){
+        document.getElementById("infectionProbabilityBox").style.gridColumn = "";
     }
 }
 
 function scaleSmallBox4(w){
+    let selectedstate = document.getElementById("stateSelect").value;
+    let czechia = selectedstate == "czechia" || urlSelectedCountry == "czechia";
     if (w.matches){
         document.getElementById("infectionProbabilityBox").style["grid-column"] = "";
+    }else if (!czechia && selectedstate != "czechia"){
+        document.getElementById("infectionProbabilityBox").style.gridColumn = "";
     }
 }
 
