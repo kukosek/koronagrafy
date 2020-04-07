@@ -438,6 +438,7 @@ function databaseChange() {
         }
         if (document.getElementById("stateSelect").value != "czechia"){
             document.getElementById("okresyBox").style.display = "initial";
+            console.log("test");
         }else{
             document.getElementById("okresyBox").style.display = "none";
         }
@@ -464,13 +465,15 @@ function countryNameChange(){
         czechCovidDbParse("deaths");
         if (document.getElementById("stateSelect").value != "czechia"){
             document.getElementById("okresyBox").style.display = "initial";
+            scaleSmallBox(x);
             loadDistrictsTable();
         }else{
             //average age box
             document.getElementById("importedCasesText").getElementsByClassName("statNumber")[0].innerHTML = data["confirmedImported"]["number"];
             document.getElementById("importedCasesText").getElementsByClassName("statDate")[0].innerHTML = strings.importedCases;
 
-            document.getElementById("okresyBox").style.display = "none";            loadTestsChart();
+            document.getElementById("okresyBox").style.display = "none";
+            loadTestsChart();
             loadImportsChart();
             loadAgegroupsChart();
         }
@@ -1782,7 +1785,7 @@ function loadImportsChart(changed){
             }
         }
     }
-    statesToShow.max = czechCovidDbArr.imports[0].slice(3).length-48;
+    statesToShow.max = czechCovidDbArr.imports[0].slice(3).length;
     let targetIndex = parseInt(slider.value)-1;
     let stateValues = czechCovidDbArr.imports[targetIndex].slice(3, 3+numberOfStates);
     for (i=0; i<stateValues.length; i++){

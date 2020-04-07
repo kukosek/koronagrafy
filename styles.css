@@ -108,7 +108,6 @@
 @media screen and (-webkit-min-device-pixel-ratio:0) {
     input[type='range'] {
       overflow: hidden;
-      -webkit-appearance: none;
       background-color: transparent;
     }
     
