@@ -41,16 +41,10 @@
         
         <h1>How it works</h1>
             <h2>Data</h2>
-                The client-side downloads data from <a href="https://github.com/kukosek/czech-covid-db"> czech-covid-db github</a>. This repository is updated by <a href="https://github.com/kukosek/czech-covid-db-wikipediaparser"> czech-covid-db-wikipediaparser </a>, which checks the wikipedia article <a href="https://cs.wikipedia.org/wiki/Pandemie_COVID-19_v_%C4%8Cesku">Pandemie COVID-19 v Česku</a> every minute to see if the numbers are changed. If it detects some information is changed, it stores it as a record in a .csv table, which it then sends to github.
+                The client-side downloads data from <a href="https://github.com/kukosek/czech-covid-db"> czech-covid-db github</a>. This repository is updated by <a href="https://github.com/kukosek/czech-covid-db-multiparser"> czech-covid-db-multiparser </a>, which checks the wikipedia article <a href="https://cs.wikipedia.org/wiki/Pandemie_COVID-19_v_%C4%8Cesku">Pandemie COVID-19 v Česku</a> and <a href="https://onemocneni-aktualne.mzcr.cz/covid-19"> official website of the Ministry of Health </a>every minute to see if the numbers are changed. If it detects some information is changed, it stores it as a record in a .csv table, which it then sends to github.
 
-                <br><b>Why wikipedia?</b>
-                    I wanted to download data from the <a href="https://onemocneni-aktualne.mzcr.cz/covid-19"> official website of the Ministry of Health </a>, but unfortunately I found that it used a pretty complicated API from Google that needs variables full of access keys to get any data at all. If I had to reverse engineer it, it would take too much time. So I chosed the path with wikipedia and it turned out that it was not such a bad choice, because the current data sometimes gets faster to wikipedia than to the website of the Czech Ministry of Health.
-                <p>
-                    I would like to point out that due to these circumstances, please <b> do not accept the data shown here as trusted </b>. At any time, it may happen that someone enters a false value to the Wikipedia article, and it is displays here. Take the record times only for reference, this is the time when someone changed the information to Wikipedia.
-                </p>
-                <p>
-                    The website of the Czech Ministry of Health on COVID-19 says that they are preparing an open dataset. If they really release it, I will try to use their official data.
-                </p>
+                <br><b>Official dataset</b>
+                    Since 7.4. we use only the official data for czechia. The wikipedia dataset on czech-covid-db is still updated.
                 <p>
                     <b>Edit 22.3.</b>: We now support the <a href="https://github.com/CSSEGISandData/COVID-19">world-wide dataset</a> from Johns Hopkins University.
                 </p>
@@ -144,6 +138,10 @@
                 <li><b>21.3. 2020</b> - Release, sending friends and relatives
                 </li>
                 <li><b>22.3. 2020</b> - World-wide data fron the JHO CSSE dataset</li>
+                <li><b>30.3. 2020</b> - Started developing the MZCR parser</li>
+                <li><b>01.4. 2020</b> - New parser is completed, czech-covid-db has many new usable data</li> 
+                <li><b>07.4. 2020</b> - Big update: site is using the official data, new imports, age groups and testing block for czech covid db, option to switch regions</li>
+                <li><b>future</b> - New comparision page (For data and growth factor - comparision of czech regions with czech covid db or countries with CSSE dataset)</li>
                 <li><b>futute</b> - Growth factor prediction??</li>
             </ul>
         <h1>License</h1>
