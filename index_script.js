@@ -187,7 +187,21 @@ var populations = {world: 7800000000, Germany: 83149300, Italy: 60243406,
                     China: 1401841400, Netherlands: 17446481, US: 327200000
                 };
 
-var czechRegionsPopulations = {};
+var czechRegionsPopulations = { 'Hlavní město Praha': 1280508,
+'Středočeský kraj': 1338982,
+'Jihočeský kraj': 638782,
+'Plzeňský kraj': 578629,
+'Karlovarský kraj': 296749,
+'Ústecký kraj': 821377,
+'Liberecký kraj': 440836,
+'Královéhradecký kraj': 550804,
+'Pardubický kraj': 517087,
+'Kraj Vysočina': 508952,
+'Jihomoravský kraj': 1178812,
+'Olomoucký kraj': 633925,
+'Zlínský kraj': 583698,
+'Moravskoslezský kraj': 1209879 };
+
 var czechRegionCodes = { 'Hlavní město Praha': 'CZ010',
 'Středočeský kraj': 'CZ020',
 'Jihočeský kraj': 'CZ031',
