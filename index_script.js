@@ -1,25 +1,25 @@
 function convertDate(dateString) {
 	if(dateString == null) {
 		return strings.noData;
-	} else {
+	}else{
 		let mmnt = moment(dateString);
 		let today = moment();
 		let yesterday = moment().subtract(1, "days");
 		if(mmnt.isSame(today, "day")) {
 			if(mmnt.hours() == 0 && mmnt.minutes() == 0) {
 				return strings.today
-			} else {
+			}else{
 				return strings.today + " " + mmnt.format("H:mm");
 			}
-		} else if(mmnt.isSame(yesterday, "day")) {
+		}else if(mmnt.isSame(yesterday, "day")) {
 			if(mmnt.hours() == 0 && mmnt.minutes() == 0) {
 				return strings.yesterday
-			} else {
+			}else{
 				return strings.yesterday + " " + mmnt.format("H:mm");
 			}
-		} else if(mmnt.hours() == 0 && mmnt.minutes() == 0) {
+		}else if(mmnt.hours() == 0 && mmnt.minutes() == 0) {
 			return mmnt.format("D.M. YYYY");
-		} else {
+		}else{
 			return mmnt.format("D.M. YYYY H:mm");
 		}
 	}
@@ -38,7 +38,7 @@ function calculateInfectionDefaultProbability(daysSinceOutbreakStart, currentCon
 	let howtonamethis = ((Math.pow(currentConfirmedCases / firstRecordConfirmedCases, 1 / daysSinceOutbreakStart) - 1));
 	if(meetPerDay != false) {
 		return howtonamethis * 100 / meetPerDay;
-	} else {
+	}else{
 		return howtonamethis;
 	}
 }
@@ -272,7 +272,7 @@ function parseEndVarValues(varValues) {
 			for(j = 0; j < times; j += 1) {
 				returnList.push(value);
 			}
-		} else {
+		}else{
 			returnList.push(parseFloat(entry));
 		}
 	}
@@ -285,7 +285,7 @@ if(window.location.toString().includes("cs")) {
 	var predictionConfig = JSON.parse(JSON.stringify(predictionConfigCzechDefaults));
 	predictionConfig.startDate = new Date(predictionConfig.startDate);
 	var growthFactorCalcConfig = growthFactorCalcConfigCzechDefaults;
-} else {
+}else{
 	var databaseName = "CSSE COVID-19 Dataset";
 	var strings = enStrings;
 	var predictionConfig = JSON.parse(JSON.stringify(predictionConfigWorldDefaults));
@@ -345,7 +345,7 @@ function loadDataChart() {
 			deathsDataset[i].y = currValue - lastValue;
 			lastValue = currValue;
 		}
-	} else {
+	}else{
 		confirmedLabel = strings.dataChartConfirmedLabel;
 		recoveredLabel = strings.dataChartRecoveredLabel;
 		deathsLabel = strings.dataChartDeathsLabel;
@@ -418,7 +418,7 @@ function loadDataChart() {
 				document.getElementById("growthFactorDateLimit").value = dateOfClickedPoint.toISOString().substr(0, 10);
 			}
 		};
-	} else {
+	}else{
 		dataChart.data.datasets = feeddatasets;
 		dataChart.update();
 	}
@@ -476,7 +476,7 @@ function databaseChange() {
 		growthFactorCalcConfig = growthFactorCalcConfigWorldDefaults;
 		if(csseArr.confirmed.length == 0) {
 			loadCurrentData(databaseName)
-		} else {
+		}else{
 			document.getElementById("stateSelect").innerHTML = "";
 			let optionToAdd = document.createElement("option");
 			optionToAdd.value = "world";
@@ -499,7 +499,7 @@ function databaseChange() {
 		scaleSmallBox(x);
 		scaleSmallBox2(match2);
 		scaleSmallBox3(match3);
-	} else if(databaseName == "czech-covid-db") {
+	}else if(databaseName == "czech-covid-db") {
 		if(!progressBarShowed) {
 			NProgress.start();
 			progressBarShowed = true;
@@ -514,7 +514,7 @@ function databaseChange() {
 		growthFactorCalcConfig = growthFactorCalcConfigCzechDefaults;
 		if(czechCovidDbArr.confirmed.length == 0) {
 			loadCurrentData(databaseName);
-		} else {
+		}else{
 			czechCountrySelect(czechCovidDbArr.confirmed[0]);
 			data = JSON.parse(JSON.stringify(czechCovidDbData));
 			czechCovidDbParse("confirmed");
@@ -530,7 +530,7 @@ function databaseChange() {
 		if(document.getElementById("stateSelect").value != "czechia") {
 			document.getElementById("okresyBox").style.display = "initial";
 			console.log("test");
-		} else {
+		}else{
 			document.getElementById("okresyBox").style.display = "none";
 		}
 	}
@@ -550,7 +550,7 @@ function countryNameChange() {
 		csseParse("confirmed");
 		csseParse("recovered");
 		csseParse("deaths");
-	} else if(document.getElementById("databasePick").value == "czech-covid-db") {
+	}else if(document.getElementById("databasePick").value == "czech-covid-db") {
 		detailedStatsSH()
 		scaleSmallBox(x);
 		scaleSmallBox2(match2);
@@ -562,7 +562,7 @@ function countryNameChange() {
 			document.getElementById("okresyBox").style.display = "initial";
 			scaleSmallBox(x);
 			loadDistrictsTable();
-		} else {
+		}else{
 			//average age box
 			document.getElementById("importedCasesText").getElementsByClassName("statNumber")[0].innerHTML = data.confirmedImported.number;
 			document.getElementById("importedCasesText").getElementsByClassName("statDate")[0].innerHTML = strings.importedCases;
@@ -608,7 +608,7 @@ function csseParse(datasetName) {
 	let stateName;
 	if(urlSelectedCountry == null) {
 		stateName = document.getElementById("stateSelect").value;
-	} else {
+	}else{
 		stateName = urlSelectedCountry;
 		document.getElementById("stateSelect").value = stateName;
 		urlSelectedCountry = null;
@@ -635,7 +635,7 @@ function csseParse(datasetName) {
 	}
 	if(valuesStart == null) {
 		datasets[datasetNameMaxInDay] = [datasets[datasetNameMaxInDay][datasets[datasetNameMaxInDay].length - 1]];
-	} else {
+	}else{
 		datasets[datasetNameMaxInDay].splice(0, valuesStart);
 	}
 	datasets[datasetName] = datasets[datasetNameMaxInDay];
@@ -645,7 +645,7 @@ function csseParse(datasetName) {
 		predictionConfig.infectionProbability = calculateInfectionDefaultProbability(false, datasets[datasetNameMaxInDay][datasets[datasetNameMaxInDay].length - 1].y, predictionConfig.averageMeetPerDay);
 		if(populations.hasOwnProperty(stateName)) {
 			predictionConfig.populationSize = populations[stateName];
-		} else {
+		}else{
 			predictionConfig.populationSize = Math.floor(parseInt(populations.world, 10) / 198);
 		}
 	}
@@ -657,7 +657,7 @@ function csseParse(datasetName) {
 		document.getElementsByClassName("box")[1].style.fontSize = "11px";
 		document.getElementById(datasetName + "Text").getElementsByClassName("statDate")[0].innerHTML = strings.jhoRecoveredUnavailable;
 		document.getElementById(datasetName + "Text").getElementsByClassName("statDate")[0].style.fontSize = "10px";
-	} else {
+	}else{
 		document.getElementById(datasetName + "Text").getElementsByClassName("statDate")[0].innerHTML = convertDate(data[datasetName].date);
 	}
 	if(datasetName == "confirmed") {
@@ -674,7 +674,7 @@ function csseParse(datasetName) {
 			if(progressBarShowed) {
 				NProgress.inc();
 			}
-		} else {
+		}else{
 			loadDataChart();
 			if(progressBarShowed) {
 				NProgress.inc();
@@ -682,7 +682,7 @@ function csseParse(datasetName) {
 			getDataCalculatePredictionAndPlot();
 		}
 		NProgress.done();
-	} else {
+	}else{
 		if(progressBarShowed) {
 			NProgress.inc();
 		}
@@ -699,16 +699,16 @@ function czechCovidDbParse(datasetName) {
 		selValue = document.getElementById("stateSelect").value;
 		if(selValue && (!columnNames.includes(selValue) && selValue != "czechia")) {
 			targetIndex = null;
-		} else if(!selValue || selValue == "czechia") {
+		}else if(!selValue || selValue == "czechia") {
 			targetIndex = 2;
-		} else {
+		}else{
 			targetIndex = columnNames.indexOf(selValue);
 		}
-	} else {
+	}else{
 		selValue = urlSelectedCountry;
 		if(urlSelectedCountry == "czechia") {
 			targetIndex = 2;
-		} else {
+		}else{
 			targetIndex = columnNames.indexOf(urlSelectedCountry);
 		}
 		document.getElementById("stateSelect").value = urlSelectedCountry;
@@ -716,7 +716,7 @@ function czechCovidDbParse(datasetName) {
 	}
 	if(selValue != "czechia") {
 		document.getElementById("okresyBox").style.display = "initial";
-	} else {
+	}else{
 		document.getElementById("okresyBox").style.display = "none";
 	}
 	let datasetsInRows = datasetsInColumns[0].map(function(col, i) {
@@ -757,11 +757,11 @@ function czechCovidDbParse(datasetName) {
 		if(targetIndex != 2) {
 			data[datasetName].number = datasets[datasetNameMaxInDay][datasets[datasetNameMaxInDay].length - 1].y;
 			data[datasetName].date = datasets[datasetNameMaxInDay][datasets[datasetNameMaxInDay].length - 1].x;
-		} else if(czechCovidDbData !== undefined) {
+		}else if(czechCovidDbData !== undefined) {
 			data[datasetName].number = czechCovidDbData[datasetName].number
 			data[datasetName].date = czechCovidDbData[datasetName].date
 		}
-	} else {
+	}else{
 		data[datasetName].number = "???";
 		data[datasetName].date = null;
 	}
@@ -778,9 +778,9 @@ function czechCovidDbParse(datasetName) {
 		predictionConfig.infectionProbability = predictionConfigCzechDefaults.infectionProbability;
 		if(selValue == "czechia") {
 			predictionConfig.populationSize = predictionConfigCzechDefaults.populationSize
-		} else if(czechRegionsPopulations.hasOwnProperty(selValue)) {
+		}else if(czechRegionsPopulations.hasOwnProperty(selValue)) {
 			predictionConfig.populationSize = czechRegionsPopulations[selValue];
-		} else {
+		}else{
 			predictionConfig.populationSize = parseInt(predictionConfigCzechDefaults.populationSize, 10) / 14;
 		}
 		//calculate spread growth factors from confirmed dataset
@@ -794,7 +794,7 @@ function czechCovidDbParse(datasetName) {
 	if(czechCovidDbArrParsed.confirmed == true && czechCovidDbArrParsed.recovered == true && czechCovidDbArrParsed.deaths == true) {
 		if(predictionConfig.plotPredictionToDataChart) {
 			getDataCalculatePredictionAndPlot();
-		} else {
+		}else{
 			loadDataChart();
 			getDataCalculatePredictionAndPlot();
 		}
@@ -824,11 +824,11 @@ function czechCovidDbTestsParse() {
 				currentValueConfirmed = datasets.confirmedMaxInDay[i - confirmedStartIndex].y;
 				ratio = currentValueConfirmed / currValue;
 				perDayRatio = (currentValueConfirmed - lastValueConfirmed) / currValue;
-			} else {
+			}else{
 				ratio = 0;
 				perDayRatio = 0;
 			}
-		} else {
+		}else{
 			currentValueConfirmed = datasets.confirmedMaxInDay[i - confirmedStartIndex].y;
 			ratio = currentValueConfirmed / currValue;
 			perDayRatio = (currentValueConfirmed - lastValueConfirmed) / currValue;
@@ -865,7 +865,7 @@ var testsChartHtml = "<canvas class=\"chartjs\" id=\"testsChart\"></canvas>";
 function loadTestsChart() {
 	if(datasets.tests == undefined) {
 		czechCovidDbTestsParse();
-	} else {
+	}else{
 		//tests box
 		document.getElementById("testedText").getElementsByClassName("statNumber")[0].innerHTML = data.tested.number;
 		document.getElementById("testedText").getElementsByClassName("statDate")[0].innerHTML = convertDate(data.tested.date);
@@ -898,16 +898,16 @@ function loadTestsChart() {
 			yAxis = yAxisPercent;
 			ttips = ttipsPercent;
 			color = "#f84f4a";
-		} else if(!perDayChecked && ratioChecked) {
+		}else if(!perDayChecked && ratioChecked) {
 			testsDataset = datasets.tests.allRatio;
 			testsLabel = strings.testsAllRatio;
 			yAxis = yAxisPercent;
 			ttips = ttipsPercent;
 			color = "#f84f4a";
-		} else if(perDayChecked && !ratioChecked) {
+		}else if(perDayChecked && !ratioChecked) {
 			testsDataset = datasets.tests.perDay;
 			testsLabel = strings.testsPerDay;
-		} else {
+		}else{
 			testsDataset = datasets.tests.all;
 			testsLabel = strings.testsAll;
 		}
@@ -944,7 +944,7 @@ function loadTestsChart() {
 					tooltips: ttips
 				}
 			});
-		} else {
+		}else{
 			testsChart.data.datasets[0].data = testsDataset;
 			testsChart.data.datasets[0].label = testsLabel;
 			testsChart.data.datasets[0].borderColor = color;
@@ -1008,7 +1008,7 @@ function loadCurrentData(databaseName) {
 				let basicStatsParse = false;
 				if(document.getElementById("stateSelect") == undefined) {
 					basicStatsParse = true;
-				} else {
+				}else{
 					if(selectedCountry == "czechia" || selectedCountry == "world" || selectedCountry == "") {
 						basicStatsParse = true;
 					}
@@ -1033,7 +1033,7 @@ function loadCurrentData(databaseName) {
 				//load default value into did i got the virus today box inputBox
 				document.getElementById("myMeetPerDay").value = myMeetPerDayConf;
 				dynamicInputAdjust();
-			} else { // show the result
+			}else{ // show the result
 				alert(`Error ${xhr.status}: ${xhr.statusText}`); // e.g. 404: Not Found
 			}
 		};
@@ -1051,13 +1051,13 @@ function loadCurrentData(databaseName) {
 					let selectedCountry = document.getElementById("stateSelect").value;
 					if(selectedCountry == "czechia" && czechCovidDbArrParsed.confirmed && data.tested != undefined) {
 						czechCovidDbTestsParse();
-					} else {
+					}else{
 						czechCovidDbArrParseWaiting.tests = true;
 					}
-				} else {
+				}else{
 					alert("Error parsing chart dataset\n" + results.errors[0].message);
 				}
-			} else { // show the result
+			}else{ // show the result
 				alert(`Error ${xhrTests.status}: ${xhrTests.statusText}`); // e.g. 404: Not Found
 			}
 		};
@@ -1112,10 +1112,10 @@ function loadCurrentData(databaseName) {
 					if(progressBarShowed) {
 						NProgress.inc();
 					}
-				} else {
+				}else{
 					alert("Error parsing chart dataset\n" + results.errors[0].message);
 				}
-			} else { // show the result
+			}else{ // show the result
 				alert(`Error ${xhrConfirmed.status}: ${xhrConfirmed.statusText}`); // e.g. 404: Not Found
 			}
 		};
@@ -1132,16 +1132,16 @@ function loadCurrentData(databaseName) {
 					czechCovidDbArr.recovered = results.data;
 					if(czechCovidDbArrParsed.confirmed) {
 						czechCovidDbParse("recovered");
-					} else {
+					}else{
 						czechCovidDbArrParseWaiting.recovered = true;
 					}
 					if(progressBarShowed) {
 						NProgress.inc();
 					}
-				} else {
+				}else{
 					alert("Error parsing chart dataset\n" + results.errors[0].message);
 				}
-			} else { // show the result
+			}else{ // show the result
 				alert(`Error ${xhrRecovered.status}: ${xhrRecovered.statusText}`); // e.g. 404: Not Found
 			}
 		};
@@ -1158,16 +1158,16 @@ function loadCurrentData(databaseName) {
 					czechCovidDbArr.deaths = results.data;
 					if(czechCovidDbArrParsed.confirmed) {
 						czechCovidDbParse("deaths");
-					} else {
+					}else{
 						czechCovidDbArrParseWaiting.deaths = true;
 					}
 					if(progressBarShowed) {
 						NProgress.inc();
 					}
-				} else {
+				}else{
 					alert("Error parsing chart dataset\n" + results.errors[0].message);
 				}
-			} else { // show the result
+			}else{ // show the result
 				alert(`Error ${xhrDeaths.status}: ${xhrDeaths.statusText}`); // e.g. 404: Not Found
 			}
 		};
@@ -1187,10 +1187,10 @@ function loadCurrentData(databaseName) {
 					if((selectedCountry != "" && selectedCountry != "czechia") || (urlSelectedCountry != "czechia" && urlSelectedCountry != null)) {
 						loadDistrictsTable();
 					}
-				} else {
+				}else{
 					czechCovidDbArrParseWaiting.districtsNumbers = true;
 				}
-			} else { // show the result
+			}else{ // show the result
 				alert(`Error ${xhrDN.status}: ${xhrDN.statusText}`); // e.g. 404: Not Found
 			}
 		};
@@ -1210,16 +1210,16 @@ function loadCurrentData(databaseName) {
 						if(urlSelectedCountry == "czechia" || selectedCountry == "czechia") {
 							loadImportsChart();
 						}
-					} else {
+					}else{
 						czechCovidDbArrParseWaiting.imports = true;
 					}
 					if(progressBarShowed) {
 						NProgress.inc();
 					}
-				} else {
+				}else{
 					alert("Error parsing chart dataset\n" + results.errors[0].message);
 				}
-			} else { // show the result
+			}else{ // show the result
 				alert(`Error ${xhrImports.status}: ${xhrImports.statusText}`); // e.g. 404: Not Found
 			}
 		};
@@ -1239,23 +1239,23 @@ function loadCurrentData(databaseName) {
 						if(urlSelectedCountry == "czechia" || selectedCountry == "czechia") {
 							loadAgegroupsChart();
 						}
-					} else {
+					}else{
 						czechCovidDbArrParseWaiting.ageGroups = true;
 					}
 					if(progressBarShowed) {
 						NProgress.inc();
 					}
-				} else {
+				}else{
 					alert("Error parsing chart dataset\n" + results.errors[0].message);
 				}
-			} else { // show the result
+			}else{ // show the result
 				alert(`Error ${xhrAgegroups.status}: ${xhrAgegroups.statusText}`); // e.g. 404: Not Found
 			}
 		};
 		xhrAgegroups.onerror = function() {
 			alert("Request failed");
 		};
-	} else if(databaseName == "CSSE COVID-19 Dataset") {
+	}else if(databaseName == "CSSE COVID-19 Dataset") {
 		csseArrParsed = {
 			confirmed: false,
 			recovered: false,
@@ -1302,10 +1302,10 @@ function loadCurrentData(databaseName) {
 						csseParse("deaths");
 						csseArrParseWaiting.deaths = false;
 					}
-				} else {
+				}else{
 					alert("Error parsing confirmed chart dataset\n" + results.errors[0].message);
 				}
-			} else { // show the result
+			}else{ // show the result
 				alert(`Error ${xhrConfirmed.status}: ${xhrConfirmed.statusText}`); // e.g. 404: Not Found
 			}
 		};
@@ -1323,13 +1323,13 @@ function loadCurrentData(databaseName) {
 					csseArr.recovered = JSON.parse(JSON.stringify(results.data));
 					if(csseArrParsed.confirmed) {
 						csseParse("recovered");
-					} else {
+					}else{
 						csseArrParseWaiting.recovered = true;
 					}
-				} else {
+				}else{
 					alert("Error parsing recovered chart dataset\n" + results.errors[0].message);
 				}
-			} else { // show the result
+			}else{ // show the result
 				alert(`Error ${xhrRecovered.status}: ${xhrRecovered.statusText}`); // e.g. 404: Not Found
 			}
 		};
@@ -1347,13 +1347,13 @@ function loadCurrentData(databaseName) {
 					csseArr.deaths = JSON.parse(JSON.stringify(results.data));
 					if(csseArrParsed.confirmed) {
 						csseParse("deaths");
-					} else {
+					}else{
 						csseArrParseWaiting.deaths = true;
 					}
-				} else {
+				}else{
 					alert("Error parsing deaths chart dataset\n" + results.errors[0].message);
 				}
-			} else { // show the result
+			}else{ // show the result
 				alert(`Error ${xhrDeaths.status}: ${xhrDeaths.statusText}`); // e.g. 404: Not Found
 			}
 		};
@@ -1371,7 +1371,7 @@ function detailedStatsSH() {
 		for(i = 0; i < elems.length; i += 1) {
 			if(elems[i].parentElement.className == "wrapperBasicStats") {
 				elems[i].style.display = "flex";
-			} else {
+			}else{
 				elems[i].style.display = "initial";
 			}
 		}
@@ -1381,7 +1381,7 @@ function detailedStatsSH() {
 				elemsSmall[i].style.height = "160px";
 			}
 		}
-	} else {
+	}else{
 		for(i = 0; i < elems.length; i += 1) {
 			elems[i].style.display = "none";
 		}
@@ -1404,18 +1404,18 @@ function scaleSmallBox(w) {
 				elemsSmall[i].style.height = bigHeight;
 			}
 			document.getElementById("infectionProbabilityBox").style.gridColumn = "";
-		} else {
+		}else{
 			for(i = 0; i < elemsSmall.length; i += 1) {
 				elemsSmall[i].style.height = "160px";
 			}
 			let selectedstate = document.getElementById("stateSelect").value;
 			if((urlSelectedCountry != null && urlSelectedCountry != "czechia") || selectedstate != "" && selectedstate != "czechia") {
 				document.getElementById("infectionProbabilityBox").style["grid-column"] = "1/5";
-			} else {
+			}else{
 				document.getElementById("infectionProbabilityBox").style["grid-column"] = "";
 			}
 		}
-	} else {
+	}else{
 		document.getElementById("infectionProbabilityBox").style["grid-column"] = "";
 	}
 }
@@ -1425,7 +1425,7 @@ function scaleSmallBox2(w) {
 	let czechia = selectedstate == "czechia" || urlSelectedCountry == "czechia";
 	if(w.matches && databaseName == "czech-covid-db" && czechia) {
 		document.getElementById("infectionProbabilityBox").style["grid-column"] = "1/4";
-	} else if(!czechia && selectedstate != "czechia") {
+	}else if(!czechia && selectedstate != "czechia") {
 		document.getElementById("infectionProbabilityBox").style.gridColumn = "";
 	}
 }
@@ -1435,7 +1435,7 @@ function scaleSmallBox3(w) {
 	let czechia = selectedstate == "czechia" || urlSelectedCountry == "czechia";
 	if(w.matches && databaseName == "czech-covid-db") {
 		document.getElementById("infectionProbabilityBox").style["grid-column"] = "1/3";
-	} else if(!czechia && selectedstate != "czechia") {
+	}else if(!czechia && selectedstate != "czechia") {
 		document.getElementById("infectionProbabilityBox").style.gridColumn = "";
 	}
 }
@@ -1445,7 +1445,7 @@ function scaleSmallBox4(w) {
 	let czechia = selectedstate == "czechia" || urlSelectedCountry == "czechia";
 	if(w.matches) {
 		document.getElementById("infectionProbabilityBox").style["grid-column"] = "";
-	} else if(!czechia && selectedstate != "czechia") {
+	}else if(!czechia && selectedstate != "czechia") {
 		document.getElementById("infectionProbabilityBox").style.gridColumn = "";
 	}
 }
@@ -1470,10 +1470,10 @@ function loadPredictionConfigIntoHTML() {
 	document.getElementById("continuous_endCustomVars").checked = predictionConfig.continuous_endVar;
 	if(predictionConfig.growthFactorDataUntilDate == -1) {
 		document.getElementById("continuous_limitData").checked = false;
-	} else if(predictionConfig.growthFactorDataUntilDate < -1) {
+	}else if(predictionConfig.growthFactorDataUntilDate < -1) {
 		document.getElementById("continuous_limitData").checked = true;
 		document.getElementById("growthFactorDateLimit").value = new Date(new Date().setDate(new Date().getDate() + (predictionConfig.growthFactorDataUntilDate + 1))).toISOString().substr(0, 10);
-	} else {
+	}else{
 		document.getElementById("continuous_limitData").checked = true;
 		document.getElementById("growthFactorDateLimit").value = predictionConfig.growthFactorDataUntilDate.toISOString().substr(0, 10);
 	}
@@ -1498,7 +1498,7 @@ function saveHTMLtoPredictionConfig() {
 	predictionConfig.continuos_endCustom_val = document.getElementById("valueAfterDataFromGrowthChart").value;
 	if(document.getElementById("continuous_limitData").checked) {
 		predictionConfig.growthFactorDataUntilDate = new Date(document.getElementById("growthFactorDateLimit").value);
-	} else {
+	}else{
 		predictionConfig.growthFactorDataUntilDate = -1;
 	}
 	predictionConfig.populationSize = document.getElementById("populationSize").value;
@@ -1518,7 +1518,7 @@ function predictionConfigSH(calculate) {
 		document.getElementById("predictionConfig").style.display = "initial";
 		loadPredictionConfigIntoHTML();
 		document.getElementById('config-input').addEventListener('change', loadPredictionConfigFile, false);
-	} else {
+	}else{
 		predictionConfigShowed = false;
 		document.getElementById("settingsApplyButton").src = "/images/settings.svg";
 		let fghjkl = document.getElementsByClassName("showedInPredictionConfig");
@@ -1543,7 +1543,7 @@ function savePredictionConfigFile() {
 		var event = document.createEvent('MouseEvents');
 		event.initEvent('click', true, true);
 		pom.dispatchEvent(event);
-	} else {
+	}else{
 		pom.click();
 	}
 }
@@ -1561,7 +1561,7 @@ function loadPredictionConfigFile(evt) {
 				alert(strings.errorReadingFile + err.message);
 			}
 		};
-	} else {
+	}else{
 		alert(strings.fileApiNotSupported);
 	}
 	loadPredictionConfigIntoHTML();
@@ -1581,22 +1581,22 @@ function predictionConfigMtimesPwayChange() {
 		document.getElementById("label_averageMeetPerDay").style.display = "initial";
 		document.getElementById("label_infectionProbability").style.display = "initial";
 		document.getElementById("continuousFromExistingDataConfig").style.display = "none";
-	} else if(document.getElementById("predictionFunctionName").value == "henryProbabilistic" && document.getElementById("mTimesPway").value == "continuousFromExistingData") {
+	}else if(document.getElementById("predictionFunctionName").value == "henryProbabilistic" && document.getElementById("mTimesPway").value == "continuousFromExistingData") {
 		document.getElementById("continuousFromExistingDataConfig").style.display = "initial";
 		document.getElementById("customFixedValueConfig").style.display = "initial";
 		document.getElementById("label_averageMeetPerDay").style.display = "none";
 		document.getElementById("label_infectionProbability").style.display = "initial";
-	} else if(document.getElementById("predictionFunctionName").value == "henryProbabilistic" && document.getElementById("mTimesPway").value == "fixedFromCurrentValue") {
+	}else if(document.getElementById("predictionFunctionName").value == "henryProbabilistic" && document.getElementById("mTimesPway").value == "fixedFromCurrentValue") {
 		document.getElementById("continuousFromExistingDataConfig").style.display = "none";
 		document.getElementById("customFixedValueConfig").style.display = "initial";
 		document.getElementById("label_averageMeetPerDay").style.display = "none";
 		document.getElementById("label_infectionProbability").style.display = "initial";
-	} else if(document.getElementById("mTimesPway").value == "continuousFromExistingData") {
+	}else if(document.getElementById("mTimesPway").value == "continuousFromExistingData") {
 		document.getElementById("continuousFromExistingDataConfig").style.display = "initial";
 		document.getElementById("customFixedValueConfig").style.display = "none";
 		document.getElementById("label_averageMeetPerDay").style.display = "none";
 		document.getElementById("label_infectionProbability").style.display = "none";
-	} else {
+	}else{
 		document.getElementById("customFixedValueConfig").style.display = "none";
 		document.getElementById("continuousFromExistingDataConfig").style.display = "none";
 	}
@@ -1607,12 +1607,12 @@ function predictionConfigFunctionNameChange() {
 		document.getElementById("customFixedValueConfig").style.display = "initial";
 		document.getElementById("label_averageMeetPerDay").style.display = "none";
 		document.getElementById("label_infectionProbability").style.display = "initial";
-	} else if(document.getElementById("predictionFunctionName").value == "henryProbabilistic" && document.getElementById("mTimesPway").value == "fixedFromCurrentValue") {
+	}else if(document.getElementById("predictionFunctionName").value == "henryProbabilistic" && document.getElementById("mTimesPway").value == "fixedFromCurrentValue") {
 		document.getElementById("continuousFromExistingDataConfig").style.display = "none";
 		document.getElementById("customFixedValueConfig").style.display = "initial";
 		document.getElementById("label_averageMeetPerDay").style.display = "none";
 		document.getElementById("label_infectionProbability").style.display = "initial";
-	} else {
+	}else{
 		document.getElementById("label_averageMeetPerDay").style.display = "none";
 		document.getElementById("label_infectionProbability").style.display = "none";
 	}
@@ -1622,7 +1622,7 @@ function plotPredictionToDataChartCbChange() {
 	if(document.getElementById("plotPredictionToDataChart").checked) {
 		document.getElementById("plotPredictionToDataChartAddDays").disabled = false;
 		document.getElementById("label_plotPredictionToDataChartAddDays").style.color = "#444";
-	} else {
+	}else{
 		document.getElementById("plotPredictionToDataChartAddDays").disabled = true;
 		document.getElementById("label_plotPredictionToDataChartAddDays").style.color = "grey";
 	}
@@ -1633,11 +1633,11 @@ function predictionConfigValAtEndChange(promptT) {
 		document.getElementById("valueAfterDataFromGrowthChart").disabled = false;
 		document.getElementById("label_continuous_endLast").style.color = "grey";
 		predictionConfig.continuous_endVar = false;
-	} else if(document.getElementById("continuous_endLast").checked) {
+	}else if(document.getElementById("continuous_endLast").checked) {
 		document.getElementById("valueAfterDataFromGrowthChart").disabled = true;
 		document.getElementById("label_continuous_endLast").style.color = "#444";
 		predictionConfig.continuous_endVar = false;
-	} else {
+	}else{
 		if(promptT) {
 			predictionConfig.continuous_endVar = true;
 			let specifiedEndVars = prompt(strings.endVarsPrompt, predictionConfig.continuous_endVarValues);
@@ -1645,7 +1645,7 @@ function predictionConfigValAtEndChange(promptT) {
 				let output = parseEndVarValues(specifiedEndVars);
 				if(output.length > 0 && !output.includes(NaN)) {
 					predictionConfig.continuous_endVarValues = specifiedEndVars;
-				} else {
+				}else{
 					alert(strings.endVarsBadFormat + " " + strings.tryItAgaing);
 					predictionConfigValAtEndChange();
 				}
@@ -1661,7 +1661,7 @@ function predictionConfigValAtEndChange(promptT) {
 function predictionConfigDateLimitCbChange() {
 	if(document.getElementById("continuous_limitData").checked) {
 		document.getElementById("growthFactorDateLimit").disabled = false;
-	} else {
+	}else{
 		document.getElementById("growthFactorDateLimit").disabled = true;
 	}
 }
@@ -1740,7 +1740,7 @@ function growthFactorConfigChange() {
 		document.getElementById("label_daysToCalculateGrowthFactorOver").style.color = "grey";
 		document.getElementById("daysToCalculateGrowthFactorOver").disabled = true;
 		growthFactorCalcConfig.days = "all";
-	} else {
+	}else{
 		document.getElementById("label_daysToCalculateGrowthFactorOver").style.color = "#444";
 		document.getElementById("daysToCalculateGrowthFactorOver").disabled = false;
 		growthFactorCalcConfig.days = document.getElementById("daysToCalculateGrowthFactorOver").value;
@@ -1755,12 +1755,12 @@ function growthFactorConfigSH() {
 		calculateSpreadGrowthFactorAndPlot("77%");
 		document.getElementById("growthFactorChartConfig").style.display = "none";
 		document.getElementById("growthFactorChartInfo").style.display = "initial";
-	} else {
+	}else{
 		document.getElementById("growthFactorChartConfig").style.display = "initial";
 		document.getElementById("growthFactorChartInfo").style.display = "none";
 		if(growthFactorCalcConfig.days == "all") {
 			document.getElementById("dataChart_whole").checked = true;
-		} else {
+		}else{
 			document.getElementById("chartConfig_between").checked = true;
 			document.getElementById("daysToCalculateGrowthFactorOver").value = growthFactorCalcConfig.days;
 		}
@@ -1783,7 +1783,7 @@ function calculateSpreadGrowthFactor(dataset) {
 					y: result
 				});
 			}
-		} else {
+		}else{
 			for(i = 0; i < dataset.length - days; i += 1) {
 				let upperSide = dataset[i + days].y - dataset[i].y;
 				let bottomSidePart1 = 0;
@@ -1799,7 +1799,7 @@ function calculateSpreadGrowthFactor(dataset) {
 				let result;
 				if(bottomSide == 0) {
 					result = 0;
-				} else {
+				}else{
 					result = upperSide / bottomSide;
 				}
 				if(result == 0) {
@@ -1810,7 +1810,7 @@ function calculateSpreadGrowthFactor(dataset) {
 								break;
 							}
 						}
-					} else {
+					}else{
 						result = 0;
 					}
 				}
@@ -1843,7 +1843,7 @@ function loadImportsChart(changed) {
 		selectedDate = moment(firstRecordDate);
 		selectedDate.add(parseInt(slider.value, 10), "days");
 		dateThing.value = selectedDate.toISOString().substr(0, 10);
-	} else {
+	}else{
 		selectedDate = moment(dateThing.value);
 		dateDiff = selectedDate.diff(firstRecordDate, 'days');
 		slider.value = dateDiff;
@@ -1888,7 +1888,7 @@ function loadImportsChart(changed) {
 				maintainAspectRatio: false,
 			}
 		});
-	} else {
+	}else{
 		importschart.data = chartData;
 		importschart.update(0);
 	}
@@ -1911,7 +1911,7 @@ function loadAgegroupsChart(changed) {
 		selectedDate = moment(firstRecordDate);
 		selectedDate.add(parseInt(slider.value, 10), "days");
 		dateThing.value = selectedDate.toISOString().substr(0, 10);
-	} else {
+	}else{
 		selectedDate = moment(dateThing.value);
 		dateDiff = selectedDate.diff(firstRecordDate, 'days');
 		slider.value = dateDiff;
@@ -1946,7 +1946,7 @@ function loadAgegroupsChart(changed) {
 				maintainAspectRatio: false,
 			}
 		});
-	} else {
+	}else{
 		agegroupschart.data = chartData;
 		agegroupschart.update(0);
 	}
@@ -1998,7 +1998,7 @@ function calculateSpreadGrowthFactorAndPlot(height) {
 			}
 		};
 		lastHeight = height;
-	} else {
+	}else{
 		infectionGrowthFactorChart.data.datasets[0].data = datasets.spreadGrowthFactor;
 		infectionGrowthFactorChart.update();
 	}
@@ -2035,7 +2035,7 @@ function calculatePredictions() {
 			}
 			if(minDateConfirmedValue == null) {
 				alert(strings.idiotError);
-			} else {
+			}else{
 				indexOfStartSpreadGrowthFactor = 0;
 				lastResult = minDateConfirmedValue;
 				date = new Date(minDateSpreadGrowthKnows);
@@ -2054,7 +2054,7 @@ function calculatePredictions() {
 	let growthFactorUntilDate;
 	if(predictionConfig.growthFactorDataUntilDate < 0) {
 		growthFactorUntilDate = new Date(datasets.confirmedMaxInDay[datasets.confirmedMaxInDay.length + predictionConfig.growthFactorDataUntilDate].x);
-	} else {
+	}else{
 		growthFactorUntilDate = new Date(predictionConfig.growthFactorDataUntilDate);
 	}
 	growthFactorUntilDate.setHours(0, 0, 0, 0);
@@ -2066,7 +2066,7 @@ function calculatePredictions() {
 	while(lastResult <= populationSize && Math.round(lastResult) != Math.round(resultBeforeInfectionPeriod)) {
 		if(day - predictionConfig.infectionPeriod - 1 >= 0) {
 			resultBeforeInfectionPeriod = returnObject.infectedPeopleInDay[day - predictionConfig.infectionPeriod - 1].y;
-		} else {
+		}else{
 			resultBeforeInfectionPeriod = 0;
 		}
 		let MtimesP;
@@ -2078,7 +2078,7 @@ function calculatePredictions() {
 				if(dateOfPotentialIndex.getTime() <= growthFactorUntilDate.getTime()) {
 					MtimesP = datasets.spreadGrowthFactor[indexOfSGF].y;
 					lastMTimesP = MtimesP;
-				} else {
+				}else{
 					MtimesP = lastMTimesP;
 				}
 				if(indexOfSGF > 0) {
@@ -2091,35 +2091,35 @@ function calculatePredictions() {
 						}
 					}
 				}
-			} else {
+			}else{
 				if(predictionConfig.continuous_endCustom && date.getTime() > growthFactorUntilDate.getTime()) {
 					MtimesP = predictionConfig.continuos_endCustom_val;
-				} else if(predictionConfig.continuous_endVar == true) {
+				}else if(predictionConfig.continuous_endVar == true) {
 					if(endVarsIndex < endVars.length) {
 						let endVarFromList = endVars[endVarsIndex];
 						if(endVarFromList == -1) {
 							MtimesP = lastMTimesP;
-						} else {
+						}else{
 							MtimesP = endVarFromList;
 							lastMTimesP = MtimesP;
 						}
 						endVarsIndex += 1;
-					} else {
+					}else{
 						MtimesP = lastMTimesP;
 					}
-				} else {
+				}else{
 					MtimesP = lastMTimesP;
 				}
 			}
-		} else if(predictionConfig.growthFactor == "customFixed") {
+		}else if(predictionConfig.growthFactor == "customFixed") {
 			MtimesP = predictionConfig.averageMeetPerDay * predictionConfig.infectionProbability * 0.01;
-		} else if(predictionConfig.growthFactor == "fixedFromCurrentValue") {
+		}else if(predictionConfig.growthFactor == "fixedFromCurrentValue") {
 			MtimesP = predictionConfigCzechDefaults.averageMeetPerDay * predictionConfigCzechDefaults.infectionProbability * 0.01;
 		}
 		let result;
 		if(predictionConfig.functionName == "henry1") {
 			result = lastResult + MtimesP * (1 - (lastResult / populationSize)) * (lastResult - resultBeforeInfectionPeriod);
-		} else if(predictionConfig.functionName == "henryProbabilistic") {
+		}else if(predictionConfig.functionName == "henryProbabilistic") {
 			let probabilisticProbability = predictionConfig.infectionProbability * 0.01;
 			let meetInThisDay = MtimesP / probabilisticProbability;
 			result = populationSize * (1 - (1 - lastResult / populationSize) * Math.pow((1 - probabilisticProbability * (lastResult - resultBeforeInfectionPeriod) / populationSize), meetInThisDay));
@@ -2129,7 +2129,7 @@ function calculatePredictions() {
 				x: date.toISOString(),
 				y: result
 			});
-		} else {
+		}else{
 			returnObject.infectedPeopleInDay.push({
 				x: date.toISOString(),
 				y: populationSize
@@ -2150,7 +2150,7 @@ function myTodayInfectedProbability() {
 	let resultBeforeInfectionPeriod;
 	if(indexOfRBIP >= 0) {
 		resultBeforeInfectionPeriod = datasets.confirmedMaxInDay[indexOfRBIP];
-	} else {
+	}else{
 		resultBeforeInfectionPeriod = 0;
 	}
 	let probabilityIamInfected = 1 - Math.pow((1 - predictionConfig.infectionProbability * 0.01 * (datasets.confirmedMaxInDay[datasets.confirmedMaxInDay.length - 1].y - resultBeforeInfectionPeriod) / predictionConfig.populationSize), myMeetPerDay);
