@@ -168,10 +168,10 @@ var predictionConfigCzechDefaults = {
 	growthFactorDataUntilDate: -2,
 	averageMeetPerDay: 30,
 	infectionProbability: 30,
-	continuous_endCustom: false,
-	continuos_endCustom_val: 0.5,
+	continuous_endCustom: true,
+	continuos_endCustom_val: 0.13,
 	populationSize: 10649800,
-	continuous_endVar: true,
+	continuous_endVar: false,
 	continuous_endVarValues: "0.25*10; 0.2*10; 0.12",
 	plotPredictionToDataChart: true,
 	plotPredictionToDataChartAddDays: 4
