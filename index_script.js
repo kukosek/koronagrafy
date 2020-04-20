@@ -51,7 +51,7 @@ var czechCovidDbURLs = {
 	confirmed: 'https://raw.githubusercontent.com/kukosek/czech-covid-db/master/uzis/records_confirmed_uzis.csv',
 	recovered: 'https://raw.githubusercontent.com/kukosek/czech-covid-db/master/uzis/records_recovered_uzis.csv',
 	deaths: 'https://raw.githubusercontent.com/kukosek/czech-covid-db/master/uzis/records_deaths_uzis.csv',
-	districtsNumbers: 'https://api.allorigins.win/get?url=https://mapy.cz/covid/data/districts.json',
+	districtsNumbers: 'https://secret-ocean-49799.herokuapp.com/https://mapy.cz/covid/data/districts.json',
 	imports: 'https://raw.githubusercontent.com/kukosek/czech-covid-db/master/uzis/records_imports_uzis.csv',
 	ageGroups: 'https://raw.githubusercontent.com/kukosek/czech-covid-db/master/uzis/records_confirmed-agegroups_uzis.csv'
 };
@@ -1176,11 +1176,11 @@ function loadCurrentData(databaseName) {
 		};
 		let xhrDN = new XMLHttpRequest();
 		xhrDN.open('GET', czechCovidDbURLs.districtsNumbers);
-		xhrDN.setRequestHeader("x-requested-with", "XMLHttpRequest");
+		//xhrDN.setRequestHeader("x-requested-with", "XMLHttpRequest");
 		xhrDN.send();
 		xhrDN.onload = function() {
 			if(xhrDN.status == 200) { // analyze HTTP status of the response
-				czechCovidDbData.districtsNumbers = JSON.parse(JSON.parse(xhrDN.response).contents.replace('/', ''));
+				czechCovidDbData.districtsNumbers = JSON.parse(xhrDN.response.replace('/', ''));
 				data.districtsNumbers = JSON.parse(JSON.stringify(czechCovidDbData.districtsNumbers));
 				if(czechCovidDbArrParsed.confirmed) {
 					let selectedCountry = document.getElementById("stateSelect").value;
