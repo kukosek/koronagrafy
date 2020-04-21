@@ -1484,7 +1484,9 @@ match2.addListener(scaleSmallBox2);
 match3.addListener(scaleSmallBox3);
 match4.addListener(scaleSmallBox4);
 
+var lastPredictionConfigShCountryName;
 function loadPredictionConfigIntoHTML() {
+	lastPredictionConfigShCountryName = document.getElementById("stateSelect").value;
 	document.getElementById("predictionChartDiv").innerHTML = "";
 	document.getElementById("predictionFunctionName").value = predictionConfig.functionName;
 	document.getElementById("mTimesPway").value = predictionConfig.growthFactor;
@@ -1527,12 +1529,14 @@ function saveHTMLtoPredictionConfig() {
 	}else{
 		predictionConfig.growthFactorDataUntilDate = -1;
 	}
-	predictionConfig.populationSize = document.getElementById("populationSize").value;
+	if (document.getElementById("stateSelect").value == lastPredictionConfigShCountryName){
+		predictionConfig.populationSize = document.getElementById("populationSize").value;
+	}
+	lastPredictionConfigShCountryName
 	predictionConfig.plotPredictionToDataChart = document.getElementById("plotPredictionToDataChart").checked;
 	predictionConfig.plotPredictionToDataChartAddDays = document.getElementById("plotPredictionToDataChartAddDays").value;
 }
 var predictionConfigShowed = false;
-
 function predictionConfigSH(calculate) {
 	if(predictionConfigShowed == false) {
 		predictionConfigShowed = true;
