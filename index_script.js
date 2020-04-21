@@ -58,7 +58,8 @@ var czechCovidDbURLs = {
 var csseURLs = {
 	confirmed: 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv',
 	recovered: 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_recovered_global.csv',
-	deaths: 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_global.csv'
+	deaths: 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_global.csv',
+	populations: 'https://raw.githubusercontent.com/samayo/country-json/master/src/country-by-population.json'
 };
 var csseDateFormat = {
 	confirmed: "M/D/YY",
@@ -203,14 +204,7 @@ var growthFactorCalcConfigWorldDefaults = {
 };
 var populations = {
 	world: 7800000000,
-	Germany: 83149300,
-	Italy: 60243406,
-	Spain: 47100396,
-	Iran: 83295597,
 	"Korea, South": 51780579,
-	France: 67069000,
-	China: 1401841400,
-	Netherlands: 17446481,
 	US: 327200000
 };
 var czechRegionsPopulations = {
@@ -427,11 +421,8 @@ var csseArrParseWaiting = {
 	recovered: false,
 	deaths: false
 };
-var csseArrParsed = {
-	confirmed: false,
-	recovered: false,
-	deaths: false
-};
+var csseLoadedConfirmed;
+var csseArrParsed;
 var csseArr = {
 	confirmed: [],
 	recovered: [],
@@ -529,7 +520,6 @@ function databaseChange() {
 		}
 		if(document.getElementById("stateSelect").value != "czechia") {
 			document.getElementById("okresyBox").style.display = "initial";
-			console.log("test");
 		}else{
 			document.getElementById("okresyBox").style.display = "none";
 		}
@@ -643,6 +633,7 @@ function csseParse(datasetName) {
 		predictionConfig.startDate = new Date(datasets[datasetNameMaxInDay][0].x);
 		predictionConfig.startValue = datasets[datasetNameMaxInDay][0].y;
 		predictionConfig.infectionProbability = calculateInfectionDefaultProbability(false, datasets[datasetNameMaxInDay][datasets[datasetNameMaxInDay].length - 1].y, predictionConfig.averageMeetPerDay);
+
 		if(populations.hasOwnProperty(stateName)) {
 			predictionConfig.populationSize = populations[stateName];
 		}else{
@@ -1256,14 +1247,46 @@ function loadCurrentData(databaseName) {
 			alert("Request failed");
 		};
 	}else if(databaseName == "CSSE COVID-19 Dataset") {
+		csseLoadedConfirmed = false;
 		csseArrParsed = {
 			confirmed: false,
 			recovered: false,
-			deaths: false
+			deaths: false,
+			populations: false
 		};
 		/* Fetch current data from CSSEGISandData github
 		 * 
 		 */
+		let xhrPopulations = new XMLHttpRequest();
+		xhrPopulations.open('GET', csseURLs.populations);
+		xhrPopulations.send();
+		xhrPopulations.onload = function() {
+			if(xhrPopulations.status == 200) { // analyze HTTP status of the response
+				let populationList = JSON.parse(xhrPopulations.response);
+				populationList.forEach(element => {
+					populations[element.country] = parseInt(element.population);
+					
+				});
+				csseArrParsed.populations = true;
+				if(csseLoadedConfirmed) {
+					csseParse("confirmed");
+					if(csseArrParseWaiting.recovered) {
+						csseParse("recovered");
+						csseArrParseWaiting.recovered = false;
+					}
+					if(csseArrParseWaiting.deaths) {
+						csseParse("deaths");
+						csseArrParseWaiting.deaths = false;
+					}
+				}
+			}else{ // show the result
+				alert(`Error ${xhrPopulations.status}: ${xhrPopulations.statusText}`); // e.g. 404: Not Found
+			}
+		};
+		xhrPopulations.onerror = function() {
+			alert("Request for country populations failed");
+		};
+		 
 		let xhrConfirmed = new XMLHttpRequest();
 		xhrConfirmed.open('GET', csseURLs.confirmed);
 		xhrConfirmed.send();
@@ -1293,14 +1316,17 @@ function loadCurrentData(databaseName) {
 						optionToAdd.innerHTML = currContryName;
 						document.getElementById("stateSelect").appendChild(optionToAdd);
 					}
-					csseParse("confirmed");
-					if(csseArrParseWaiting.recovered) {
-						csseParse("recovered");
-						csseArrParseWaiting.recovered = false;
-					}
-					if(csseArrParseWaiting.deaths) {
-						csseParse("deaths");
-						csseArrParseWaiting.deaths = false;
+					csseLoadedConfirmed = true;
+					if (csseArrParsed.populations){
+						csseParse("confirmed");
+						if(csseArrParseWaiting.recovered) {
+							csseParse("recovered");
+							csseArrParseWaiting.recovered = false;
+						}
+						if(csseArrParseWaiting.deaths) {
+							csseParse("deaths");
+							csseArrParseWaiting.deaths = false;
+						}
 					}
 				}else{
 					alert("Error parsing confirmed chart dataset\n" + results.errors[0].message);
