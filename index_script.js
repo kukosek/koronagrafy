@@ -1302,7 +1302,7 @@ function loadCurrentData(databaseName) {
 					optionToAdd.innerHTML = strings.world;
 					document.getElementById("stateSelect").appendChild(optionToAdd);
 					detailedStatsSH();
-					for(i = 1; i < csseArr.confirmed.length; i += 1) {
+					for(i = 1; i < csseArr.confirmed.length-1; i += 1) {
 						let currContryName = csseArr.confirmed[i][1];
 						if(!csseCountriesList.includes(currContryName)) {
 							csseCountriesList.push(currContryName);
