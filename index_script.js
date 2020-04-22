@@ -90,6 +90,8 @@ var csStrings = {
 	growthFactorChartLabel: "Faktor šíření",
 	dataChartConfirmedLabel: "Potvrzené případy",
 	dataChartPerDayConfirmedLabel: "Nárůst potvrzených případů",
+	dataChartActiveLabel: "Aktuálně nemocní",
+	dataChartPerDayActiveLabel: "Nárůst počtu aktuálně nemocných",
 	dataChartRecoveredLabel: "Zotavení",
 	dataChartPerDayRecoveredLabel: "Nárůst počtu zotavených",
 	dataChartDeathsLabel: "Úmrtí",
@@ -133,6 +135,8 @@ var enStrings = {
 	growthFactorChartLabel: "Growth factor",
 	dataChartConfirmedLabel: "Confirmed cases",
 	dataChartPerDayConfirmedLabel: "Confirmed cases increase",
+	dataChartActiveLabel: "Currently infected",
+	dataChartPerDayActiveLabel: "Currently infected increase",
 	dataChartRecoveredLabel: "Recovered",
 	dataChartPerDayRecoveredLabel: "Recovered increase",
 	dataChartDeathsLabel: "Deaths",
@@ -305,13 +309,70 @@ function loadDataChart() {
 	let ttformat = 'dddd D. M.';
 	let confirmedDataset = JSON.parse(JSON.stringify(datasets["confirmed" + datasetNameMaxString]));
 	let confirmedLabel;
+	let activeDataset = [];
+	let activeLabel;
 	let recoveredDataset = JSON.parse(JSON.stringify(datasets["recovered" + datasetNameMaxString]));
 	let recoveredLabel;
 	let deathsDataset = JSON.parse(JSON.stringify(datasets["deaths" + datasetNameMaxString]));
 	let deathsLabel;
+
+	let activeCasesPlot = document.getElementById("stateSelect").value == "czechia" || databaseName != "czech-covid-db";
+	if (activeCasesPlot){
+		let recoveredDate = moment(recoveredDataset[0].x);
+		let deathsDate = moment(deathsDataset[0].x);
+		let recoveredStartIndex = (function() {
+			let dateDiff = recoveredDate.diff(moment(confirmedDataset[0].x), 'days');
+			if (dateDiff<0){
+				return 0;
+			}else{
+				return dateDiff;
+			}
+		})();
+		let deathsStartIndex = (function() {
+			let dateDiff = deathsDate.diff(moment(confirmedDataset[0].x), 'days');
+			if (dateDiff<0){
+				return 0;
+			}else{
+				return dateDiff;
+			}
+		})();
+		let desiredDate = moment(confirmedDataset[0].x);
+		let shiftRecovered = 0;
+		let shiftDeaths = 0;
+		let lastNumRecovered = 0;
+		let lastNumDeaths = 0;
+		for (i=0; i<confirmedDataset.length; i++){
+			let numRecovered = 0;
+			if (i>=recoveredStartIndex){
+				let record = recoveredDataset[i-recoveredStartIndex-shiftRecovered];
+				if(record!=undefined && moment(record.x).isSame(desiredDate, 'day')){
+					numRecovered = record.y;
+				}else{
+					numRecovered = lastNumRecovered;
+					shiftRecovered++;
+				}
+			}
+			lastNumRecovered = numRecovered;
+
+			let numDeaths = 0;
+			if (i>=deathsStartIndex){
+				let record = deathsDataset[i-deathsStartIndex-shiftDeaths];
+				if(record!=undefined && moment(record.x).isSame(desiredDate, 'day')){
+					numDeaths = record.y;
+				}else{
+					numDeaths = lastNumDeaths;
+					shiftDeaths++;
+				}
+			}
+			lastNumDeaths = numDeaths;
+			activeDataset.push({x: confirmedDataset[i].x, y: confirmedDataset[i].y-numRecovered-numDeaths});
+			desiredDate.add(1, 'days');
+		}
+	}
 	if(document.getElementById("dataChart_perDay").checked) {
 		let lastValue = 0;
 		confirmedLabel = strings.dataChartPerDayConfirmedLabel;
+		activeLabel = strings.dataChartPerDayActiveLabel;
 		recoveredLabel = strings.dataChartPerDayRecoveredLabel;
 		deathsLabel = strings.dataChartPerDayDeathsLabel;
 		if(optionalDataset != null) {
@@ -321,10 +382,18 @@ function loadDataChart() {
 				lastValue = currValue;
 			}
 		}
+		if (activeCasesPlot){
+			lastValue = 0;
+			for(i = 0; i < confirmedDataset.length; i += 1) {
+				let currValue = confirmedDataset[i].y;
+				confirmedDataset[i].y = currValue - lastValue;
+				lastValue = currValue;
+			}
+		}
 		lastValue = 0;
-		for(i = 0; i < confirmedDataset.length; i += 1) {
-			let currValue = confirmedDataset[i].y;
-			confirmedDataset[i].y = currValue - lastValue;
+		for(i = 0; i < activeDataset.length; i += 1) {
+			let currValue = activeDataset[i].y;
+			activeDataset[i].y = currValue - lastValue;
 			lastValue = currValue;
 		}
 		lastValue = 0;
@@ -341,6 +410,7 @@ function loadDataChart() {
 		}
 	}else{
 		confirmedLabel = strings.dataChartConfirmedLabel;
+		activeLabel = strings.dataChartActiveLabel;
 		recoveredLabel = strings.dataChartRecoveredLabel;
 		deathsLabel = strings.dataChartDeathsLabel;
 	}
@@ -348,7 +418,7 @@ function loadDataChart() {
 			data: confirmedDataset,
 			label: confirmedLabel,
 			borderColor: "#f84f4a",
-			fill: 1
+			fill: true
 		},
 		{
 			data: recoveredDataset,
@@ -369,6 +439,16 @@ function loadDataChart() {
 			label: strings.dataChartPredictionLabel,
 			borderColor: "#964906",
 			fill: false
+		});
+	}
+	if (activeCasesPlot){
+		feeddatasets.push({
+			data: activeDataset,
+			label: activeLabel,
+			borderColor: "#f84f4a",
+			backgroundColor: "#5e00c9",
+			fill: false,
+			hidden: true
 		});
 	}
 	if(dataChart == undefined) {
@@ -422,7 +502,12 @@ var csseArrParseWaiting = {
 	deaths: false
 };
 var csseLoadedConfirmed;
-var csseArrParsed;
+var csseArrParsed  = {
+	confirmed: false,
+	recovered: false,
+	deaths: false,
+	populations: false
+};
 var csseArr = {
 	confirmed: [],
 	recovered: [],
@@ -458,11 +543,7 @@ function databaseChange() {
 			NProgress.start();
 			progressBarShowed = true;
 		}
-		csseArrParsed = {
-			confirmed: false,
-			recovered: false,
-			deaths: false
-		};
+		for(var i in csseArrParsed) csseArrParsed[i] = false;
 		predictionConfig = JSON.parse(JSON.stringify(predictionConfigWorldDefaults));
 		growthFactorCalcConfig = growthFactorCalcConfigWorldDefaults;
 		if(csseArr.confirmed.length == 0) {
@@ -495,11 +576,7 @@ function databaseChange() {
 			NProgress.start();
 			progressBarShowed = true;
 		}
-		czechCovidDbArrParsed = {
-			confirmed: false,
-			recovered: false,
-			deaths: false
-		};
+		for(var i in czechCovidDbArrParsed) czechCovidDbArrParsed[i] = false;
 		predictionConfig = JSON.parse(JSON.stringify(predictionConfigCzechDefaults));
 		predictionConfig.startDate = new Date(predictionConfig.startDate);
 		growthFactorCalcConfig = growthFactorCalcConfigCzechDefaults;
@@ -532,11 +609,7 @@ function countryNameChange() {
 			NProgress.start();
 			progressBarShowed = true;
 		}
-		csseArrParsed = {
-			confirmed: false,
-			recovered: false,
-			deaths: false
-		};
+		for(var i in csseArrParsed) csseArrParsed[i] = false;
 		csseParse("confirmed");
 		csseParse("recovered");
 		csseParse("deaths");
@@ -545,9 +618,10 @@ function countryNameChange() {
 		scaleSmallBox(x);
 		scaleSmallBox2(match2);
 		scaleSmallBox3(match3);
-		czechCovidDbParse("confirmed");
+		for(var i in czechCovidDbArrParsed) czechCovidDbArrParsed[i] = false;
 		czechCovidDbParse("recovered");
 		czechCovidDbParse("deaths");
+		czechCovidDbParse("confirmed");
 		if(document.getElementById("stateSelect").value != "czechia") {
 			document.getElementById("okresyBox").style.display = "initial";
 			scaleSmallBox(x);
@@ -1055,11 +1129,7 @@ function loadCurrentData(databaseName) {
 		xhrTests.onerror = function() {
 			alert("Request failed");
 		};
-		czechCovidDbArrParsed = {
-			confirmed: false,
-			recovered: false,
-			deaths: false
-		};
+		for(var i in czechCovidDbArrParsed) czechCovidDbArrParsed[i] = false;
 		/* Fetch current datasets to charts from kukosek's github
 		 * 
 		 */
@@ -1248,12 +1318,7 @@ function loadCurrentData(databaseName) {
 		};
 	}else if(databaseName == "CSSE COVID-19 Dataset") {
 		csseLoadedConfirmed = false;
-		csseArrParsed = {
-			confirmed: false,
-			recovered: false,
-			deaths: false,
-			populations: false
-		};
+		for(var i in csseArrParsed) csseArrParsed[i] = false;
 		/* Fetch current data from CSSEGISandData github
 		 * 
 		 */
@@ -1735,6 +1800,7 @@ function getDataCalculatePredictionAndPlot() {
 				data: predDataset,
 				label: strings.predictionLabel,
 				borderColor: "#964906",
+				lineTension: 0,
 				fill: false
 			}]
 		},
