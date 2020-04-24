@@ -1540,14 +1540,27 @@ function scaleSmallBox4(w) {
 		document.getElementById("infectionProbabilityBox").style.gridColumn = "";
 	}
 }
+function movePageControls(quer){
+	let indiv;
+	if(quer.matches){
+		indiv = document.getElementById("navBarInfoDiv");
+	}else{
+		indiv = document.getElementById("navBar").children[0];
+	}
+	indiv.appendChild(document.getElementById("databasePick"));
+	indiv.appendChild(document.getElementById("stateSelect"));
+}
 var x = window.matchMedia("(max-width:1655px), (min-width:2075px)");
 var match2 = window.matchMedia("(min-width:1235px) and (max-width:1655px)");
 var match3 = window.matchMedia("(min-width:840px) and (max-width:1235px)");
 var match4 = window.matchMedia("(max-width:840px)");
+var pagecontrolsQuery = window.matchMedia("(max-width:410px)");
 x.addListener(scaleSmallBox);
 match2.addListener(scaleSmallBox2);
 match3.addListener(scaleSmallBox3);
 match4.addListener(scaleSmallBox4);
+pagecontrolsQuery.addListener(movePageControls);
+movePageControls(pagecontrolsQuery);
 
 var lastPredictionConfigShCountryName;
 function loadPredictionConfigIntoHTML() {
