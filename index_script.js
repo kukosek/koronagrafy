@@ -383,17 +383,18 @@ function loadDataChart() {
 			}
 		}
 		if (activeCasesPlot){
+			
 			lastValue = 0;
-			for(i = 0; i < confirmedDataset.length; i += 1) {
-				let currValue = confirmedDataset[i].y;
-				confirmedDataset[i].y = currValue - lastValue;
+			for(i = 0; i < activeDataset.length; i += 1) {
+				let currValue = activeDataset[i].y;
+				activeDataset[i].y = currValue - lastValue;
 				lastValue = currValue;
 			}
 		}
 		lastValue = 0;
-		for(i = 0; i < activeDataset.length; i += 1) {
-			let currValue = activeDataset[i].y;
-			activeDataset[i].y = currValue - lastValue;
+		for(i = 0; i < confirmedDataset.length; i += 1) {
+			let currValue = confirmedDataset[i].y;
+			confirmedDataset[i].y = currValue - lastValue;
 			lastValue = currValue;
 		}
 		lastValue = 0;
