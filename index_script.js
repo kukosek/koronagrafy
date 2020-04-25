@@ -1030,7 +1030,7 @@ function loadDistrictsTable() {
 	for(i = 0; i < data.districtsNumbers.districts.length; i += 1) {
 		let district = data.districtsNumbers.districts[i];
 		if(district.id.substring(0, 5) == regionId) {
-			deathsSum += district.deaths;
+			deathsSum += district.deaths || 0;
 			suitDistricts.push(district);
 		}
 	}
@@ -1045,7 +1045,7 @@ function loadDistrictsTable() {
 		let confirmedCell = row.insertCell(1);
 		confirmedCell.appendChild(document.createTextNode(district.total_cases));
 		let deathsCell = row.insertCell(2);
-		deathsCell.appendChild(document.createTextNode(district.deaths));
+		deathsCell.appendChild(document.createTextNode(district.deaths || 0));
 	}
 	data.deaths.number = deathsSum;
 	document.getElementById("deathsText");
