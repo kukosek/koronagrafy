@@ -1,7 +1,6 @@
-.content {
-  margin: 10px;
-}
-
+body {
+    margin: 10px;
+} 
 .wrapperNavBar {
     display:flex;
     flex-wrap:wrap;
@@ -178,32 +177,32 @@ input[type="range"]::-ms-fill-upper {
     display: none;
 }
 
-#districts {
+.scrolltable {
     border-collapse: collapse;
     table-layout: fixed;
     width: 100%;
 }
 
-#districts thead tr {
+.scrolltable thead tr {
     display: block;
     
 }
 
-#districts tbody{
+.scrolltable tbody{
     display:block;
     width: 100%;
     overflow: auto;
     height: 300px;
 }
 
-#districts td, #districts th {
+.scrolltable td, .scrolltable th {
     border-bottom: 1px solid #444;
     padding: 8px;
     width: 70%;
 }
 
-#districts tbody tr:hover {background-image: linear-gradient(45deg, #d4e1ff 0%, #efcafa 60%);}
-#districts th {
+.scrolltable tbody tr:hover {background-image: linear-gradient(45deg, #d4e1ff 0%, #efcafa 60%);}
+.scrolltable th {
     padding-top: 12px;
     padding-bottom: 12px;
     text-align: left;
@@ -232,7 +231,7 @@ input[type="range"]::-ms-fill-upper {
 /*this is pretty shity solution to a creepy bug but i dont know how to solve it better*/
 @media screen and (max-width:440px){
     .chartsBox {
-        width: 78vw;
+        width: 84vw;
     }
     #navBarLogo {
         align-items: center;
@@ -415,3 +414,52 @@ input[type="range"]::-ms-fill-upper {
         padding:10px;
         margin: 15px;
 }
+
+/*COMPARISIONS.HTML*/
+.wrapperTwoCharts {
+    display:flex;
+}
+.chartsBoxC {
+    font-family: 'PT Mono', monospace;
+    background-image: linear-gradient(45deg, #a1bfff 0%, #ecadff 60%);
+    border-radius: 5px; 
+    font-size: 100%;
+    flex: 50%;
+    max-width: 100%;
+    padding: 20px 20px 75px 20px;
+    margin: 5px;
+    height: 350px;
+}
+
+@media screen and (max-width:840px) {
+    .wrapperTwoCharts{
+        flex-direction: column;
+    }
+}
+
+.selectBox {
+    font-family: 'PT Mono', monospace;
+    background-image: linear-gradient(125deg, #f7b2b2 0%, #a1bfff 100%);
+    border-radius: 5px; 
+    font-size: 100%;
+    padding: 20px 20px 75px 20px;
+    margin: 5px;
+    height: 240px;
+}
+
+#selecttable > tbody {
+    height: 160px;
+}
+#selecttable tr {
+    height: 12px;
+}
+#selecttable td, #selecttable th  {
+    padding-bottom: 1px;
+}
+
+#areaSearch {
+    width: 120px;
+    background-color: transparent;
+    border: none;
+    border-bottom: 2px solid #444;
+  }
