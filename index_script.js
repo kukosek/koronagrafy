@@ -174,7 +174,7 @@ var predictionConfigCzechDefaults = {
 	averageMeetPerDay: 30,
 	infectionProbability: 30,
 	continuous_endCustom: true,
-	continuos_endCustom_val: 0.13,
+	continuos_endCustom_val: 0.16,
 	populationSize: 10649800,
 	continuous_endVar: false,
 	continuous_endVarValues: "0.25*10; 0.2*10; 0.12",
@@ -383,7 +383,6 @@ function loadDataChart() {
 			}
 		}
 		if (activeCasesPlot){
-			
 			lastValue = 0;
 			for(i = 0; i < activeDataset.length; i += 1) {
 				let currValue = activeDataset[i].y;
@@ -1048,7 +1047,6 @@ function loadDistrictsTable() {
 		deathsCell.appendChild(document.createTextNode(district.deaths || 0));
 	}
 	data.deaths.number = deathsSum;
-	document.getElementById("deathsText");
 	document.getElementById("deathsText").getElementsByClassName("statNumber")[0].innerHTML = data.deaths.number;
 }
 var progressBarShowed = false;
