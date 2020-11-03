@@ -1,3 +1,4 @@
+No longer actively maintained. I am too lazy to keep it working all the time. Sorry. Please use the official page - Onemocneni aktualne MZCR
 # [koronagrafy](http://koronagrafy.techbrick.cz)
 Mathematical prediction of COVID-19 pandemic's development. Fetching data from [czech-covid-db](https://github.com/kukosek/czech-covid-db) and Johns Hopkins University [COVID-19 repository](https://github.com/CSSEGISandData/COVID-19/). Everything is downloaded and calculated on the client side. This project has no server side, except the [program](https://github.com/kukosek/czech-covid-db-multiparser) that updates czech-covid-db.
 ### Getting currently displayed data from console
